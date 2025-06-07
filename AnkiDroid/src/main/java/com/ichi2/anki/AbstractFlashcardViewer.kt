@@ -120,7 +120,6 @@ import com.ichi2.anki.reviewer.EaseButton
 import com.ichi2.anki.reviewer.FullScreenMode
 import com.ichi2.anki.reviewer.FullScreenMode.Companion.DEFAULT
 import com.ichi2.anki.reviewer.FullScreenMode.Companion.fromPreference
-import com.ichi2.anki.reviewer.MotionEventHandler
 import com.ichi2.anki.reviewer.PreviousAnswerIndicator
 import com.ichi2.anki.servicelayer.LanguageHintService.applyLanguageHint
 import com.ichi2.anki.servicelayer.NoteService.isMarked
@@ -269,9 +268,6 @@ abstract class AbstractFlashcardViewer :
     protected val gestureProcessor = GestureProcessor(this)
 
     // needs to be lateinit due to a reliance on Context
-
-    /** Handle joysticks/pedals */
-    protected lateinit var motionEventHandler: MotionEventHandler
 
     val server = AnkiServer(this).also { it.start() }
 
@@ -545,7 +541,6 @@ abstract class AbstractFlashcardViewer :
         restorePreferences()
         tagsDialogFactory = TagsDialogFactory(this).attachToActivity<TagsDialogFactory>(this)
         super.onCreate(savedInstanceState)
-        motionEventHandler = MotionEventHandler.createInstance(this)
 
         // Issue 14142: The reviewer had a focus highlight after answering using a keyboard.
         // This theme removes the highlight, but there is likely a better way.
@@ -1688,11 +1683,6 @@ abstract class AbstractFlashcardViewer :
                 true
             }
 
-            ViewerCommand.ABORT_AND_SYNC -> {
-                abortAndSync()
-                true
-            }
-
             ViewerCommand.RECORD_VOICE -> {
                 recordVoice()
                 true
@@ -1786,10 +1776,6 @@ abstract class AbstractFlashcardViewer :
 
     protected open fun changeWhiteboardPenColor() {
         // intentionally blank
-    }
-
-    private fun abortAndSync() {
-        closeReviewer(RESULT_ABORT_AND_SYNC)
     }
 
     override val baseSnackbarBuilder: SnackbarBuilder = {
@@ -2674,7 +2660,6 @@ abstract class AbstractFlashcardViewer :
          */
         const val RESULT_DEFAULT = 50
         const val RESULT_NO_MORE_CARDS = 52
-        const val RESULT_ABORT_AND_SYNC = 53
 
         /**
          * Time to wait in milliseconds before resuming fullscreen mode

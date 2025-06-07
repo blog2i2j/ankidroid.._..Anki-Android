@@ -18,11 +18,10 @@ package com.ichi2.preferences
 import android.content.Context
 import android.util.AttributeSet
 import com.ichi2.anki.cardviewer.GestureProcessor
-import com.ichi2.anki.cardviewer.ViewerCommand
 import com.ichi2.anki.dialogs.CardSideSelectionDialog
+import com.ichi2.anki.preferences.reviewer.ViewerAction
 import com.ichi2.anki.reviewer.Binding
 import com.ichi2.anki.reviewer.CardSide
-import com.ichi2.anki.reviewer.MappableAction
 import com.ichi2.anki.reviewer.MappableBinding.Companion.toPreferenceString
 import com.ichi2.anki.reviewer.ReviewerBinding
 
@@ -44,31 +43,11 @@ class ReviewerControlPreference : ControlPreference {
     @Suppress("unused")
     constructor(context: Context) : super(context)
 
-    /**
-     * The command associated to this preference.
-     */
-    private val viewerCommand: MappableAction<*> = ViewerCommand.fromPreferenceKey(key)!!
-
-    /**
-     *  The side(s) on which this preference can be executed
-     */
-    override val potentialSides = viewerCommand.potentialSides
+    /** The action associated to this preference */
+    private val viewerAction get() = ViewerAction.fromPreferenceKey(key)
 
     override val areGesturesEnabled: Boolean
         get() = sharedPreferences?.getBoolean(GestureProcessor.PREF_KEY, false) ?: false
-
-    /**
-     * If this command can be executed on a single side, execute the callback on this side.
-     * Otherwise, ask the user to select one or two side(s) and execute the callback on them.
-     */
-    private fun selectSide(callback: (c: CardSide) -> Unit) {
-        val potentialSides = potentialSides
-        if (potentialSides != CardSide.BOTH) {
-            callback(potentialSides)
-        } else {
-            CardSideSelectionDialog.displayInstance(context, callback)
-        }
-    }
 
     override fun getMappableBindings(): List<ReviewerBinding> = ReviewerBinding.fromPreferenceString(value).toList()
 
@@ -79,8 +58,8 @@ class ReviewerControlPreference : ControlPreference {
     }
 
     override fun onGestureSelected(binding: Binding) {
-        CardSideSelectionDialog.displayInstance(context) { side ->
-            addBinding(binding, potentialSides)
+        selectSide { side ->
+            addBinding(binding, side)
         }
     }
 
@@ -99,5 +78,17 @@ class ReviewerControlPreference : ControlPreference {
         val bindings = ReviewerBinding.fromPreferenceString(value).toMutableList()
         bindings.add(newBinding)
         value = bindings.toPreferenceString()
+    }
+
+    /**
+     * If this command can be executed on a single side, execute the callback on this side.
+     * Otherwise, ask the user to select one or two side(s) and execute the callback on them.
+     */
+    private fun selectSide(callback: (c: CardSide) -> Unit) {
+        if (viewerAction == ViewerAction.SHOW_ANSWER) {
+            callback(CardSide.ANSWER)
+        } else {
+            CardSideSelectionDialog.displayInstance(context, callback)
+        }
     }
 }
