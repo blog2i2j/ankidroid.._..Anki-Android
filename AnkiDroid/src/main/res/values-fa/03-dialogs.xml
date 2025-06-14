@@ -167,7 +167,7 @@
     <string name="help_item_mailing_list">لیست ایمیل‌ها</string>
     <string name="help_item_reddit">ردیت</string>
     <string name="help_item_report_bug">گزارش مشکل</string>
-    <string name="help_title_support_ankidroid" maxLength="28">AnkiDroid را حمایت کنید</string>
+    <string name="help_title_support_ankidroid" maxLength="28">را حمایت کنید AnkiDroid</string>
     <string name="help_item_support_opencollective_donate">کمک مالی</string>
     <string name="help_item_support_develop_ankidroid">توسعه</string>
     <string name="help_item_support_rate_ankidroid">امتیازدهی</string>
@@ -229,6 +229,10 @@
     <plurals name="set_due_date_label_suffix" comment="a suffix on a text field allowing a user to enter a number of days">
         <item quantity="one">روز</item>
         <item quantity="other">روزها</item>
+    </plurals>
+    <plurals name="set_due_date_current_interval">
+        <item quantity="one">Current interval: %d day</item>
+        <item quantity="other">Current interval: %d days</item>
     </plurals>
     <string name="range_delimiter" comment="Placed between two input boxes to denote a range">-</string>
     <string name="set_due_date_range_start" comment="\'Set Due Date\' may change the due date of a card to a random number of days in the future. This labels the \'minimum\' value of this range (inclusive)">از</string>

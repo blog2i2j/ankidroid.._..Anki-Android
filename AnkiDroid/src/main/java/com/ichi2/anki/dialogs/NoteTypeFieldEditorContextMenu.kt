@@ -16,13 +16,13 @@ import com.ichi2.utils.create
 import timber.log.Timber
 
 /**
- * Note: the class is declared as open only to support testing.
+ * [NoteTypeFieldEditor]'s context menu
  */
-open class NoteTypeEditorContextMenu : AnalyticsDialogFragment() {
+class NoteTypeFieldEditorContextMenu : AnalyticsDialogFragment() {
     @SuppressLint("CheckResult")
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         super.onCreate(savedInstanceState)
-        val availableItems = NoteTypeEditorContextMenuAction.entries.sortedBy { it.order }
+        val availableItems = NoteTypeFieldEditorContextMenuAction.entries.sortedBy { it.order }
 
         return AlertDialog.Builder(requireActivity()).create {
             setTitle(requireArguments().getString(KEY_LABEL))
@@ -33,7 +33,7 @@ open class NoteTypeEditorContextMenu : AnalyticsDialogFragment() {
         }
     }
 
-    enum class NoteTypeEditorContextMenuAction(
+    enum class NoteTypeFieldEditorContextMenuAction(
         val order: Int,
         @StringRes val actionTextId: Int,
     ) {
@@ -41,16 +41,15 @@ open class NoteTypeEditorContextMenu : AnalyticsDialogFragment() {
         Sort(1, R.string.model_field_editor_sort_field),
         Rename(2, R.string.model_field_editor_rename),
         Delete(3, R.string.model_field_editor_delete),
-        ToggleSticky(4, R.string.model_field_editor_toggle_sticky),
-        AddLanguageHint(5, R.string.model_field_editor_language_hint),
+        AddLanguageHint(4, R.string.model_field_editor_language_hint),
     }
 
     companion object {
         @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
         const val KEY_LABEL = "key_label"
 
-        fun newInstance(label: String): NoteTypeEditorContextMenu =
-            NoteTypeEditorContextMenu().apply {
+        fun newInstance(label: String): NoteTypeFieldEditorContextMenu =
+            NoteTypeFieldEditorContextMenu().apply {
                 arguments = bundleOf(KEY_LABEL to label)
             }
     }

@@ -24,7 +24,7 @@ import android.view.MenuItem
 import android.view.View
 import android.webkit.WebView
 import androidx.appcompat.widget.Toolbar
-import androidx.core.os.BundleCompat
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
@@ -39,12 +39,13 @@ import com.ichi2.anki.DispatchKeyEventListener
 import com.ichi2.anki.Flag
 import com.ichi2.anki.R
 import com.ichi2.anki.browser.IdsFile
-import com.ichi2.anki.cardviewer.CardMediaPlayer
+import com.ichi2.anki.previewer.PreviewerFragment.Companion.CARD_IDS_FILE_ARG
+import com.ichi2.anki.reviewer.BindingMap
 import com.ichi2.anki.reviewer.BindingProcessor
 import com.ichi2.anki.reviewer.MappableBinding
-import com.ichi2.anki.reviewer.PeripheralKeymap
 import com.ichi2.anki.snackbar.BaseSnackbarBuilderProvider
 import com.ichi2.anki.snackbar.SnackbarBuilder
+import com.ichi2.anki.utils.ext.collectIn
 import com.ichi2.anki.utils.ext.sharedPrefs
 import com.ichi2.annotations.NeedsTest
 import com.ichi2.utils.performClickIfEnabled
@@ -57,14 +58,7 @@ class PreviewerFragment :
     BaseSnackbarBuilderProvider,
     DispatchKeyEventListener,
     BindingProcessor<MappableBinding, PreviewerAction> {
-    override val viewModel: PreviewerViewModel by viewModels {
-        val idsFile =
-            requireNotNull(BundleCompat.getParcelable(requireArguments(), CARD_IDS_FILE_ARG, IdsFile::class.java)) {
-                "$CARD_IDS_FILE_ARG is required"
-            }
-        val currentIndex = requireArguments().getInt(CURRENT_INDEX_ARG, 0)
-        PreviewerViewModel.factory(idsFile, currentIndex, CardMediaPlayer())
-    }
+    override val viewModel: PreviewerViewModel by viewModels()
     override val webView: WebView
         get() = requireView().findViewById(R.id.webview)
 
@@ -79,7 +73,7 @@ class PreviewerFragment :
                 }
         }
 
-    private lateinit var keyMap: PeripheralKeymap<MappableBinding, PreviewerAction>
+    private lateinit var bindingMap: BindingMap<MappableBinding, PreviewerAction>
 
     override fun onViewCreated(
         view: View,
@@ -178,6 +172,16 @@ class PreviewerFragment :
             viewModel.onPreviousButtonClick()
         }
 
+        view.setOnGenericMotionListener { _, event ->
+            bindingMap.onGenericMotionEvent(event)
+        }
+
+        viewModel.showingAnswer.collectIn(lifecycleScope) {
+            // focus on the whole layout so motion controllers can be captured
+            // without navigating the other View elements
+            view.findViewById<CoordinatorLayout>(R.id.root_layout).requestFocus()
+        }
+
         view.findViewById<MaterialToolbar>(R.id.toolbar).apply {
             setOnMenuItemClickListener(this@PreviewerFragment)
             setNavigationOnClickListener { requireActivity().onBackPressedDispatcher.onBackPressed() }
@@ -187,7 +191,7 @@ class PreviewerFragment :
             view.findViewById<MaterialCardView>(R.id.webview_container).elevation = 0F
         }
 
-        keyMap = PeripheralKeymap(sharedPrefs(), PreviewerAction.entries, this)
+        bindingMap = BindingMap(sharedPrefs(), PreviewerAction.entries, this)
     }
 
     private fun setupFlagMenu(menu: Menu) {
@@ -226,7 +230,7 @@ class PreviewerFragment :
             PreviewerAction.MARK -> viewModel.toggleMark()
             PreviewerAction.EDIT -> editCard()
             PreviewerAction.TOGGLE_BACKSIDE_ONLY -> viewModel.toggleBackSideOnly()
-            PreviewerAction.REPLAY_AUDIO -> viewModel.replayAudios()
+            PreviewerAction.REPLAY_AUDIO -> viewModel.replayMedia()
             PreviewerAction.TOGGLE_FLAG_RED -> viewModel.toggleFlag(Flag.RED)
             PreviewerAction.TOGGLE_FLAG_ORANGE -> viewModel.toggleFlag(Flag.ORANGE)
             PreviewerAction.TOGGLE_FLAG_GREEN -> viewModel.toggleFlag(Flag.GREEN)
@@ -269,7 +273,7 @@ class PreviewerFragment :
 
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
         if (event.action != KeyEvent.ACTION_DOWN) return false
-        return keyMap.onKeyDown(event)
+        return bindingMap.onKeyDown(event)
     }
 
     companion object {

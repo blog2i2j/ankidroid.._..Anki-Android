@@ -51,6 +51,7 @@ import com.ichi2.anki.reviewer.FullScreenMode
 import com.ichi2.anki.reviewer.MappableBinding
 import com.ichi2.anki.reviewer.MappableBinding.Companion.toPreferenceString
 import com.ichi2.anki.reviewer.ReviewerBinding
+import com.ichi2.annotations.NeedsTest
 import com.ichi2.libanki.Consts
 import com.ichi2.utils.HashUtil.hashSetInit
 import timber.log.Timber
@@ -126,6 +127,7 @@ object PreferenceUpgradeService {
                     yield(RemoveNoCodeFormatting())
                     yield(UpgradeBrowserColumns())
                     yield(RemoveLastExportedAtTime())
+                    yield(RemoveLongTouchGesture())
                 }
 
             /** Returns a list of preference upgrade classes which have not been applied */
@@ -314,7 +316,6 @@ object PreferenceUpgradeService {
                     Pair(31, ViewerCommand.PAGE_DOWN),
                     Pair(32, ViewerCommand.TAG),
                     Pair(33, ViewerCommand.CARD_INFO),
-                    Pair(34, ViewerCommand.ABORT_AND_SYNC),
                     Pair(35, ViewerCommand.RECORD_VOICE),
                     Pair(36, ViewerCommand.REPLAY_VOICE),
                     Pair(46, ViewerCommand.SAVE_VOICE),
@@ -675,6 +676,22 @@ object PreferenceUpgradeService {
                 preferences.edit {
                     remove("last_successful_export_mod")
                     remove("last_successful_export_second")
+                }
+            }
+        }
+
+        @NeedsTest("long touch gesture is removed from preferences")
+        internal class RemoveLongTouchGesture : PreferenceUpgrade(21) {
+            override fun upgrade(preferences: SharedPreferences) {
+                for (command in ViewerCommand.entries) {
+                    val value = preferences.getString(command.preferenceKey, null) ?: continue
+                    val bindings = ReviewerBinding.fromPreferenceString(value)
+                    val unknown = bindings.filter { it.binding is Binding.UnknownBinding }
+                    if (unknown.isEmpty()) continue
+                    val newBindings = bindings - unknown
+                    preferences.edit {
+                        putString(command.preferenceKey, newBindings.toPreferenceString())
+                    }
                 }
             }
         }

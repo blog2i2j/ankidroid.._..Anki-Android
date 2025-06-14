@@ -57,6 +57,7 @@ import com.ichi2.libanki.CardId
 import com.ichi2.libanki.CardType
 import com.ichi2.libanki.ChangeManager
 import com.ichi2.libanki.DeckId
+import com.ichi2.libanki.DeckNameId
 import com.ichi2.libanki.QueueType
 import com.ichi2.libanki.QueueType.ManuallyBuried
 import com.ichi2.libanki.QueueType.SiblingBuried
@@ -95,6 +96,15 @@ import kotlin.math.max
 import kotlin.math.min
 
 // TODO: move the tag computation to ViewModel
+
+/**
+ * @param lastDeckIdRepository returns the last selected ID. See [LastDeckIdRepository]
+ * @param cacheDir Temporary location to store data too large to pass via intent
+ * @param options Options passed to CardBrowser on startup
+ * @param preferences Accessor for `SharedPreferences`
+ * @param isFragmented `true` if a NoteEditor side panel is displayed (x-large displays)
+ * @param manualInit test-only: defer `initCompleted` until `manualInit()` is called
+ */
 @NeedsTest("reverseDirectionFlow/sortTypeFlow are not updated on .launch { }")
 @NeedsTest("columIndex1/2 config is not not updated on init")
 @NeedsTest("13442: selected deck is not changed, as this affects the reviewer")
@@ -105,6 +115,7 @@ class CardBrowserViewModel(
     private val cacheDir: File,
     options: CardBrowserLaunchOptions?,
     preferences: SharedPreferencesProvider,
+    val isFragmented: Boolean,
     private val manualInit: Boolean = false,
 ) : ViewModel(),
     SharedPreferencesProvider by preferences {
@@ -206,6 +217,17 @@ class CardBrowserViewModel(
     val rowLongPressFocusFlow = MutableStateFlow<CardOrNoteId?>(null)
 
     val cardSelectionEventFlow = MutableSharedFlow<Unit>()
+
+    /**
+     * If cards are marked or flagged
+     */
+    val flowOfCardStateChanged = MutableSharedFlow<Unit>()
+
+    var focusedRow: CardOrNoteId? = null
+        set(value) {
+            if (!isFragmented) return
+            field = value
+        }
 
     suspend fun queryAllSelectedCardIds() = selectedRows.queryCardIds(this.cardsOrNotes)
 
@@ -440,14 +462,12 @@ class CardBrowserViewModel(
                 saveScrollingState(id)
                 toggleRowSelection(id)
             }
+            focusedRow = id
             rowLongPressFocusFlow.emit(id)
         }
 
-    fun handleCardSelection(
-        cardId: CardId,
-        fragmented: Boolean,
-    ) {
-        createCardSelector(this)(cardId, fragmented)
+    fun handleCardSelection(cardId: CardId) {
+        createCardSelector(this)(cardId, isFragmented)
     }
 
     /** Whether any rows are selected */
@@ -477,6 +497,7 @@ class CardBrowserViewModel(
                 tags.bulkRemove(noteIds, "marked")
             }
         }
+        flowOfCardStateChanged.emit(Unit)
     }
 
     /**
@@ -962,7 +983,8 @@ class CardBrowserViewModel(
 
     suspend fun updateSelectedCardsFlag(flag: Flag): List<CardId> {
         val idsToChange = queryAllSelectedCardIds()
-        undoableOp { setUserFlagForCards(cids = idsToChange, flag = flag) }
+        undoableOp(this) { setUserFlagForCards(cids = idsToChange, flag = flag) }
+        flowOfCardStateChanged.emit(Unit)
         return idsToChange
     }
 
@@ -1120,6 +1142,7 @@ class CardBrowserViewModel(
         fun factory(
             lastDeckIdRepository: LastDeckIdRepository,
             cacheDir: File,
+            isFragmented: Boolean,
             preferencesProvider: SharedPreferencesProvider? = null,
             options: CardBrowserLaunchOptions?,
         ) = viewModelFactory {
@@ -1129,6 +1152,7 @@ class CardBrowserViewModel(
                     cacheDir,
                     options,
                     preferencesProvider ?: AnkiDroidApp.sharedPreferencesProvider,
+                    isFragmented,
                 )
             }
         }
@@ -1180,6 +1204,11 @@ class CardBrowserViewModel(
             lastSelectedPosition = position
         }
     }
+
+    /**
+     * Returns the decks which are suitable for [moveSelectedCardsToDeck]
+     */
+    suspend fun getAvailableDecks(): List<DeckNameId> = withCol { decks.allNamesAndIds(includeFiltered = false) }
 }
 
 enum class SaveSearchResult {

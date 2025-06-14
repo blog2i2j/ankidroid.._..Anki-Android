@@ -15,9 +15,8 @@
  */
 package com.ichi2.anki.previewer
 
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.viewModelScope
 import anki.collection.OpChanges
 import com.ichi2.anki.CollectionManager.withCol
 import com.ichi2.anki.Flag
@@ -31,7 +30,9 @@ import com.ichi2.anki.pages.AnkiServer
 import com.ichi2.anki.reviewer.CardSide
 import com.ichi2.anki.servicelayer.MARKED_TAG
 import com.ichi2.anki.servicelayer.NoteService
+import com.ichi2.anki.utils.ext.collectIn
 import com.ichi2.anki.utils.ext.flag
+import com.ichi2.anki.utils.ext.require
 import com.ichi2.anki.utils.ext.setUserFlagForCards
 import com.ichi2.annotations.NeedsTest
 import com.ichi2.libanki.Card
@@ -45,16 +46,16 @@ import kotlinx.coroutines.flow.update
 import timber.log.Timber
 
 class PreviewerViewModel(
-    idsFile: IdsFile,
-    firstIndex: Int,
-    cardMediaPlayer: CardMediaPlayer,
-) : CardViewerViewModel(cardMediaPlayer),
+    stateHandle: SavedStateHandle,
+) : CardViewerViewModel(CardMediaPlayer()),
     ChangeManager.Subscriber {
-    val currentIndex = MutableStateFlow(firstIndex)
+    val currentIndex = MutableStateFlow<Int>(stateHandle.require(PreviewerFragment.CURRENT_INDEX_ARG))
     val backSideOnly = MutableStateFlow(false)
     val isMarked = MutableStateFlow(false)
     val flag: MutableStateFlow<Flag> = MutableStateFlow(Flag.NONE)
-    private val selectedCardIds: List<Long> = idsFile.getIds()
+    private val selectedCardIds: List<Long> = stateHandle.require<IdsFile>(PreviewerFragment.CARD_IDS_FILE_ARG).getIds()
+
+    override val showingAnswer = MutableStateFlow(stateHandle[SHOWING_ANSWER_KEY] ?: false)
     val isBackButtonEnabled =
         combine(currentIndex, showingAnswer, backSideOnly) { index, showingAnswer, isBackSideOnly ->
             index != 0 || (showingAnswer && !isBackSideOnly)
@@ -68,12 +69,18 @@ class PreviewerViewModel(
 
     override var currentCard: Deferred<Card> =
         asyncIO {
-            withCol { getCard(selectedCardIds[firstIndex]) }
+            withCol { getCard(selectedCardIds[stateHandle.require(PreviewerFragment.CURRENT_INDEX_ARG)]) }
         }
     override val server = AnkiServer(this).also { it.start() }
 
     init {
         ChangeManager.subscribe(this)
+        showingAnswer.collectIn(viewModelScope) {
+            stateHandle[SHOWING_ANSWER_KEY] = it
+        }
+        currentIndex.collectIn(viewModelScope) {
+            stateHandle[PreviewerFragment.CURRENT_INDEX_ARG] = it
+        }
     }
 
     /* *********************************************************************************************
@@ -92,7 +99,7 @@ class PreviewerViewModel(
                 // * after recreation (ViewModel did not exist)
                 // if the ViewModel existed, we want to continue playing audio
                 // if not, we want to setup the sound player
-                cardMediaPlayer.ensureCardSoundsLoaded(currentCard.await())
+                cardMediaPlayer.ensureAvTagsLoaded(currentCard.await())
             }
             return
         }
@@ -110,10 +117,10 @@ class PreviewerViewModel(
             backSideOnly.emit(!backSideOnly.value)
             if (!backSideOnly.value && showingAnswer.value) {
                 showQuestion()
-                cardMediaPlayer.autoplayAllSoundsForSide(CardSide.QUESTION)
+                cardMediaPlayer.autoplayAllForSide(CardSide.QUESTION)
             } else if (backSideOnly.value && !showingAnswer.value) {
                 showAnswer()
-                cardMediaPlayer.autoplayAllSoundsForSide(CardSide.ANSWER)
+                cardMediaPlayer.autoplayAllForSide(CardSide.ANSWER)
             }
         }
     }
@@ -153,7 +160,7 @@ class PreviewerViewModel(
         launchCatchingIO {
             if (!showingAnswer.value && !backSideOnly.value) {
                 showAnswer()
-                cardMediaPlayer.autoplayAllSoundsForSide(CardSide.ANSWER)
+                cardMediaPlayer.autoplayAllForSide(CardSide.ANSWER)
             } else {
                 currentIndex.update { it + 1 }
             }
@@ -176,10 +183,10 @@ class PreviewerViewModel(
 
     suspend fun getNoteEditorDestination() = NoteEditorLauncher.EditNoteFromPreviewer(currentCard.await().id)
 
-    fun replayAudios() {
+    fun replayMedia() {
         launchCatchingIO {
             val side = if (showingAnswer.value) SingleCardSide.BACK else SingleCardSide.FRONT
-            cardMediaPlayer.replayAllSounds(side)
+            cardMediaPlayer.replayAll(side)
         }
     }
 
@@ -222,8 +229,8 @@ class PreviewerViewModel(
                 showingAnswer.value -> CardSide.ANSWER
                 else -> CardSide.QUESTION
             }
-        cardMediaPlayer.loadCardSounds(currentCard.await())
-        cardMediaPlayer.autoplayAllSoundsForSide(side)
+        cardMediaPlayer.loadCardAvTags(currentCard.await())
+        cardMediaPlayer.autoplayAllForSide(side)
     }
 
     /** From the [desktop code](https://github.com/ankitects/anki/blob/1ff55475b93ac43748d513794bcaabd5d7df6d9d/qt/aqt/reviewer.py#L671) */
@@ -242,7 +249,6 @@ class PreviewerViewModel(
         changes: OpChanges,
         handler: Any?,
     ) {
-        Timber.v("PreviewerViewModel::opExecuted %s", changes.toString())
         launchCatchingIO {
             when {
                 changes.noteText -> {
@@ -265,15 +271,6 @@ class PreviewerViewModel(
     }
 
     companion object {
-        fun factory(
-            idsFile: IdsFile,
-            currentIndex: Int,
-            cardMediaPlayer: CardMediaPlayer,
-        ): ViewModelProvider.Factory =
-            viewModelFactory {
-                initializer {
-                    PreviewerViewModel(idsFile, currentIndex, cardMediaPlayer)
-                }
-            }
+        private const val SHOWING_ANSWER_KEY = "showingAnswer"
     }
 }

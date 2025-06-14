@@ -1433,10 +1433,10 @@ class NoteEditor :
             }
             R.id.action_font_size -> {
                 Timber.i("NoteEditor:: Font Size button pressed")
-                val repositionDialog = IntegerDialog()
-                repositionDialog.setArgs(getString(R.string.menu_font_size), editTextFontSize, 2)
-                repositionDialog.setCallbackRunnable { fontSizeSp: Int? -> setFontSize(fontSizeSp) }
-                showDialogFragment(repositionDialog)
+                val fontSizeDialog = IntegerDialog()
+                fontSizeDialog.setArgs(getString(R.string.menu_font_size), editTextFontSize, 2)
+                fontSizeDialog.setCallbackRunnable { fontSizeSp: Int? -> setFontSize(fontSizeSp) }
+                showDialogFragment(fontSizeDialog)
                 return true
             }
             R.id.action_show_toolbar -> {
@@ -2076,14 +2076,21 @@ class NoteEditor :
         toggleStickyButton: ImageButton,
         index: Int,
     ) {
+        val updatedStickyState = !currentFields[index].sticky
+        currentFields[index].sticky = updatedStickyState
         val text = editFields!![index].fieldText
-        if (toggleStickyText[index] == null) {
+        if (updatedStickyState) {
             toggleStickyText[index] = text
             toggleStickyButton.background.alpha = 255
             Timber.d("Saved Text:: %s", toggleStickyText[index])
         } else {
             toggleStickyText.remove(index)
             toggleStickyButton.background.alpha = 64
+        }
+        launchCatchingTask {
+            withCol {
+                this.notetypes.save(editorNote!!.notetype)
+            }
         }
     }
 
@@ -2565,7 +2572,7 @@ class NoteEditor :
                 R.string.CardEditorTags,
                 getColUnsafe.tags
                     .join(getColUnsafe.tags.canonify(selectedTags!!))
-                    .trim { it <= ' ' }
+                    .trim()
                     .replace(" ", ", "),
             )
     }

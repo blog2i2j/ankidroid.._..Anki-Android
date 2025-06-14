@@ -27,6 +27,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.annotation.XmlRes
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import androidx.fragment.app.commit
 import androidx.preference.Preference
@@ -49,17 +50,30 @@ class PreferencesFragment :
     Fragment(R.layout.preferences),
     PreferenceFragmentCompat.OnPreferenceStartFragmentCallback,
     SearchPreferenceResultListener {
-    private val onBackPressedCallback =
-        object : OnBackPressedCallback(true) {
+    private val childFragmentOnBackPressedCallback =
+        object : OnBackPressedCallback(enabled = false) {
             override fun handleOnBackPressed() {
-                if (!settingsIsSplit && childFragmentManager.backStackEntryCount > 0) {
-                    childFragmentManager.popBackStack()
-                } else if (parentFragmentManager.backStackEntryCount > 0) {
-                    parentFragmentManager.popBackStack()
-                } else {
-                    requireActivity().finish()
-                }
+                Timber.i("back pressed - popping child backstack")
+                childFragmentManager.popBackStack()
             }
+        }
+
+    private val parentFragmentOnBackPressedCallback =
+        object : OnBackPressedCallback(enabled = false) {
+            override fun handleOnBackPressed() {
+                Timber.i("back pressed - popping parent backstack")
+                parentFragmentManager.popBackStack()
+            }
+        }
+
+    private val childBackStackListener =
+        FragmentManager.OnBackStackChangedListener {
+            childFragmentOnBackPressedCallback.isEnabled = !settingsIsSplit && childFragmentManager.backStackEntryCount > 0
+        }
+
+    private val parentBackStackListener =
+        FragmentManager.OnBackStackChangedListener {
+            parentFragmentOnBackPressedCallback.isEnabled = parentFragmentManager.backStackEntryCount > 0
         }
 
     override fun onViewCreated(
@@ -68,9 +82,9 @@ class PreferencesFragment :
     ) {
         view
             .findViewById<MaterialToolbar>(R.id.toolbar)
-            .setNavigationOnClickListener { onBackPressedCallback.handleOnBackPressed() }
+            .setNavigationOnClickListener { requireActivity().onBackPressedDispatcher.onBackPressed() }
 
-        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, onBackPressedCallback)
+        setupBackCallbacks()
 
         // Load initial subscreen if activity is being first created
         if (savedInstanceState == null) {
@@ -97,6 +111,12 @@ class PreferencesFragment :
         }
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        parentFragmentManager.removeOnBackStackChangedListener(parentBackStackListener)
+        childFragmentManager.removeOnBackStackChangedListener(childBackStackListener)
+    }
+
     override fun onPreferenceStartFragment(
         caller: PreferenceFragmentCompat,
         pref: Preference,
@@ -115,7 +135,7 @@ class PreferencesFragment :
         fragment.arguments = pref.extras
         childFragmentManager.commit {
             replace(R.id.settings_container, fragment, fragment::class.jvmName)
-            setOpenTransition(this)
+            setFadeTransition(this)
             addToBackStack(null)
         }
         return true
@@ -127,12 +147,20 @@ class PreferencesFragment :
         parentFragmentManager.popBackStack() // clear the search fragment from the backstack
         childFragmentManager.commit {
             replace(R.id.settings_container, fragment, fragment.javaClass.name)
-            setOpenTransition(this)
+            setFadeTransition(this)
             addToBackStack(fragment.javaClass.name)
         }
 
         Timber.i("Highlighting key '%s' on %s", result.key, fragment)
         result.highlight(fragment as PreferenceFragmentCompat)
+    }
+
+    private fun setupBackCallbacks() {
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, childFragmentOnBackPressedCallback)
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, parentFragmentOnBackPressedCallback)
+
+        parentFragmentManager.addOnBackStackChangedListener(parentBackStackListener)
+        childFragmentManager.addOnBackStackChangedListener(childBackStackListener)
     }
 
     private fun setFragmentTitleOnToolbar(fragment: Fragment) {
@@ -142,9 +170,9 @@ class PreferencesFragment :
         view?.findViewById<MaterialToolbar>(R.id.toolbar)?.title = title
     }
 
-    private fun setOpenTransition(fragmentTransaction: FragmentTransaction) {
+    private fun setFadeTransition(fragmentTransaction: FragmentTransaction) {
         if (!sharedPrefs().getBoolean("safeDisplay", false)) {
-            fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+            fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
         }
     }
 
