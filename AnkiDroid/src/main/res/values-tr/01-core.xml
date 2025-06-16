@@ -76,7 +76,7 @@
         <item quantity="one">%1$d gün %2$d saat kaldı</item>
         <item quantity="other">%1$d gün %2$d saat kaldı</item>
     </plurals>
-    <string name="type_answer_hint" comment="In the reviewer. When the user use note type with hint. It\'s the default content of the text field in which the user is invited to type their answer. It disappears as soon as the user start to type.">Cevabı yazın</string>
+    <string name="type_answer_hint" comment="In the reviewer. When the user use note type with hint. It\'s the default content of the text field in which the user is invited to type their answer. It disappears as soon as the user start to type.">Cevabı yaz</string>
     <string name="show_answer" maxLength="41" comment="When displaying the question side of a card. This is the label of a button that display the answer side.">Cevabı göster</string>
     <string name="hide_answer" comment="In the previewer, when the answer side is displayed. This is the label of the button that sends back to the question side.">Cevabı gizle</string>
     <string name="ease_button_again" maxLength="41" comment="In the reviewer, in the answer side. Label of the button that request the card to be shown again soon.">Yeniden</string>
@@ -87,7 +87,7 @@
     <string name="undo" maxLength="28" comment="When tapping on this text, the last action is undone.">Geri al</string>
     <string name="redo" maxLength="28" comment="Menu entry that allows to redo action that was just undone.">Tekrarla</string>
     <!-- flashcard_portrait.xml -->
-    <string name="undo_action_whiteboard_last_stroke" comment="One of the display patterns of \'Undo\' item on the action menu in Reviewer. It is shown as the title of the item when the whiteboard (handwriting) feature is enabled and visible and has any strokes (handwritten lines)" maxLength="28">Konturu geri al</string>
+    <string name="undo_action_whiteboard_last_stroke" comment="One of the display patterns of \'Undo\' item on the action menu in the Study Screen. It is shown as the title of the item when the whiteboard (handwriting) feature is enabled and visible and has any strokes (handwritten lines)" maxLength="28">Konturu geri al</string>
     <string name="move_all_to_deck">Hepsini desteye taşı</string>
     <string name="unbury" maxLength="28">Gömülenleri çıkar</string>
     <string name="rename_deck" maxLength="28">Desteyi yeniden adlandır</string>

@@ -24,6 +24,7 @@ import com.ichi2.anki.R
 import com.ichi2.anki.settings.enums.FrameStyle
 import com.ichi2.anki.settings.enums.HideSystemBars
 import com.ichi2.anki.settings.enums.PrefEnum
+import com.ichi2.anki.settings.enums.ToolbarPosition
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
@@ -73,6 +74,12 @@ object Prefs {
         @StringRes keyResId: Int,
         defValue: Int,
     ): Int = sharedPrefs.getInt(key(keyResId), defValue)
+
+    @VisibleForTesting
+    fun putInt(
+        @StringRes keyResId: Int,
+        defValue: Int,
+    ) = sharedPrefs.edit { putInt(key(keyResId), defValue) }
 
     @VisibleForTesting
     fun <E> getEnum(
@@ -129,23 +136,24 @@ object Prefs {
         }
 
     @VisibleForTesting
-    class StringPref(
-        @StringRes private val keyResId: Int,
-        private val defaultValue: String? = null,
-    ) : ReadWriteProperty<Any?, String?> {
-        override fun getValue(
-            thisRef: Any?,
-            property: KProperty<*>,
-        ): String? = getString(keyResId, defaultValue) ?: defaultValue
+    fun intPref(
+        @StringRes keyResId: Int,
+        defaultValue: Int,
+    ): ReadWriteProperty<Any, Int> =
+        object : ReadWriteProperty<Any?, Int> {
+            override fun getValue(
+                thisRef: Any?,
+                property: KProperty<*>,
+            ): Int = getInt(keyResId, defaultValue)
 
-        override fun setValue(
-            thisRef: Any?,
-            property: KProperty<*>,
-            value: String?,
-        ) {
-            putString(keyResId, value)
+            override fun setValue(
+                thisRef: Any?,
+                property: KProperty<*>,
+                value: Int,
+            ) {
+                putInt(keyResId, value)
+            }
         }
-    }
 
     // ****************************************************************************************** //
     // **************************************** Settings **************************************** //
@@ -172,10 +180,19 @@ object Prefs {
     val hideSystemBars: HideSystemBars
         get() = getEnum(R.string.hide_system_bars_key, HideSystemBars.NONE)
 
+    val toolbarPosition: ToolbarPosition
+        get() = getEnum(R.string.reviewer_toolbar_position_key, ToolbarPosition.TOP)
+
     // ************************************** Accessibility ************************************* //
 
     val answerButtonsSize: Int
         get() = getInt(R.string.answer_button_size_preference, 100)
+
+    // **************************************** Advanced **************************************** //
+
+    var useFixedPortInReviewer by booleanPref(R.string.use_fixed_port_pref_key, false)
+
+    var reviewerPort by intPref(R.string.reviewer_port_pref_key, defaultValue = 0)
 
     // ************************************* Developer options ********************************** //
 

@@ -20,7 +20,6 @@ import android.view.KeyEvent
 import com.ichi2.anki.reviewer.Binding.Companion.keyCode
 import com.ichi2.anki.reviewer.Binding.Companion.unicode
 import com.ichi2.anki.reviewer.Binding.ModifierKeys.Companion.ctrl
-import com.ichi2.anki.reviewer.CardSide
 import com.ichi2.anki.reviewer.MappableAction
 import com.ichi2.anki.reviewer.MappableBinding
 
@@ -30,6 +29,8 @@ enum class PreviewerAction : MappableAction<MappableBinding> {
     MARK,
     EDIT,
     TOGGLE_BACKSIDE_ONLY,
+
+    // TODO: rename to REPLAY_MEDIA and handle previewer_replay_audio_key
     REPLAY_AUDIO,
     TOGGLE_FLAG_RED,
     TOGGLE_FLAG_ORANGE,
@@ -40,8 +41,6 @@ enum class PreviewerAction : MappableAction<MappableBinding> {
     TOGGLE_FLAG_PURPLE,
     UNSET_FLAG,
     ;
-
-    override val potentialSides = CardSide.BOTH
 
     override val preferenceKey = "previewer_$name"
 

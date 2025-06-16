@@ -83,13 +83,13 @@ import com.ichi2.anki.reviewer.AnswerButtons.Companion.getTextColors
 import com.ichi2.anki.reviewer.AnswerTimer
 import com.ichi2.anki.reviewer.AutomaticAnswerAction
 import com.ichi2.anki.reviewer.Binding
+import com.ichi2.anki.reviewer.BindingMap
 import com.ichi2.anki.reviewer.BindingProcessor
 import com.ichi2.anki.reviewer.CardMarker
 import com.ichi2.anki.reviewer.CardSide
 import com.ichi2.anki.reviewer.FullScreenMode
 import com.ichi2.anki.reviewer.FullScreenMode.Companion.fromPreference
 import com.ichi2.anki.reviewer.FullScreenMode.Companion.isFullScreenReview
-import com.ichi2.anki.reviewer.PeripheralKeymap
 import com.ichi2.anki.reviewer.ReviewerBinding
 import com.ichi2.anki.reviewer.ReviewerUi
 import com.ichi2.anki.scheduling.ForgetCardsDialog
@@ -203,7 +203,7 @@ open class Reviewer :
     private lateinit var toolbar: Toolbar
 
     @VisibleForTesting
-    protected open lateinit var processor: PeripheralKeymap<ReviewerBinding, ViewerCommand>
+    protected open lateinit var processor: BindingMap<ReviewerBinding, ViewerCommand>
 
     private val addNoteLauncher =
         registerForActivityResult(
@@ -228,7 +228,7 @@ open class Reviewer :
         textBarReview = findViewById(R.id.review_number)
         toolbar = findViewById(R.id.toolbar)
         micToolBarLayer = findViewById(R.id.mic_tool_bar_layer)
-        processor = PeripheralKeymap(sharedPrefs(), ViewerCommand.entries, this)
+        processor = BindingMap(sharedPrefs(), ViewerCommand.entries, this)
         if (sharedPrefs().getString("answerButtonPosition", "bottom") == "bottom" && !navBarNeedsScrim) {
             setNavigationBarColor(R.attr.showAnswerColor)
         }
@@ -254,11 +254,6 @@ open class Reviewer :
         if (typeAnswer?.autoFocusEditText() == true) {
             answerField?.focusWithKeyboard()
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        server.stop()
     }
 
     protected val flagToDisplay: Flag
@@ -438,8 +433,8 @@ open class Reviewer :
                 onMark(currentCard)
             }
             R.id.action_replay -> {
-                Timber.i("Reviewer:: Replay audio button pressed (from menu)")
-                playSounds(true)
+                Timber.i("Reviewer:: Replay media button pressed (from menu)")
+                playMedia(doMediaReplay = true)
             }
             R.id.action_toggle_mic_tool_bar -> {
                 Timber.i("Reviewer:: Voice playback visibility set to %b", !isMicToolBarVisible)
@@ -872,6 +867,8 @@ open class Reviewer :
         val voicePlaybackIcon = menu.findItem(R.id.action_toggle_mic_tool_bar)
         if (isMicToolBarVisible) {
             voicePlaybackIcon.setTitle(R.string.menu_disable_voice_playback)
+            // #18477: always show 'disable', even if 'enable' was invisible
+            voicePlaybackIcon.isVisible = true
         } else {
             voicePlaybackIcon.setTitle(R.string.menu_enable_voice_playback)
         }
@@ -920,7 +917,7 @@ open class Reviewer :
     }
 
     override fun onGenericMotionEvent(event: MotionEvent?): Boolean {
-        if (motionEventHandler.onGenericMotionEvent(event)) {
+        if (processor.onGenericMotionEvent(event)) {
             return true
         }
         return super.onGenericMotionEvent(event)

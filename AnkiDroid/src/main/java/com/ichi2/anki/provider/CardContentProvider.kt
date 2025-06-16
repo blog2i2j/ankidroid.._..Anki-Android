@@ -18,6 +18,7 @@
  ****************************************************************************************/
 package com.ichi2.anki.provider
 
+import android.annotation.SuppressLint
 import android.content.ContentProvider
 import android.content.ContentUris
 import android.content.ContentValues
@@ -39,6 +40,7 @@ import com.ichi2.anki.common.time.TimeManager
 import com.ichi2.anki.common.utils.annotation.KotlinCleanup
 import com.ichi2.anki.utils.ext.description
 import com.ichi2.libanki.Card
+import com.ichi2.libanki.CardId
 import com.ichi2.libanki.CardTemplate
 import com.ichi2.libanki.Collection
 import com.ichi2.libanki.Deck
@@ -319,14 +321,14 @@ class CardContentProvider : ContentProvider() {
                         try {
                             // check if value is a placeholder ("?"), if so replace with the next value of selectionArgs
                             val value =
-                                if ("?" == keyAndValue[1].trim { it <= ' ' }) {
+                                if ("?" == keyAndValue[1].trim()) {
                                     selectionArgs!![selectionArgIndex++]
                                 } else {
                                     keyAndValue[1]
                                 }
-                            if ("limit" == keyAndValue[0].trim { it <= ' ' }) {
+                            if ("limit" == keyAndValue[0].trim()) {
                                 limit = value.toInt()
-                            } else if ("deckID" == keyAndValue[0].trim { it <= ' ' }) {
+                            } else if ("deckID" == keyAndValue[0].trim()) {
                                 deckIdOfTemporarilySelectedDeck = value.toLong()
                                 if (!selectDeckWithCheck(col, deckIdOfTemporarilySelectedDeck)) {
                                     return rv // if the provided deckID is wrong, return empty cursor.
@@ -413,6 +415,7 @@ class CardContentProvider : ContentProvider() {
             put(deck.newCount)
         }
 
+    @SuppressLint("CheckResult")
     override fun update(
         uri: Uri,
         values: ContentValues?,
@@ -682,12 +685,11 @@ class CardContentProvider : ContentProvider() {
                 col.removeNotes(nids = listOf(uri.pathSegments[1].toLong()))
                 1
             }
-//            MODELS_ID_EMPTY_CARDS -> {
-//                val noteType = col.models.get(getNoteTypeIdFromUri(uri, col)) ?: return -1
-//                val cids: List<Long> = col.genCards(col.models.nids(noteType), noteType)!!
-//                col.removeCardsAndOrphanedNotes(cids)
-//                cids.size
-//            }
+            NOTE_TYPES_ID_EMPTY_CARDS -> {
+                val noteType = col.notetypes.get(getNoteTypeIdFromUri(uri, col)) ?: return -1
+                val cardIdsToRemove = noteType.getEmptyCardIds(col)
+                return col.removeCardsAndOrphanedNotes(cardIdsToRemove).count
+            }
             else -> throw UnsupportedOperationException()
         }
     }
@@ -1362,8 +1364,21 @@ fun Card.pureAnswer(col: Collection): String {
     for (target in arrayOf("<hr id=answer>", "<hr id=\"answer\">")) {
         val pos = s.indexOf(target)
         if (pos == -1) continue
-        return s.substring(pos + target.length).trim { it <= ' ' }
+        return s.substring(pos + target.length).trim()
     }
     // neither found
     return s
+}
+
+/**
+ * Returns the ids of empty cards for a given note type
+ */
+private fun NotetypeJson.getEmptyCardIds(col: Collection): List<CardId> {
+    val noteIdsOfType = col.notetypes.nids(this).toSet()
+
+    return col
+        .getEmptyCards()
+        .notesList
+        .filter { noteIdsOfType.contains(it.noteId) }
+        .flatMap { it.cardIdsList }
 }

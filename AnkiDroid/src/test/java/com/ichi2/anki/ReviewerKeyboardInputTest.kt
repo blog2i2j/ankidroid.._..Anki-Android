@@ -43,8 +43,8 @@ import com.ichi2.anki.cardviewer.Gesture
 import com.ichi2.anki.cardviewer.ViewerCommand
 import com.ichi2.anki.reviewer.Binding.Companion.keyCode
 import com.ichi2.anki.reviewer.Binding.ModifierKeys
+import com.ichi2.anki.reviewer.BindingMap
 import com.ichi2.anki.reviewer.CardSide
-import com.ichi2.anki.reviewer.PeripheralKeymap
 import com.ichi2.anki.reviewer.ReviewerBinding
 import com.ichi2.anki.utils.ext.addBinding
 import com.ichi2.libanki.Card
@@ -167,17 +167,17 @@ class ReviewerKeyboardInputTest : RobolectricTest() {
     }
 
     @Test
-    fun pressingRShouldReplayAudio() {
+    fun pressingRShouldReplayMedia() {
         val underTest = KeyboardInputTestReviewer.displayingAnswer()
         underTest.handleAndroidKeyPress(KEYCODE_R)
-        assertThat("Replay Audio should be called", underTest.replayAudioCalled)
+        assertThat("Replay Media should be called", underTest.replayMediaCalled)
     }
 
     @Test
-    fun pressingF5ShouldReplayAudio() {
+    fun pressingF5ShouldReplayMedia() {
         val underTest = KeyboardInputTestReviewer.displayingAnswer()
         underTest.handleKeyPress(KEYCODE_F5, '\u0000')
-        assertThat("Replay Audio should be called", underTest.replayAudioCalled)
+        assertThat("Replay Media should be called", underTest.replayMediaCalled)
     }
 
     @Test
@@ -249,7 +249,7 @@ class ReviewerKeyboardInputTest : RobolectricTest() {
             private set
         var undoCalled = false
             private set
-        var replayAudioCalled = false
+        var replayMediaCalled = false
             private set
 
         private val cardFlips = mutableListOf<String>()
@@ -260,8 +260,8 @@ class ReviewerKeyboardInputTest : RobolectricTest() {
             displayAnswer = true
         }
 
-        override var processor: PeripheralKeymap<ReviewerBinding, ViewerCommand> =
-            PeripheralKeymap(sharedPrefs(), ViewerCommand.entries, this)
+        override var processor: BindingMap<ReviewerBinding, ViewerCommand> =
+            BindingMap(sharedPrefs(), ViewerCommand.entries, this)
 
         override fun answerFieldIsFocused(): Boolean = focusTextField
 
@@ -420,8 +420,8 @@ class ReviewerKeyboardInputTest : RobolectricTest() {
             return true
         }
 
-        override fun playSounds(doAudioReplay: Boolean) {
-            replayAudioCalled = true
+        override fun playMedia(doMediaReplay: Boolean) {
+            replayMediaCalled = true
         }
 
         override fun buryNote(): Boolean {

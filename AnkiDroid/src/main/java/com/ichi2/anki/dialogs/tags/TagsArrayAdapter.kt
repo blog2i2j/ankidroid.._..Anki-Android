@@ -354,6 +354,7 @@ class TagsArrayAdapter(
      *
      * @param expandTarget The target tag to expand. Do nothing if it is empty or not found.
      */
+    @NeedsTest("#18481 - case insensitivity")
     private fun buildTagTree(expandTarget: String) {
         // init mapping for newly added tags
         filteredList.forEach {
@@ -380,7 +381,7 @@ class TagsArrayAdapter(
         for (tag in filteredList) {
             // root will never be popped
             while (stack.size > 1) {
-                if (!tag.startsWith(stack.peek().tag + "::")) {
+                if (!tag.startsWith(stack.peek().tag + "::", ignoreCase = true)) {
                     stackPopAndPushUp()
                 } else {
                     break
@@ -436,7 +437,7 @@ class TagsArrayAdapter(
             items: List<String>,
         ): List<String> {
             val shownTags = TreeSet<String>()
-            val filterPattern = constraint.toString().lowercase(Locale.getDefault()).trim { it <= ' ' }
+            val filterPattern = constraint.toString().lowercase(Locale.getDefault()).trim()
             val crucialTags =
                 items.filter {
                     it.lowercase(Locale.getDefault()).contains(filterPattern)
