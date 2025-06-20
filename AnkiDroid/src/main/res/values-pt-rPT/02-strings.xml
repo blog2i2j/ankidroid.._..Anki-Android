@@ -60,7 +60,7 @@
     <string name="filter_tags" maxLength="28">Filtrar etiquetas</string>
     <string name="no_tags">Ainda não adicionou quaisquer etiquetas.</string>
     <string name="updated_version">Atualizada para a versão %s</string>
-    <!-- Reviewer.kt -->
+    <!-- Reviewer.kt (Study Screen) -->
     <string name="save_whiteboard" maxLength="28">Guardar o quadro de escrita</string>
     <string name="enable_stylus" maxLength="28">Activar a escrita com caneta</string>
     <string name="disable_stylus">Desactivar a escrita com caneta</string>
@@ -69,7 +69,7 @@
     <string name="show_whiteboard">Mostrar quadro</string>
     <string name="hide_whiteboard" maxLength="28">Esconder quadro</string>
     <string name="clear_whiteboard" maxLength="28">Limpar quadro</string>
-    <string name="replay_audio" maxLength="28">Repetir áudio</string>
+    <string name="replay_media" maxLength="28">Replay media</string>
     <string name="leech_suspend_notification">Ficha marcada como sanguessuga e suspensa</string>
     <string name="leech_notification">Ficha marcada como sanguessuga</string>
     <string name="webview_crash_unknown">Erro desconhecido</string>
@@ -193,7 +193,7 @@
     <!-- Card Template Browser Appearance -->
     <string name="restore_default" maxLength="28">Restaurar predefinições</string>
     <string name="reviewer_tts_cloze_spoken_replacement">Em branco</string>
-    <!-- Whiteboard save image message in Reviewer -->
+    <!-- Whiteboard save image message in the Study Screen -->
     <string name="white_board_image_save_failed">Falha ao guardar a imagem do quadro de escrita. %s</string>
     <string name="white_board_image_saved">Imagem do quadro de escrita guardado em %s</string>
     <string name="title_whiteboard_editor" maxLength="28">Editor do quadro de escrita</string>
@@ -263,7 +263,7 @@
     <string name="search_using_deck_name">Pesquisar utilizando o nome do baralho</string>
     <string name="external_storage_unavailable">Transferência cancelada, o armazenamento externo não está disponível.</string>
     <string name="home" maxLength="28">Página Inicial</string>
-    <!-- Reviewer actions
+    <!-- Study Screen actions
     Each of these strings ends with a period, following the notation of Anki Desktop -->
     <string name="card_buried">Ficha adiada</string>
     <plurals name="note_suspended">
@@ -349,4 +349,6 @@
     <string name="edit_browser_appearance" comment="Description of the shortcut that edits the browser appearance of card template">Editar a aparência do explorador</string>
     <string name="missing_user_action_dialog_message" comment="%s is the user action number">A acção %s não foi definida para este tipo de nota. Por favor configure-o.</string>
     <string name="directory_inaccessible_info">Descubra mais sobre como restaurar o acesso aqui %s, ou vá às definições para actualizar a pasta das colecções.</string>
+    <!-- Scheduler Upgrade Required Dialog title-->
+    <string name="scheduler_upgrade_required_dialog_title" comment="Shown in a dialog when user has imported a collection using a very old version of the Anki spaced repetition scheduler">Scheduler upgrade required</string>
 </resources>

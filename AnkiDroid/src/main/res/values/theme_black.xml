@@ -41,7 +41,8 @@
         <item name="reviewCountColor">@color/material_green_400</item>
         <item name="buryCountColor">@color/disabled_gray_dark</item>
         <item name="zeroCountColor">#202020</item>
-        <!-- Reviewer colors -->
+        <!-- Study Screen colors -->
+        <item name="showAnswerButtonBackground">#0C01579B</item>
         <item name="showAnswerColor">@color/theme_black_primary</item>
         <item name="topBarColor">@color/theme_black_primary</item>
         <item name="maxTimerColor">@color/material_red_300</item>
@@ -51,7 +52,7 @@
         <item name="goodButtonTextColor">@color/material_green_400</item>
         <item name="easyButtonTextColor">@color/material_blue_700</item>
         <item name="alternativeBackgroundColor">#101010</item>
-        <!-- Reviewer button drawables -->
+        <!-- Study Screen button drawables -->
         <item name="againButtonRef">@drawable/footer_button_all_black</item>
         <item name="hardButtonRef">@drawable/footer_button_all_black</item>
         <item name="goodButtonRef">@drawable/footer_button_all_black</item>
@@ -101,6 +102,8 @@
         <!-- Introduction -->
         <item name="introductionLogoTransparent">#55111111</item>
 
+        <!-- Card-->
+        <item name="cardViewStyle">@style/BlackCardBackground</item>
 
         <!-- ProgressDialog-->
         <item name="dialogBackground">@color/theme_black_primary_light</item>
@@ -111,7 +114,11 @@
         <item name="android:textColor">@color/white</item>
     </style>
 
+    <style name="BlackCardBackground" parent="CardView">
+        <item name="cardBackgroundColor">@color/theme_black_primary_light</item>
+    </style>
+
     <style name="ThemeOverlay.AnkiDroid.AlertDialog.Black" parent="ThemeOverlay.AnkiDroid.AlertDialog">
-        <item name="android:background">@color/theme_black_primary_light</item>
+        <item name="android:windowBackground">@drawable/black_round_alert_dialog_background</item>
     </style>
 </resources>

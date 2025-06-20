@@ -60,7 +60,7 @@
     <string name="filter_tags" maxLength="28">Lọc các đuôi</string>
     <string name="no_tags">Bạn chưa thêm bất kỳ đuôi nào</string>
     <string name="updated_version">Đã cập nhật lên phiên bản %s</string>
-    <!-- Reviewer.kt -->
+    <!-- Reviewer.kt (Study Screen) -->
     <string name="save_whiteboard" maxLength="28">Lưu bảng viết</string>
     <string name="enable_stylus" maxLength="28">Bật tính năng viết bằng bút cảm ứng</string>
     <string name="disable_stylus">Tắt tính năng viết bằng bút cảm ứng</string>
@@ -69,7 +69,7 @@
     <string name="show_whiteboard">Hiện bảng viết</string>
     <string name="hide_whiteboard" maxLength="28">Ẩn bảng viết</string>
     <string name="clear_whiteboard" maxLength="28">Xoá bảng viết</string>
-    <string name="replay_audio" maxLength="28">Phát lại âm thanh</string>
+    <string name="replay_media" maxLength="28">Replay media</string>
     <string name="leech_suspend_notification">Thẻ được đánh dấu là thẻ khó và đã tạm dừng</string>
     <string name="leech_notification">Thẻ được đánh dấu là thẻ khó</string>
     <string name="webview_crash_unknown">Lỗi không xác định</string>
@@ -189,7 +189,7 @@
     <!-- Card Template Browser Appearance -->
     <string name="restore_default" maxLength="28">Khôi phục mặc định</string>
     <string name="reviewer_tts_cloze_spoken_replacement">Chỗ trống</string>
-    <!-- Whiteboard save image message in Reviewer -->
+    <!-- Whiteboard save image message in the Study Screen -->
     <string name="white_board_image_save_failed">Không thể lưu hình ảnh bảng trắng. %s</string>
     <string name="white_board_image_saved">Hình ảnh bảng trắng được lưu vào %s</string>
     <string name="title_whiteboard_editor" maxLength="28">Trình chỉnh sửa bảng trắng</string>
@@ -259,7 +259,7 @@
     <string name="search_using_deck_name">Tìm kiếm theo tên bộ thẻ</string>
     <string name="external_storage_unavailable">Tải xuống bị hủy, bộ nhớ ngoài không khả dụng</string>
     <string name="home" maxLength="28">Trang chủ</string>
-    <!-- Reviewer actions
+    <!-- Study Screen actions
     Each of these strings ends with a period, following the notation of Anki Desktop -->
     <string name="card_buried">Các thẻ bị chôn</string>
     <plurals name="note_suspended">
@@ -343,4 +343,6 @@
     <string name="edit_browser_appearance" comment="Description of the shortcut that edits the browser appearance of card template">Chỉnh sửa giao diện trình duyệt</string>
     <string name="missing_user_action_dialog_message" comment="%s is the user action number">User action %s is not set in this notetype. Please configure it</string>
     <string name="directory_inaccessible_info">Learn more about how to restore access here %s or go to settings to update collection folder.</string>
+    <!-- Scheduler Upgrade Required Dialog title-->
+    <string name="scheduler_upgrade_required_dialog_title" comment="Shown in a dialog when user has imported a collection using a very old version of the Anki spaced repetition scheduler">Scheduler upgrade required</string>
 </resources>

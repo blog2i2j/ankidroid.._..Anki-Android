@@ -60,7 +60,7 @@
     <string name="filter_tags" maxLength="28">टैग छानें</string>
     <string name="no_tags">अपने अभी तक कोई टैग नहीं जोड़ा है</string>
     <string name="updated_version">%s संस्करण को अद्यतित किया गया</string>
-    <!-- Reviewer.kt -->
+    <!-- Reviewer.kt (Study Screen) -->
     <string name="save_whiteboard" maxLength="28">श्वेतपट्ट सहेजें</string>
     <string name="enable_stylus" maxLength="28">स्टाइलस मोड सक्षम करें</string>
     <string name="disable_stylus">स्टाइलस मोड अक्षम करें</string>
@@ -69,7 +69,7 @@
     <string name="show_whiteboard">श्वेतपट्ट दिखाएँ</string>
     <string name="hide_whiteboard" maxLength="28">श्वेतपट्ट छिपाएं</string>
     <string name="clear_whiteboard" maxLength="28">श्वेतपट्ट साफ करें</string>
-    <string name="replay_audio" maxLength="28">ध्वनि फिर चलाएँ</string>
+    <string name="replay_media" maxLength="28">Replay media</string>
     <string name="leech_suspend_notification">जोंक के रूप में के रूप में चिह्नित और निलंबित कार्ड</string>
     <string name="leech_notification">जोंक के रूप में के रूप में चिह्नित कार्ड</string>
     <string name="webview_crash_unknown">अज्ञात त्रुटि</string>
@@ -193,7 +193,7 @@
     <!-- Card Template Browser Appearance -->
     <string name="restore_default" maxLength="28">पहले जैसा कर देना</string>
     <string name="reviewer_tts_cloze_spoken_replacement">रिक्त</string>
-    <!-- Whiteboard save image message in Reviewer -->
+    <!-- Whiteboard save image message in the Study Screen -->
     <string name="white_board_image_save_failed">श्वेतपट्ट छवि को सहेजने में विफल। %s</string>
     <string name="white_board_image_saved">श्वेतपट्ट छवि %s में सहेजी गई</string>
     <string name="title_whiteboard_editor" maxLength="28">श्वेतपट्ट संपादक</string>
@@ -263,7 +263,7 @@
     <string name="search_using_deck_name">डेक नाम का उपयोग करके खोजें</string>
     <string name="external_storage_unavailable">डाउनलोड निरस्त हो गया, बाह्य स्टोरेज  उपलब्ध नहीं है</string>
     <string name="home" maxLength="28">गृह</string>
-    <!-- Reviewer actions
+    <!-- Study Screen actions
     Each of these strings ends with a period, following the notation of Anki Desktop -->
     <string name="card_buried">कार्ड दफन।</string>
     <plurals name="note_suspended">
@@ -349,4 +349,6 @@
     <string name="edit_browser_appearance" comment="Description of the shortcut that edits the browser appearance of card template">ब्राउज़र स्वरूप संपादित करें</string>
     <string name="missing_user_action_dialog_message" comment="%s is the user action number">इस नोटटाइप में उपयोगकर्ता कार्रवाई %s सेट नहीं है. कृपया इसे कॉन्फ़िगर करें</string>
     <string name="directory_inaccessible_info">यहां %s तक पहुंच बहाल करने के तरीके के बारे में और जानें या संग्रह फ़ोल्डर को अपडेट करने के लिए सेटिंग्स पर जाएं।</string>
+    <!-- Scheduler Upgrade Required Dialog title-->
+    <string name="scheduler_upgrade_required_dialog_title" comment="Shown in a dialog when user has imported a collection using a very old version of the Anki spaced repetition scheduler">Scheduler upgrade required</string>
 </resources>

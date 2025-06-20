@@ -44,7 +44,6 @@ import com.ichi2.anki.R
 import com.ichi2.anki.analytics.AnalyticsDialogFragment
 import com.ichi2.anki.common.utils.annotation.KotlinCleanup
 import com.ichi2.anki.dialogs.DeckSelectionDialog.DecksArrayAdapter.DecksFilter
-import com.ichi2.anki.dialogs.DeckSelectionDialog.SelectableDeck
 import com.ichi2.anki.launchCatchingTask
 import com.ichi2.anki.showThemedToast
 import com.ichi2.annotations.NeedsTest
@@ -247,23 +246,22 @@ open class DeckSelectionDialog : AnalyticsDialogFragment() {
             if (field != null) {
                 return field
             }
+            val parentFragment = parentFragment
+            if (parentFragment is DeckSelectionListener) {
+                return parentFragment
+            }
             val activity: Activity = requireActivity()
             if (activity is DeckSelectionListener) {
                 return activity
             }
-            val parentFragment = parentFragment
-            if (parentFragment is DeckSelectionListener) {
-                return parentFragment
-            } else {
-                // try to find inside the activity an active fragment that is a DeckSelectionListener
-                val foundAvailableFragments =
-                    parentFragmentManager.fragments.filter {
-                        it.isResumed && it is DeckSelectionListener
-                    }
-                if (foundAvailableFragments.isNotEmpty()) {
-                    // if we found at least one resumed candidate fragment use it
-                    return foundAvailableFragments[0] as DeckSelectionListener
+            // try to find inside the activity an active fragment that is a DeckSelectionListener
+            val foundAvailableFragments =
+                parentFragmentManager.fragments.filter {
+                    it.isResumed && it is DeckSelectionListener
                 }
+            if (foundAvailableFragments.isNotEmpty()) {
+                // if we found at least one resumed candidate fragment use it
+                return foundAvailableFragments[0] as DeckSelectionListener
             }
             throw IllegalStateException("Neither activity or any fragment in the activity were a selection listener")
         }
@@ -399,8 +397,10 @@ open class DeckSelectionDialog : AnalyticsDialogFragment() {
         private fun hasSubDecks(node: DeckNode): Boolean = node.children.isNotEmpty()
 
         private fun isViewable(deck: DeckNode): Boolean {
-            val parentNode = deck.parent ?: return true
-            return !parentNode.get()?.collapsed!! && isViewable(parentNode.get()!!)
+            val parentNodeRef = deck.parent ?: return true
+            // The parent belongs to the tree retained by [allDecksList], so should still exist.
+            val parentNode = parentNodeRef.get()!!
+            return !parentNode.collapsed && isViewable(parentNode)
         }
 
         override fun getItemCount(): Int = currentlyDisplayedDecks.size
@@ -414,7 +414,7 @@ open class DeckSelectionDialog : AnalyticsDialogFragment() {
                 constraint: CharSequence,
                 items: List<DeckNode>,
             ): List<DeckNode> {
-                val filterPattern = constraint.toString().lowercase(Locale.getDefault()).trim { it <= ' ' }
+                val filterPattern = constraint.toString().lowercase(Locale.getDefault()).trim()
                 return items.filter {
                     it.fullDeckName.lowercase(Locale.getDefault()).contains(filterPattern)
                 }

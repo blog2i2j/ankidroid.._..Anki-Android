@@ -79,7 +79,7 @@
     <string name="card_details_tags">Etikedoj</string>
     <string-array name="card_browser_order_labels">
         <item>Sen ordigo (pli rapide)</item>
-        <item>Laŭ ordig-kampon</item>
+        <item>Laŭ ordiga kampo</item>
         <item>Laŭ tempo de kreo</item>
         <item>Laŭ modif‑dato de noto</item>
         <item>Laŭ modif‑dato de karto</item>
@@ -121,6 +121,6 @@
     <string name="user_potential_columns">Disponeblaj</string>
     <string name="include_column">Aldoni kolumnon</string>
     <string name="exclude_column">Forigi kolumnon</string>
-    <string name="save_changes_message">Please save your changes first</string>
+    <string name="save_changes_message">Unue konservu viajn ŝanĝojn</string>
     <string name="browser_find_replace_loading_fields">Akirado de nomoj de kampoj&#8230;</string>
 </resources>

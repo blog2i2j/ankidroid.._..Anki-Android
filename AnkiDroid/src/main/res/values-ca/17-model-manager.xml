@@ -49,6 +49,7 @@
     <string name="model_browser_template">Edita les targetes</string>
     <!--Rename-->
     <string name="rename_model">Canvieu el nom del tipus de nota</string>
+    <string name="rename_card_type">Rename card type</string>
     <!--Language Hint-->
     <string name="model_field_editor_language_hint_dialog_success_result">Estableix consell d\'idioma a %s</string>
     <!--Field Editing-->
@@ -58,7 +59,6 @@
     <string name="model_field_editor_rename">Canviar el nom del camp</string>
     <string name="model_field_editor_language_hint">Estableix consell d\'idioma del teclat</string>
     <string name="model_field_editor_reposition_menu">Camp de repós</string>
-    <string name="model_field_editor_toggle_sticky">Recordeu la darrera entrada al afegir</string>
     <string name="model_field_editor_changing">Actualitzant els camps</string>
     <string name="model_field_editor_sort_field">Ordena per aquest camp</string>
     <!--Warnings-->

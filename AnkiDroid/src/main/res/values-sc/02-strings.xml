@@ -60,7 +60,7 @@
     <string name="filter_tags" maxLength="28">Filtra sas etichetas</string>
     <string name="no_tags">No as galu annànghidu eticheta peruna</string>
     <string name="updated_version">Atualizadu a sa versione %s</string>
-    <!-- Reviewer.kt -->
+    <!-- Reviewer.kt (Study Screen) -->
     <string name="save_whiteboard" maxLength="28">Sarva sa lavagna</string>
     <string name="enable_stylus" maxLength="28">Abìlita sa modalidade penninu</string>
     <string name="disable_stylus">Disabìlita sa modalidade penninu</string>
@@ -69,7 +69,7 @@
     <string name="show_whiteboard">Ammustra sa lavagna</string>
     <string name="hide_whiteboard" maxLength="28">Cua sa lavagna</string>
     <string name="clear_whiteboard" maxLength="28">Isbòida sa lavagna</string>
-    <string name="replay_audio" maxLength="28">Riprodui s\'àudio</string>
+    <string name="replay_media" maxLength="28">Replay media</string>
     <string name="leech_suspend_notification">Carta marcada comente sambisua e suspèndida</string>
     <string name="leech_notification">Carta marcada comente sambisua</string>
     <string name="webview_crash_unknown">Faddina disconnota</string>
@@ -196,7 +196,7 @@
     <!-- Card Template Browser Appearance -->
     <string name="restore_default" maxLength="28">Torra a sos valores predefinidos</string>
     <string name="reviewer_tts_cloze_spoken_replacement">Bòidu</string>
-    <!-- Whiteboard save image message in Reviewer -->
+    <!-- Whiteboard save image message in the Study Screen -->
     <string name="white_board_image_save_failed">Sarvamentu de s\'immàgine de sa lavagna fallidu. %s</string>
     <string name="white_board_image_saved">Immàgine de sa lavagna sarvada in %s</string>
     <string name="title_whiteboard_editor" maxLength="28">Editore de sa lavagna</string>
@@ -266,7 +266,7 @@
     <string name="search_using_deck_name">Chirca impreende su nùmene de su matzu</string>
     <string name="external_storage_unavailable">Iscarrigamentu annulladu, sa memòria esterna no est a disponimentu</string>
     <string name="home" maxLength="28">Pàgina printzipale</string>
-    <!-- Reviewer actions
+    <!-- Study Screen actions
     Each of these strings ends with a period, following the notation of Anki Desktop -->
     <string name="card_buried">Carta interrada.</string>
     <plurals name="note_suspended">
@@ -352,4 +352,6 @@
     <string name="edit_browser_appearance" comment="Description of the shortcut that edits the browser appearance of card template">Modìfica s\'aparèntzia de su navigadore</string>
     <string name="missing_user_action_dialog_message" comment="%s is the user action number">S\'atzione de utente %s no est cunfigurada pro custa casta de nota. Cunfigura·la</string>
     <string name="directory_inaccessible_info">Impara de prus subra de comente ripristinare s\'atzessu inoghe %s o bae a sas impostatziones pro atualizare sa cartella de sas colletziones.</string>
+    <!-- Scheduler Upgrade Required Dialog title-->
+    <string name="scheduler_upgrade_required_dialog_title" comment="Shown in a dialog when user has imported a collection using a very old version of the Anki spaced repetition scheduler">Scheduler upgrade required</string>
 </resources>

@@ -35,13 +35,14 @@ import com.ichi2.anki.dialogs.ConfirmationDialog
 import com.ichi2.anki.dialogs.LocaleSelectionDialog
 import com.ichi2.anki.dialogs.LocaleSelectionDialog.Companion.KEY_SELECTED_LOCALE
 import com.ichi2.anki.dialogs.LocaleSelectionDialog.Companion.REQUEST_HINT_LOCALE_SELECTION
-import com.ichi2.anki.dialogs.NoteTypeEditorContextMenu.Companion.newInstance
-import com.ichi2.anki.dialogs.NoteTypeEditorContextMenu.NoteTypeEditorContextMenuAction
+import com.ichi2.anki.dialogs.NoteTypeFieldEditorContextMenu.Companion.newInstance
+import com.ichi2.anki.dialogs.NoteTypeFieldEditorContextMenu.NoteTypeFieldEditorContextMenuAction
 import com.ichi2.anki.servicelayer.LanguageHintService.setLanguageHintForField
 import com.ichi2.anki.snackbar.showSnackbar
 import com.ichi2.anki.utils.ext.dismissAllDialogFragments
 import com.ichi2.anki.utils.ext.setFragmentResultListener
 import com.ichi2.anki.utils.ext.showDialogFragment
+import com.ichi2.annotations.NeedsTest
 import com.ichi2.libanki.Collection
 import com.ichi2.libanki.Fields
 import com.ichi2.libanki.NotetypeJson
@@ -60,6 +61,7 @@ import org.json.JSONException
 import timber.log.Timber
 import java.util.Locale
 
+@NeedsTest("perform one action, then another")
 class NoteTypeFieldEditor : AnkiActivity() {
     // Position of the current field selected
     private var currentPos = 0
@@ -178,7 +180,7 @@ class NoteTypeFieldEditor : AnkiActivity() {
             }
             offset++
         }
-        input = input.substring(offset).trim { it <= ' ' }
+        input = input.substring(offset).trim()
         if (input.isEmpty()) {
             showThemedToast(this, resources.getString(R.string.toast_empty_name), true)
             return null
@@ -500,14 +502,6 @@ class NoteTypeFieldEditor : AnkiActivity() {
         initialize()
     }
 
-    /**
-     * Toggle the "Remember last input" setting AKA the "Sticky" setting
-     */
-    private fun toggleStickyField() {
-        val field = noteFields[currentPos]
-        field.sticky = !field.sticky
-    }
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean =
         when (item.itemId) {
             R.id.action_add_new_model -> {
@@ -521,14 +515,13 @@ class NoteTypeFieldEditor : AnkiActivity() {
         finish()
     }
 
-    fun handleAction(contextMenuAction: NoteTypeEditorContextMenuAction) {
+    fun handleAction(contextMenuAction: NoteTypeFieldEditorContextMenuAction) {
         when (contextMenuAction) {
-            NoteTypeEditorContextMenuAction.Sort -> sortByField()
-            NoteTypeEditorContextMenuAction.Reposition -> repositionFieldDialog()
-            NoteTypeEditorContextMenuAction.Delete -> deleteFieldDialog()
-            NoteTypeEditorContextMenuAction.Rename -> renameFieldDialog()
-            NoteTypeEditorContextMenuAction.ToggleSticky -> toggleStickyField()
-            NoteTypeEditorContextMenuAction.AddLanguageHint -> localeHintDialog()
+            NoteTypeFieldEditorContextMenuAction.Sort -> sortByField()
+            NoteTypeFieldEditorContextMenuAction.Reposition -> repositionFieldDialog()
+            NoteTypeFieldEditorContextMenuAction.Delete -> deleteFieldDialog()
+            NoteTypeFieldEditorContextMenuAction.Rename -> renameFieldDialog()
+            NoteTypeFieldEditorContextMenuAction.AddLanguageHint -> localeHintDialog()
         }
     }
 
@@ -546,6 +539,7 @@ class NoteTypeFieldEditor : AnkiActivity() {
         setLanguageHintForField(getColUnsafe.notetypes, notetype, currentPos, selectedLocale)
         val format = getString(R.string.model_field_editor_language_hint_dialog_success_result, selectedLocale.displayName)
         showSnackbar(format, Snackbar.LENGTH_SHORT)
+        initialize()
     }
 
     @VisibleForTesting(otherwise = VisibleForTesting.NONE)

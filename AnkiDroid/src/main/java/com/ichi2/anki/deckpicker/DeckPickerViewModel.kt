@@ -20,10 +20,19 @@ import androidx.annotation.CheckResult
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import anki.card_rendering.EmptyCardsReport
+import anki.collection.OpChanges
 import anki.i18n.GeneratedTranslations
 import com.ichi2.anki.CollectionManager.TR
 import com.ichi2.anki.CollectionManager.withCol
 import com.ichi2.anki.DeckPicker
+import com.ichi2.anki.OnErrorListener
+import com.ichi2.anki.browser.BrowserDestination
+import com.ichi2.anki.launchCatchingIO
+import com.ichi2.anki.noteeditor.NoteEditorLauncher
+import com.ichi2.anki.notetype.ManageNoteTypesDestination
+import com.ichi2.anki.pages.DeckOptionsDestination
+import com.ichi2.anki.reviewreminders.ScheduleRemindersDestination
+import com.ichi2.anki.utils.Destination
 import com.ichi2.libanki.CardId
 import com.ichi2.libanki.Consts
 import com.ichi2.libanki.DeckId
@@ -35,13 +44,17 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 /** @see [DeckPicker] */
-class DeckPickerViewModel : ViewModel() {
+class DeckPickerViewModel :
+    ViewModel(),
+    OnErrorListener {
     /**
      * @see deleteDeck
      * @see DeckDeletionResult
      */
     val deckDeletedNotification = MutableSharedFlow<DeckDeletionResult>()
     val emptyCardsNotification = MutableSharedFlow<EmptyCardsResult>()
+    val flowOfDestination = MutableSharedFlow<Destination>()
+    override val onError = MutableSharedFlow<String>()
 
     /**
      * A notification that the study counts have changed
@@ -123,6 +136,52 @@ class DeckPickerViewModel : ViewModel() {
             withCol { decks.select(deckId) }
             undoableOp { sched.emptyDyn(decks.selected()) }
             flowOfDeckCountsChanged.emit(Unit)
+        }
+
+    fun browseCards(deckId: DeckId) =
+        launchCatchingIO {
+            withCol { decks.select(deckId) }
+            flowOfDestination.emit(BrowserDestination(deckId))
+        }
+
+    fun addNote(
+        deckId: DeckId?,
+        setAsCurrent: Boolean,
+    ) = launchCatchingIO {
+        if (deckId != null && setAsCurrent) {
+            withCol { decks.select(deckId) }
+        }
+        flowOfDestination.emit(NoteEditorLauncher.AddNote(deckId))
+    }
+
+    /**
+     * Opens the Manage Note Types screen.
+     */
+    fun openManageNoteTypes() = launchCatchingIO { flowOfDestination.emit(ManageNoteTypesDestination()) }
+
+    /**
+     * Opens study options for the provided deck
+     *
+     * @param deckId Deck to open options for
+     * @param isFiltered (optional) optimization for when we know the deck is filtered
+     */
+    fun openDeckOptions(
+        deckId: DeckId,
+        isFiltered: Boolean? = null,
+    ) = launchCatchingIO {
+        // open cram options if filtered deck, otherwise open regular options
+        val filtered = isFiltered ?: withCol { decks.isFiltered(deckId) }
+        flowOfDestination.emit(DeckOptionsDestination(deckId = deckId, isFiltered = filtered))
+    }
+
+    fun unburyDeck(deckId: DeckId) =
+        launchCatchingIO {
+            undoableOp<OpChanges> { sched.unburyDeck(deckId) }
+        }
+
+    fun scheduleReviewReminders(deckId: DeckId) =
+        viewModelScope.launch {
+            flowOfDestination.emit(ScheduleRemindersDestination(false, deckId))
         }
 }
 
