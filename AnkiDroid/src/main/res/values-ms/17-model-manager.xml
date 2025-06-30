@@ -47,6 +47,7 @@
     <string name="model_browser_template">Sunting kad</string>
     <!--Rename-->
     <string name="rename_model">Nama semula jenis nota</string>
+    <string name="rename_card_type">Rename card type</string>
     <!--Language Hint-->
     <string name="model_field_editor_language_hint_dialog_success_result">Tetapkan petunjuk bahasa kepada %s</string>
     <!--Field Editing-->
@@ -56,7 +57,6 @@
     <string name="model_field_editor_rename">Nama semula medan</string>
     <string name="model_field_editor_language_hint">Tetapkan petunjuk bahasa papan kekunci</string>
     <string name="model_field_editor_reposition_menu">Alih posisi medan</string>
-    <string name="model_field_editor_toggle_sticky">Ingat input terakhir apabila menambah</string>
     <string name="model_field_editor_changing">Mengemas kini medan</string>
     <string name="model_field_editor_sort_field">Susun ikut medan ini</string>
     <!--Warnings-->

@@ -41,9 +41,8 @@ import anki.scheduler.SchedulingStates
 import anki.scheduler.UnburyDeckRequest
 import anki.scheduler.cardAnswer
 import anki.scheduler.scheduleCardsAsNewRequest
-import com.ichi2.anki.Ease
+import com.ichi2.anki.common.time.SECONDS_PER_DAY
 import com.ichi2.anki.common.time.TimeManager.time
-import com.ichi2.anki.utils.SECONDS_PER_DAY
 import com.ichi2.libanki.Card
 import com.ichi2.libanki.CardId
 import com.ichi2.libanki.CardType
@@ -226,7 +225,11 @@ open class Scheduler(
         return intervalForState(state)
     }
 
-    /** Update a V1 scheduler collection to V2. Requires full sync. */
+    /**
+     * Update a V1 scheduler collection to V2. Requires full sync.
+     *
+     * @throws com.ichi2.libanki.exception.ConfirmModSchemaException
+     */
     fun upgradeToV2() {
         col.modSchema()
         col.backend.upgradeScheduler()

@@ -60,16 +60,18 @@
     <string name="filter_tags" maxLength="28">Фільтраваць меткі</string>
     <string name="no_tags">Вы пакуль не дадалі ніводнай меткі</string>
     <string name="updated_version">Абноўлена да версіі %s</string>
-    <!-- Reviewer.kt -->
+    <!-- Reviewer.kt (Study Screen) -->
     <string name="save_whiteboard" maxLength="28">Захаваць дошку</string>
     <string name="enable_stylus" maxLength="28">Уключыць рэжым стылуса</string>
     <string name="disable_stylus">Адключыць рэжым стылуса</string>
     <string name="enable_whiteboard" maxLength="28">Уключыць дошку</string>
     <string name="disable_whiteboard">Адключыць дошку</string>
     <string name="show_whiteboard">Паказаць дошку</string>
+    <string name="enable_eraser" maxLength="28">Enable eraser</string>
+    <string name="disable_eraser" maxLength="28">Disable eraser</string>
     <string name="hide_whiteboard" maxLength="28">Схаваць дошку</string>
     <string name="clear_whiteboard" maxLength="28">Ачысціць дошку</string>
-    <string name="replay_audio" maxLength="28">Паўтарыць аўдыя</string>
+    <string name="replay_media" maxLength="28">Replay media</string>
     <string name="leech_suspend_notification">Картка пазначана як надакучлівая і была прыпынена</string>
     <string name="leech_notification">Картка пазначаная як надакучлівая</string>
     <string name="webview_crash_unknown">Невядомая памылка</string>
@@ -201,7 +203,10 @@
     <!-- Card Template Browser Appearance -->
     <string name="restore_default" maxLength="28">Вярнуцца да прадвызначаных</string>
     <string name="reviewer_tts_cloze_spoken_replacement">Пуста</string>
-    <!-- Whiteboard save image message in Reviewer -->
+    <!-- Whiteboard eraser mode toggle message in Reviewer -->
+    <string name="white_board_eraser_enabled">Eraser mode activated</string>
+    <string name="white_board_eraser_disabled">Eraser mode deactivated</string>
+    <!-- Whiteboard save image message in the Study Screen -->
     <string name="white_board_image_save_failed">Не атрымалася захаваць відарыс дошкі. %s</string>
     <string name="white_board_image_saved">Відарыс дошкі захаваны ў %s</string>
     <string name="title_whiteboard_editor" maxLength="28">Рэдактар дошкі</string>
@@ -271,7 +276,7 @@
     <string name="search_using_deck_name">Пошук па назве калоды</string>
     <string name="external_storage_unavailable">Спампоўванне абарвана, бо знешняе сховішча недаступна.</string>
     <string name="home" maxLength="28">Галоўная</string>
-    <!-- Reviewer actions
+    <!-- Study Screen actions
     Each of these strings ends with a period, following the notation of Anki Desktop -->
     <string name="card_buried">Адкладзеная картка.</string>
     <plurals name="note_suspended">
@@ -361,4 +366,6 @@
     <string name="edit_browser_appearance" comment="Description of the shortcut that edits the browser appearance of card template">Рэдагаваць выгляд браўзера</string>
     <string name="missing_user_action_dialog_message" comment="%s is the user action number">User action %s is not set in this notetype. Please configure it</string>
     <string name="directory_inaccessible_info">Learn more about how to restore access here %s or go to settings to update collection folder.</string>
+    <!-- Scheduler Upgrade Required Dialog title-->
+    <string name="scheduler_upgrade_required_dialog_title" comment="Shown in a dialog when user has imported a collection using a very old version of the Anki spaced repetition scheduler">Scheduler upgrade required</string>
 </resources>

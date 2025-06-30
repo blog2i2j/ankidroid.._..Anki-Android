@@ -16,6 +16,7 @@
 
 package com.ichi2.testutils
 
+import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatDelegate
 import com.ichi2.anki.CollectionManager
 import com.ichi2.anki.ioDispatcher
@@ -31,7 +32,6 @@ import com.ichi2.libanki.NotetypeJson
 import com.ichi2.libanki.Notetypes
 import com.ichi2.libanki.QueueType
 import com.ichi2.libanki.exception.ConfirmModSchemaException
-import com.ichi2.libanki.utils.set
 import com.ichi2.testutils.ext.addNote
 import com.ichi2.utils.LanguageUtil
 import kotlinx.coroutines.Dispatchers
@@ -122,14 +122,14 @@ interface TestClass {
     ): String {
         val noteType = col.notetypes.new(name)
         for (field in fields) {
-            col.notetypes.addFieldInNewNoteType(noteType, col.notetypes.newField(field))
+            col.notetypes.addFieldLegacy(noteType, col.notetypes.newField(field))
         }
         val t =
             Notetypes.newTemplate("Card 1").also { tmpl ->
                 tmpl.qfmt = qfmt
                 tmpl.afmt = afmt
             }
-        col.notetypes.addTemplateInNewNoteType(noteType, t)
+        col.notetypes.addTemplate(noteType, t)
         col.notetypes.add(noteType)
         return name
     }
@@ -241,6 +241,7 @@ interface TestClass {
     }
 
     /** Helper method to update a note */
+    @SuppressLint("CheckResult")
     fun Note.update(block: Note.() -> Unit): Note {
         block(this)
         col.updateNote(this)
@@ -304,6 +305,7 @@ interface TestClass {
     fun Note.numberOfCards() = this.numberOfCards(col)
 
     // TODO remove this. not in libanki
+    @SuppressLint("CheckResult")
     fun Note.flush() {
         col.updateNote(this)
     }

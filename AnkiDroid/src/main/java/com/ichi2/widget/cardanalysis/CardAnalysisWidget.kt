@@ -30,7 +30,7 @@ import com.ichi2.anki.IntentHandler.Companion.intentToReviewDeckFromShorcuts
 import com.ichi2.anki.R
 import com.ichi2.anki.analytics.UsageAnalytics
 import com.ichi2.anki.isCollectionEmpty
-import com.ichi2.anki.pages.DeckOptions
+import com.ichi2.anki.pages.DeckOptionsDestination
 import com.ichi2.libanki.DeckId
 import com.ichi2.libanki.Decks.Companion.NOT_FOUND_DECK_ID
 import com.ichi2.widget.ACTION_UPDATE_WIDGET
@@ -166,7 +166,7 @@ class CardAnalysisWidget : AnalyticsWidgetProvider() {
             appWidgetManager.updateAppWidget(appWidgetId, remoteViews)
         }
 
-        private fun showDeck(
+        private suspend fun showDeck(
             context: Context,
             appWidgetManager: AppWidgetManager,
             appWidgetId: Int,
@@ -189,7 +189,7 @@ class CardAnalysisWidget : AnalyticsWidgetProvider() {
                 if (!isEmptyDeck) {
                     intentToReviewDeckFromShorcuts(context, deckData.deckId)
                 } else {
-                    DeckOptions.getIntent(context, deckData.deckId)
+                    DeckOptionsDestination.fromDeckId(deckData.deckId).toIntent(context)
                 }
             val pendingIntent =
                 PendingIntent.getActivity(

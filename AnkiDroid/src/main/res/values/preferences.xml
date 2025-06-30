@@ -67,11 +67,13 @@
     <string name="custom_button_suspend_key">customButtonSuspend</string>
     <string name="custom_button_delete_key">customButtonDelete</string>
     <string name="custom_button_enable_whiteboard_key">customButtonEnableWhiteboard</string>
+    <string name="custom_button_toggle_eraser_key">customButtonToggleEraser</string>
     <string name="custom_button_toggle_stylus_key">customButtonToggleStylus</string>
     <string name="custom_button_save_whiteboard_key">customButtonSaveWhiteboard</string>
     <string name="custom_button_whiteboard_pen_color_key">customButtonWhiteboardPenColor</string>
     <string name="custom_button_show_hide_whiteboard_key">customButtonShowHideWhiteboard</string>
     <string name="custom_button_clear_whiteboard_key">customButtonClearWhiteboard</string>
+    <string name="custom_button_toggle_auto_advance">customButtonToggleAutoAdvance</string>
     <string name="custom_button_user_action_1_key">customButtonUserAction1</string>
     <string name="custom_button_user_action_2_key">customButtonUserAction2</string>
     <string name="custom_button_user_action_3_key">customButtonUserAction3</string>
@@ -118,11 +120,11 @@
     <string name="page_down_command_key">binding_PAGE_DOWN</string>
     <string name="tag_command_key">binding_TAG</string>
     <string name="card_info_command_key">binding_CARD_INFO</string>
-    <string name="abort_and_sync_command_key">binding_ABORT_AND_SYNC</string>
     <string name="record_voice_command_key">binding_RECORD_VOICE</string>
     <string name="replay_voice_command_key">binding_REPLAY_VOICE</string>
     <string name="save_voice_command_key">binding_SAVE_VOICE</string>
     <string name="toggle_whiteboard_command_key">binding_TOGGLE_WHITEBOARD</string>
+    <string name="toggle_eraser_command_key">binding_TOGGLE_ERASER</string>
     <string name="clear_whiteboard_command_key">binding_CLEAR_WHITEBOARD</string>
     <string name="change_whiteboard_pen_color_command_key">binding_CHANGE_WHITEBOARD_PEN_COLOR</string>
     <string name="show_hint_command_key">binding_SHOW_HINT</string>
@@ -145,7 +147,7 @@
     <string name="previewer_back_key">previewer_BACK</string>
     <string name="previewer_mark_key">previewer_MARK</string>
     <string name="previewer_edit_key">previewer_EDIT</string>
-    <string name="previewer_replay_audio_key">previewer_REPLAY_AUDIO</string>
+    <string name="previewer_replay_media_key">previewer_REPLAY_AUDIO</string>
     <string name="previewer_backside_only_action_key">previewer_BACKSIDE_ONLY</string>
     <string name="previewer_flag_red_key">previewer_TOGGLE_FLAG_RED</string>
     <string name="previewer_flag_orange_key">previewer_TOGGLE_FLAG_ORANGE</string>
@@ -192,6 +194,8 @@
     <string name="pref_notifications_minimum_cards_due_key">minimumCardsDueForNotification</string>
     <string name="pref_notifications_vibrate_key">widgetVibrate</string>
     <string name="pref_notifications_blink_key">widgetBlink</string>
+    <!-- Review reminders -->
+    <string name="pref_review_reminders_screen_key">reviewRemindersScreen</string>
     <!-- Developer options -->
     <string name="pref_dev_options_screen_key">devOptionsKey</string>
     <string name="pref_trigger_crash_key">trigger_crash_preference</string>
@@ -205,6 +209,8 @@
     <string name="pref_new_notifications">newNotifications</string>
     <string name="dev_options_enabled_by_user_key">devOptionsEnabledByUser</string>
     <string name="pref_cat_wip_key">workInProgressDevOptions</string>
+    <string name="reviewer_port_pref_key">reviewerPort</string>
+    <string name="use_fixed_port_pref_key">useFixedPort</string>
     <!-- Developer options > Create fake notes -->
     <string name="pref_fill_default_deck_number_key">FillDefaultNumberDeck</string>
     <string name="pref_fill_default_deck_key">FillDefaultDeck</string>
@@ -225,12 +231,13 @@
     <string name="pref_weekly_backups_to_keep_key">weekly_backups_to_keep</string>
     <string name="pref_monthly_backups_to_keep_key">monthly_backups_to_keep</string>
 
-    <!-- Reviewer options -->
+    <!-- Study Screen options -->
     <string name="hide_system_bars_key">hideSystemBars</string>
     <string name="ignore_display_cutout_key">ignoreDisplayCutout</string>
     <string name="hide_answer_buttons_key">hideAnswerButtons</string>
     <string name="hide_hard_and_easy_key">hideHardAndEasy</string>
     <string name="reviewer_menu_settings_key">reviewerMenuSettings</string>
     <string name="reviewer_frame_style_key">reviewerFrameStyle</string>
+    <string name="reviewer_toolbar_position_key">reviewerToolbarPosition</string>
 
 </resources>

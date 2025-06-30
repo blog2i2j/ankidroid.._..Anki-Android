@@ -20,7 +20,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.IdRes
 import com.ichi2.anki.CollectionManager.TR
 import com.ichi2.anki.CollectionManager.withCol
-import com.ichi2.anki.utils.ext.getStringOrNull
+import com.ichi2.anki.common.utils.ext.getStringOrNull
 import org.json.JSONObject
 
 enum class Flag(
@@ -37,29 +37,33 @@ enum class Flag(
      * Color for the background of cards with this flag in the card browser.
      */
     @ColorRes val browserColorRes: Int?,
+    @ColorRes val studyScreenColorRes: Int?,
 ) {
-    NONE(0, R.id.flag_none, R.drawable.ic_flag_transparent, null),
-    RED(1, R.id.flag_red, R.drawable.ic_flag_red, R.color.flag_red),
+    NONE(0, R.id.flag_none, R.drawable.ic_flag_transparent, browserColorRes = null, studyScreenColorRes = null),
+    RED(1, R.id.flag_red, R.drawable.ic_flag_red, R.color.flag_red, R.color.flag_reviewer_red),
     ORANGE(
         2,
         R.id.flag_orange,
         R.drawable.ic_flag_orange,
         R.color.flag_orange,
+        R.color.flag_reviewer_orange,
     ),
-    GREEN(3, R.id.flag_green, R.drawable.ic_flag_green, R.color.flag_green),
-    BLUE(4, R.id.flag_blue, R.drawable.ic_flag_blue, R.color.flag_blue),
-    PINK(5, R.id.flag_pink, R.drawable.ic_flag_pink, R.color.flag_pink),
+    GREEN(3, R.id.flag_green, R.drawable.ic_flag_green, R.color.flag_green, R.color.flag_reviewer_green),
+    BLUE(4, R.id.flag_blue, R.drawable.ic_flag_blue, R.color.flag_blue, R.color.flag_reviewer_blue),
+    PINK(5, R.id.flag_pink, R.drawable.ic_flag_pink, R.color.flag_pink, R.color.flag_reviewer_pink),
     TURQUOISE(
         6,
         R.id.flag_turquoise,
         R.drawable.ic_flag_turquoise,
         R.color.flag_turquoise,
+        R.color.flag_reviewer_turquoise,
     ),
     PURPLE(
         7,
         R.id.flag_purple,
         R.drawable.ic_flag_purple,
         R.color.flag_purple,
+        R.color.flag_reviewer_purple,
     ),
     ;
 

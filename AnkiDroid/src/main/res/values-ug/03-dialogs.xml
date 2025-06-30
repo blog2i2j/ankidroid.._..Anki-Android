@@ -147,7 +147,7 @@
     <string name="error_deleting_image">سۈرەت ئۆچۈرۈۋاتقاندا خاتالىق كۆرۈلدى</string>
     <string name="failed_to_apply_background_image">تەگلىك سۈرىتى %s نى قوللىنالمىدى</string>
     <string name="background_image_too_large">دەستە تاللىغۇچ تەگلىكى بەك چوڭ</string>
-    <string name="image_max_size_allowed" comment="Consider keeping the unbreakable space after the digit">Maximum image size %d MB allowed</string>
+    <string name="image_max_size_allowed" comment="Consider keeping the unbreakable space after the digit">يول قويۇلىدىغان ئەڭ چوڭ سۈرەت چوڭلۇقى %dMB</string>
     <string name="image_dimensions_too_large">سۈرەت ئۆلچىمى بەك چوڭ (%1$d×%2$d)</string>
     <!-- Global Intent handler -->
     <!-- Also used by Card Browser, not renaming to save translators effort -->
@@ -187,8 +187,8 @@
     <string name="help_dialog_exception_report_sent">دوكلات يوللانغان ئىدى!</string>
     <!--Sync-->
     <plurals name="sync_automatic_sync_needs_more_time">
-        <item quantity="one" comment="Consider keeping the unbreakable space after the digit">An automatic sync may be triggered in %d second</item>
-        <item quantity="other" comment="Consider keeping the unbreakable space after the digit">An automatic sync may be triggered in %d seconds</item>
+        <item quantity="one" comment="Consider keeping the unbreakable space after the digit">ئۆزلۈكىدىن قەدەمداشلاش %d سېكۇنتتا قوزغىلىشى مۇمكىن</item>
+        <item quantity="other" comment="Consider keeping the unbreakable space after the digit">ئۆزلۈكىدىن قەدەمداشلاش %d سېكۇنتتا قوزغىلىشى مۇمكىن</item>
     </plurals>
     <string name="metered_sync_data_warning">ئىنتېرنېت تەمىنلىگۈچىڭىز ئىشلەتكەن سانلىق مەلۇماتقا ھەق ئېلىشى مۇمكىن</string>
     <string name="deck_picker_new">بۈگۈن بۇ دەستىدە كۆرۈنىدىغان يېڭى كارتا سانى.</string>
@@ -229,6 +229,10 @@
     <plurals name="set_due_date_label_suffix" comment="a suffix on a text field allowing a user to enter a number of days">
         <item quantity="one">كۈن</item>
         <item quantity="other">كۈن</item>
+    </plurals>
+    <plurals name="set_due_date_current_interval">
+        <item quantity="one">نۆۋەتتىكى ئارىلىق: %d كۈن</item>
+        <item quantity="other">نۆۋەتتىكى ئارىلىق: %d كۈن</item>
     </plurals>
     <string name="range_delimiter" comment="Placed between two input boxes to denote a range">–</string>
     <string name="set_due_date_range_start" comment="\'Set Due Date\' may change the due date of a card to a random number of days in the future. This labels the \'minimum\' value of this range (inclusive)">كىمدىن</string>

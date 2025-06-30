@@ -34,6 +34,8 @@ package com.ichi2.libanki
 import androidx.annotation.CheckResult
 import anki.collection.OpChanges
 import anki.collection.OpChangesWithId
+import anki.notetypes.ChangeNotetypeInfo
+import anki.notetypes.ChangeNotetypeRequest
 import anki.notetypes.Notetype
 import anki.notetypes.NotetypeId
 import anki.notetypes.NotetypeNameId
@@ -41,19 +43,21 @@ import anki.notetypes.NotetypeNameIdUseCount
 import anki.notetypes.StockNotetype
 import anki.notetypes.restoreNotetypeToStockRequest
 import com.google.protobuf.ByteString
-import com.ichi2.anki.CrashReportService
+import com.ichi2.anki.common.annotations.NeedsTest
 import com.ichi2.anki.common.time.TimeManager
-import com.ichi2.annotations.NeedsTest
 import com.ichi2.libanki.Utils.checksum
 import com.ichi2.libanki.backend.BackendUtils
 import com.ichi2.libanki.backend.BackendUtils.fromJsonBytes
 import com.ichi2.libanki.backend.BackendUtils.toJsonBytes
-import com.ichi2.libanki.exception.ConfirmModSchemaException
 import com.ichi2.libanki.utils.LibAnkiAlias
 import com.ichi2.libanki.utils.NotInLibAnki
 import com.ichi2.libanki.utils.append
-import com.ichi2.utils.len
+import com.ichi2.libanki.utils.index
+import com.ichi2.libanki.utils.insert
+import com.ichi2.libanki.utils.len
+import com.ichi2.libanki.utils.remove
 import net.ankiweb.rsdroid.RustCleanup
+import net.ankiweb.rsdroid.exceptions.BackendInvalidInputException
 import net.ankiweb.rsdroid.exceptions.BackendNotFoundException
 import org.intellij.lang.annotations.Language
 import org.json.JSONArray
@@ -64,8 +68,6 @@ class NoteTypeNameID(
     val name: String,
     val id: NoteTypeId,
 )
-
-private typealias int = Long
 
 class Notetypes(
     val col: Collection,
@@ -106,12 +108,12 @@ class Notetypes(
     }
 
     @LibAnkiAlias("_remove_from_cache")
-    internal fun removeFromCache(ntid: int) {
+    internal fun removeFromCache(ntid: NoteTypeId) {
         cache.remove(ntid)
     }
 
     @LibAnkiAlias("_get_cached")
-    private fun getCached(ntid: int): NotetypeJson? = cache[ntid]
+    private fun getCached(ntid: NoteTypeId): NotetypeJson? = cache[ntid]
 
     @NeedsTest("14827: styles are updated after syncing style changes")
     @LibAnkiAlias("_clear_cache")
@@ -132,10 +134,10 @@ class Notetypes(
 
     // legacy
 
-    fun ids(): Set<int> = allNamesAndIds().map { it.id }.toSet()
+    fun ids(): Set<NoteTypeId> = allNamesAndIds().map { it.id }.toSet()
 
     // only used by importing code
-    fun have(id: int): Boolean = allNamesAndIds().any { it.id == id }
+    fun have(id: NoteTypeId): Boolean = allNamesAndIds().any { it.id == id }
 
     /*
     # Current note type
@@ -165,7 +167,7 @@ class Notetypes(
      */
 
     @LibAnkiAlias("id_for_name")
-    fun idForName(name: String): Long? =
+    fun idForName(name: String): NoteTypeId? =
         try {
             col.backend.getNotetypeIdByName(name)
         } catch (e: BackendNotFoundException) {
@@ -173,10 +175,10 @@ class Notetypes(
         }
 
     /** "Get model with ID, or None." */
-    fun get(id: int): NotetypeJson? = get(id as int?)
+    fun get(id: NoteTypeId): NotetypeJson? = get(id as NoteTypeId?)
 
     /** Externally, we do not want to pass in a null id */
-    private fun get(id: int?): NotetypeJson? {
+    private fun get(id: NoteTypeId?): NotetypeJson? {
         if (id == null) {
             return null
         }
@@ -229,7 +231,7 @@ class Notetypes(
     }
 
     /** Modifies schema. */
-    fun remove(id: int) {
+    fun remove(id: NoteTypeId) {
         removeFromCache(id)
         col.backend.removeNotetype(id)
     }
@@ -279,10 +281,10 @@ class Notetypes(
      */
 
     @NotInLibAnki
-    fun nids(model: NotetypeJson): List<int> = nids(model.id)
+    fun nids(model: NotetypeJson): List<NoteId> = nids(model.id)
 
     /** Note ids for M. */
-    fun nids(ntid: int): List<int> = col.db.queryLongList("select id from notes where mid = ?", ntid)
+    fun nids(ntid: NoteTypeId): List<NoteId> = col.db.queryLongList("select id from notes where mid = ?", ntid)
 
     /** Number of note using M. */
     fun useCount(notetype: NotetypeJson): Int = col.db.queryLongScalar("select count() from notes where mid = ?", notetype.id).toInt()
@@ -426,43 +428,6 @@ class Notetypes(
         save(notetype)
     }
 
-    /**
-     * similar to Anki's addField; but thanks to assumption that
-     * model is new, it never has to throw
-     * [ConfirmModSchemaException]
-     */
-    @RustCleanup("Since Kotlin doesn't have throws, this may not be needed")
-    fun addFieldInNewNoteType(
-        notetype: NotetypeJson,
-        field: Field,
-    ) {
-        check(isModelNew(notetype)) { "Model was assumed to be new, but is not" }
-        try {
-            addFieldLegacy(notetype, field)
-        } catch (e: ConfirmModSchemaException) {
-            Timber.w(e, "Unexpected mod schema")
-            CrashReportService.sendExceptionReport(e, "addFieldInNewModel: Unexpected mod schema")
-            throw IllegalStateException("ConfirmModSchemaException should not be thrown", e)
-        }
-    }
-
-    fun addTemplateInNewNoteType(
-        notetype: NotetypeJson,
-        template: CardTemplate,
-    ) {
-        // similar to addTemplate, but doesn't throw exception;
-        // asserting the model is new.
-        check(isModelNew(notetype)) { "Model was assumed to be new, but is not" }
-
-        try {
-            addTemplate(notetype, template)
-        } catch (e: ConfirmModSchemaException) {
-            Timber.w(e, "Unexpected mod schema")
-            CrashReportService.sendExceptionReport(e, "addTemplateInNewModel: Unexpected mod schema")
-            throw IllegalStateException("ConfirmModSchemaException should not be thrown", e)
-        }
-    }
-
     fun addFieldModChanged(
         notetype: NotetypeJson,
         field: Field,
@@ -566,6 +531,82 @@ class Notetypes(
     }
 
     /*
+     * Changing notetypes of notes
+     * ***********************************************************
+     */
+
+    /**
+     * @return The ID of the single note type which all supplied notes are using; throws otherwise
+     *
+     * @throws BackendInvalidInputException notes from different note types were supplied
+     * @throws BackendInvalidInputException an empty list was supplied
+     * @throws BackendNotFoundException One of the provided IDs was invalid
+     */
+    @CheckResult
+    @LibAnkiAlias("get_single_notetype_of_notes")
+    fun getSingleNotetypeOfNotes(noteIds: List<NoteId>): NoteTypeId = col.backend.getSingleNotetypeOfNotes(noteIds)
+
+    @CheckResult
+    @LibAnkiAlias("change_notetype_info")
+    fun changeNotetypeInfo(
+        oldNoteTypeId: NoteTypeId,
+        newNoteTypeId: NoteTypeId,
+    ): ChangeNotetypeInfo =
+        this.col.backend.getChangeNotetypeInfo(
+            oldNotetypeId = oldNoteTypeId,
+            newNotetypeId = newNoteTypeId,
+        )
+
+    /**
+     * Assign a new notetype, optionally altering field/template order.
+     *
+     * To get defaults, use
+     *
+     * ```kotlin
+     * val info = col.models.change_notetype_info(...)
+     * val input = info.input
+     * input.note_ids.extend([...])
+     * ```
+     *
+     * The `newFields` and `newTemplates` lists are relative to the new notetype's
+     * field/template count.
+     *
+     * Each value represents the index in the previous notetype.
+     * -1 indicates the original value will be discarded.
+     */
+    @LibAnkiAlias("change_notetype_of_notes")
+    fun changeNotetypeOfNotes(input: ChangeNotetypeRequest): OpChanges {
+        val opBytes = this.col.backend.changeNotetypeRaw(input.toByteArray())
+        return OpChanges.parseFrom(opBytes)
+    }
+
+    /**
+     * Restores a notetype to its original stock kind.
+     *
+     * @param notetypeId id of the changed notetype
+     * @param forceKind optional stock kind to be forced instead of the original kind.
+     * Older notetypes did not store their original stock kind, so we allow the UI
+     * to pass in an override to use when missing, or for tests.
+     */
+    @CheckResult
+    @LibAnkiAlias("restore_notetype_to_stock")
+    fun restoreNotetypeToStock(
+        notetypeId: NotetypeId,
+        forceKind: StockNotetype.Kind? = null,
+    ): OpChanges {
+        val msg =
+            restoreNotetypeToStockRequest {
+                this.notetypeId = notetypeId
+                forceKind?.let { this.forceKind = forceKind }
+            }
+        return col.backend.restoreNotetypeToStock(msg).also {
+            // not in libAnki:
+            // Remove the specific notetype from cache to ensure consistency after restoration
+            removeFromCache(notetypeId.ntid)
+        }
+    }
+
+    /*
     # Model changing
     ##########################################################################
     # - maps are ord->ord, and there should not be duplicate targets
@@ -658,18 +699,18 @@ class Notetypes(
      * This method will either give you all the card ids for the ordinals sent in related to the model sent in *or*
      * it will return null if the result of deleting the ordinals is unsafe because it would leave notes with no cards
      *
-     * @param noteTypeId long id of the JSON model
+     * @param noteTypeId id of the note type
      * @param ords array of ints, each one is the ordinal a the card template in the given model
-     * @return null if deleting ords would orphan notes, long[] of related card ids to delete if it is safe
+     * @return null if deleting ords would orphan notes, list of related card ids to delete if it is safe
      */
     @Suppress("ktlint:standard:max-line-length")
     fun getCardIdsForNoteType(
         noteTypeId: NoteTypeId,
         ords: IntArray,
-    ): List<Long>? {
+    ): List<CardId>? {
         val cardIdsToDeleteSql =
             "select c2.id from cards c2, notes n2 where c2.nid=n2.id and n2.mid = ? and c2.ord  in ${Utils.ids2str(ords)}"
-        val cids: List<Long> = col.db.queryLongList(cardIdsToDeleteSql, noteTypeId)
+        val cids: List<CardId> = col.db.queryLongList(cardIdsToDeleteSql, noteTypeId)
         // Timber.d("cardIdsToDeleteSql was ' %s' and got %s", cardIdsToDeleteSql, Utils.ids2str(cids));
         Timber.d("getCardIdsForModel found %s cards to delete for model %s and ords %s", cids.size, noteTypeId, Utils.ids2str(ords))
 
@@ -725,7 +766,7 @@ class Notetypes(
  *
  * This better approximates `JSON.get` in the Python
  */
-private fun Deck.getLongOrNull(key: String): int? {
+private fun Deck.getLongOrNull(key: String): Long? {
     if (!has(key)) {
         return null
     }
@@ -778,30 +819,6 @@ fun Collection.addNotetypeLegacy(json: ByteString): OpChangesWithId {
 
 fun Collection.getStockNotetype(kind: StockNotetype.Kind): NotetypeJson =
     NotetypeJson(fromJsonBytes(backend.getStockNotetypeLegacy(kind = kind)))
-
-/**
- * Restores a notetype to its original stock kind.
- *
- * @param notetypeId id of the changed notetype
- * @param forceKind optional stock kind to be forced instead of the original kind.
- * Older notetypes did not store their original stock kind, so we allow the UI
- * to pass in an override to use when missing, or for tests.
- */
-@CheckResult
-fun Collection.restoreNotetypeToStock(
-    notetypeId: NotetypeId,
-    forceKind: StockNotetype.Kind? = null,
-): OpChanges {
-    val msg =
-        restoreNotetypeToStockRequest {
-            this.notetypeId = notetypeId
-            forceKind?.let { this.forceKind = forceKind }
-        }
-    val result = backend.restoreNotetypeToStock(msg)
-    // Remove the specific notetype from cache to ensure consistency after restoration
-    notetypes.removeFromCache(notetypeId.ntid)
-    return result
-}
 
 @NotInLibAnki
 fun getStockNotetypeKinds(): List<StockNotetype.Kind> = StockNotetype.Kind.entries.filter { it != StockNotetype.Kind.UNRECOGNIZED }

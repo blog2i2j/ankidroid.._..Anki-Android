@@ -20,7 +20,10 @@ package com.ichi2.libanki
 import androidx.annotation.WorkerThread
 import anki.media.CheckMediaResponse
 import com.google.protobuf.kotlin.toByteString
+import com.ichi2.libanki.Media.Companion.htmlMediaRegexps
 import com.ichi2.libanki.exception.EmptyMediaException
+import com.ichi2.libanki.utils.LibAnkiAlias
+import com.ichi2.libanki.utils.NotInLibAnki
 import timber.log.Timber
 import java.io.File
 
@@ -63,18 +66,40 @@ open class Media(
     /**
      * Extract media filenames from an HTML string.
      *
-     * @param string The string to scan for media filenames ([sound:...] or <img...>).
-     * @return A list containing all the sound and image filenames found in the input string.
+     * @param currentCard The card to scan for media filenames ([sound:...] or <img...>).
+     * @return A distinct, unordered list containing all the sound and image filenames found in the card.
      */
-    fun filesInStr(string: String): List<String> =
-        col.backend
-            .extractAvTags(string, true)
-            .avTagsList
-            .filter {
-                it.hasSoundOrVideo()
-            }.map {
-                it.soundOrVideo
+    // FIXME This doesn't match the parameters of the pylib's method
+    @LibAnkiAlias("files_in_str")
+    fun filesInStr(
+        currentCard: Card,
+        includeRemote: Boolean = false,
+    ): List<String> {
+        val files = mutableListOf<String>()
+        val model = currentCard.note(col).notetype
+        // handle latex
+        val renderOutput = currentCard.renderOutput(col)
+        val processedText = renderLatex(renderOutput.questionText + renderOutput.answerText, model, col)
+        // extract filenames
+        for (pattern in htmlMediaRegexps) {
+            val matches = pattern.findAll(processedText)
+            for (match in matches) {
+                val fname = pattern.extractFilename(match) ?: continue
+                val isLocal = !Regex("(?i)https?|ftp://").containsMatchIn(fname)
+                if (isLocal || includeRemote) {
+                    files.add(fname)
+                }
             }
+        }
+
+        // not in libAnki: the rendered output no longer contains [sound:] tags
+        files.addAll(
+            (renderOutput.questionAvTags + renderOutput.answerAvTags)
+                .filterIsInstance<SoundOrVideoTag>()
+                .map { it.filename },
+        )
+        return files.distinct()
+    }
 
     fun findUnusedMediaFiles(): List<File> = check().unusedList.map { File(dir, it) }
 
@@ -97,9 +122,10 @@ open class Media(
       Rebuilding DB
      ***********************************************************
      */
-
-    // FIXME: this also provides trash count, but UI can not handle it yet
     fun check(): CheckMediaResponse = col.backend.checkMedia()
+
+    @LibAnkiAlias("empty_trash")
+    fun emptyTrash() = col.backend.emptyTrash()
 
     /**
      * Copying on import
@@ -111,27 +137,42 @@ open class Media(
         col.backend.removeMediaDb(colPath = col.colDb.absolutePath)
     }
 
-    /**
-     * Remove a file from the media directory if it exists and mark it as removed in the media database.
-     */
-    @Suppress("unused")
-    open fun removeFile(fname: String) {
-        removeFiles(listOf(fname))
-    }
-
     // FIXME: this currently removes files immediately, as the UI does not expose a way
-    // to empty the trash or restore media files yet
-    fun removeFiles(files: Iterable<String>) {
-        col.backend.trashMediaFiles(fnames = files)
-        emptyTrash()
+
+    /** Move provided files to the trash. */
+    @LibAnkiAlias("trash_files")
+    fun trashFiles(fnames: Iterable<String>) {
+        col.backend.trashMediaFiles(fnames = fnames)
     }
 
-    private fun emptyTrash() {
-        col.backend.emptyTrash()
-    }
+    @LibAnkiAlias("restore_trash")
+    fun restoreTrash() = col.backend.restoreTrash()
 
-    @Suppress("UNUSED")
-    private fun restoreTrash() {
-        col.backend.restoreTrash()
+    companion object {
+        /**
+         * Given a [media regex][htmlMediaRegexps] and a match, return the captured media filename
+         */
+        @NotInLibAnki
+        private fun Regex.extractFilename(match: MatchResult): String? {
+            val index =
+                when (htmlMediaRegexps.indexOf(this)) {
+                    0, 2 -> 3
+                    1, 3 -> 2
+                    else -> throw IllegalStateException(pattern)
+                }
+            return match.groups[index]?.value
+        }
+
+        val htmlMediaRegexps =
+            listOf(
+                // src element quoted case
+                Regex("(?i)(<(?:img|audio|source)\\b[^>]* src=(['\"])([^>]+?)\\2[^>]*>)"), // Group 3 = fname
+                // unquoted src (img/audio)
+                Regex("(?i)(<(?:img|audio|source)\\b[^>]* src=(?!['\"])([^ >]+)[^>]*?>)"), // Group 2 = fname
+                // quoted data attribute
+                Regex("(?i)(<object\\b[^>]* data=(['\"])([^>]+?)\\2[^>]*>)"), // Group 3 = fname
+                // unquoted data attribute
+                Regex("(?i)(<object\\b[^>]* data=(?!['\"])([^ >]+)[^>]*?>)"), // Group 2 = fname
+            )
     }
 }

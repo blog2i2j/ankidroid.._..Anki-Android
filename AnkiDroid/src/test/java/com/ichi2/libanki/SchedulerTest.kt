@@ -17,16 +17,16 @@ package com.ichi2.libanki
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import anki.scheduler.UnburyDeckRequest
-import com.ichi2.anki.Ease
+import com.ichi2.anki.common.time.SECONDS_PER_DAY
 import com.ichi2.anki.common.time.TimeManager
 import com.ichi2.anki.common.time.TimeManager.time
 import com.ichi2.anki.common.utils.annotation.KotlinCleanup
-import com.ichi2.anki.utils.SECONDS_PER_DAY
 import com.ichi2.libanki.CardType.Relearning
 import com.ichi2.libanki.Consts.LEECH_SUSPEND
 import com.ichi2.libanki.Consts.STARTING_FACTOR
 import com.ichi2.libanki.exception.ConfirmModSchemaException
 import com.ichi2.libanki.sched.Counts
+import com.ichi2.libanki.sched.Ease
 import com.ichi2.testutils.AnkiAssert
 import com.ichi2.testutils.JvmTest
 import com.ichi2.testutils.ext.addNote
@@ -38,10 +38,8 @@ import org.junit.Assert
 import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.lang.Exception
 import java.time.Instant
 import java.time.ZoneId
-import kotlin.Throws
 import kotlin.math.roundToInt
 import kotlin.math.roundToLong
 import kotlin.test.assertNotNull
@@ -631,7 +629,7 @@ open class SchedulerTest : JvmTest() {
                     Ease.EASY,
                 ),
             ),
-            Matchers.equalTo("10.8mo"),
+            Matchers.equalTo("10.7mo"),
         )
     }
 

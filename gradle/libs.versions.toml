@@ -18,13 +18,13 @@ ktlint = '1.5.0'
 #
 # Old changelogs - See 'Table of Contents' in sidebar
 # https://developer.android.com/build/releases/past-releases
-androidGradlePlugin = "8.10.1"
+androidGradlePlugin = "8.11.0"
 # https://developer.android.com/jetpack/androidx/releases/activity
 androidxActivity = "1.10.1"
 # https://developer.android.com/jetpack/androidx/releases/annotation
 androidxAnnotation = "1.9.1"
 # https://developer.android.com/jetpack/androidx/releases/appcompat
-androidxAppCompat = "1.7.0"
+androidxAppCompat = "1.7.1"
 # https://developer.android.com/jetpack/androidx/releases/browser
 androidxBrowser = "1.8.0"
 # https://developer.android.com/jetpack/androidx/releases/constraintlayout
@@ -36,7 +36,7 @@ androidxDragAndDrop = "1.0.0"
 # https://developer.android.com/jetpack/androidx/releases/exifinterface
 androidxExifinterface = "1.4.1"
 # https://developer.android.com/jetpack/androidx/releases/fragment
-androidxFragmentKtx = "1.8.7"
+androidxFragmentKtx = "1.8.8"
 # https://developer.android.com/jetpack/androidx/releases/media
 androidxMedia = "1.7.0"
 # https://developer.android.com/jetpack/androidx/releases/media3
@@ -46,7 +46,7 @@ androidxPreferenceKtx = "1.2.1"
 # https://developer.android.com/jetpack/androidx/releases/recyclerview
 androidxRecyclerview = "1.4.0"
 # https://developer.android.com/jetpack/androidx/releases/sqlite
-androidxSqlite = "2.5.1"
+androidxSqlite = "2.5.2"
 # https://developer.android.com/jetpack/androidx/releases/swiperefreshlayout
 androidxSwipeRefreshLayout = "1.1.0"
 # https://developer.android.com/jetpack/androidx/releases/test
@@ -56,10 +56,10 @@ androidxTestUiAutomator = "2.3.0"
 # https://developer.android.com/jetpack/androidx/releases/viewpager2
 androidxViewpager2 = "1.1.0"
 # https://developer.android.com/jetpack/androidx/releases/webkit
-androidxWebkit = "1.13.0"
+androidxWebkit = "1.14.0"
 # https://developer.android.com/jetpack/androidx/releases/work
-androidxWork = "2.10.1"
-ankiBackend = '0.1.52-anki25.02.4'
+androidxWork = "2.10.2"
+ankiBackend = '0.1.56-anki25.06b6'
 autoService = "1.1.1"
 autoServiceAnnotations = "1.1.1"
 colorpicker = "1.2.0"
@@ -80,16 +80,18 @@ jacoco = "0.8.13"
 javaSemver = "0.10.2"
 jetbrainsAnnotations = "26.0.2"
 json = "20250517"
-jsoup = "1.20.1"
+jsoup = "1.21.1"
 androidTestJunit = "1.2.1"
-junitJupiter = "5.13.0"
-junitPlatformLauncher = "1.13.0"
+# https://github.com/junit-team/junit5/releases/
+junitJupiter = "5.13.2"
+# https://github.com/junit-team/junit5/releases/ - version numbers differ; changelogs in bundle
+junitPlatformLauncher = "1.13.2"
 # https://github.com/JetBrains/kotlin/releases/
-kotlin = '2.1.21'
+kotlin = '2.2.0'
 kotlinxSerializationJson = "1.8.1"
 ktlintGradlePlugin = "12.3.0"
 leakcanaryAndroid = "2.14"
-lint = '31.10.1'
+lint = '31.11.0'
 material = "1.12.0"
 materialTapTargetPrompt = "3.3.2"
 
@@ -97,13 +99,13 @@ materialTapTargetPrompt = "3.3.2"
 mockitoCore = "5.18.0"
 mockitoInline = "5.2.0"
 mockitoKotlin = "5.4.0" # maybe can remove mockitoCore and its usage with release > 5.4.0
-mockk = "1.14.2"
+mockk = "1.14.4"
 nanohttpd = "2.3.1"
 okhttp = "4.12.0"
 # https://github.com/protocolbuffers/protobuf/releases
 protobufKotlinLite = "4.31.1"
 # ../AnkiDroid/robolectricDownload.gradle may need changes - read instructions in that file
-robolectric = "4.14.1"
+robolectric = "4.15.1"
 searchpreference = "2.7.3"
 seismic = "1.0.3"
 sharedPreferencesMock = "1.2.4"
@@ -113,7 +115,7 @@ timber = "5.0.1"
 # https://github.com/Triple-T/gradle-play-publisher/releases
 # In the past, releases have been published before the changelog
 triplet = "3.12.1"
-turbine = "1.2.0"
+turbine = "1.2.1"
 
 [libraries]
 acra-limiter = { module = "ch.acra:acra-limiter", version.ref = "acra" }

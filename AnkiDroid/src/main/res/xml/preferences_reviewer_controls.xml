@@ -148,17 +148,12 @@
             android:title="@string/gesture_abort_learning"
             android:icon="@drawable/close_icon"
             />
-        <com.ichi2.preferences.ReviewerControlPreference
-            android:key="@string/abort_and_sync_command_key"
-            android:title="@string/gesture_abort_sync"
-            android:icon="@drawable/ic_sync"
-            />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/media">
         <com.ichi2.preferences.ReviewerControlPreference
             android:key="@string/play_media_command_key"
-            android:title="@string/gesture_play"
+            android:title="@string/replay_media"
             android:icon="@drawable/ic_play_circle_white"
             />
         <com.ichi2.preferences.ReviewerControlPreference
@@ -182,6 +177,11 @@
             android:key="@string/toggle_whiteboard_command_key"
             android:title="@string/gesture_toggle_whiteboard"
             android:icon="@drawable/ic_enable_whiteboard"
+            />
+        <com.ichi2.preferences.ReviewerControlPreference
+            android:key="@string/toggle_eraser_command_key"
+            android:title="@string/gesture_toggle_eraser"
+            android:icon="@drawable/ic_eraser"
             />
         <com.ichi2.preferences.ReviewerControlPreference
             android:key="@string/clear_whiteboard_command_key"

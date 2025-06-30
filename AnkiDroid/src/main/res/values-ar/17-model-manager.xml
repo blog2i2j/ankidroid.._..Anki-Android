@@ -57,6 +57,7 @@
     <string name="model_browser_template">تحرير البطاقات</string>
     <!--Rename-->
     <string name="rename_model">تغيير اسم نوع الملحوظة</string>
+    <string name="rename_card_type">Rename card type</string>
     <!--Language Hint-->
     <string name="model_field_editor_language_hint_dialog_success_result">تعيين تلميح اللغة إلى %s</string>
     <!--Field Editing-->
@@ -66,7 +67,6 @@
     <string name="model_field_editor_rename">تغيير اسم الحقل</string>
     <string name="model_field_editor_language_hint">تعيين تلميح لغة لوحة المفاتيح</string>
     <string name="model_field_editor_reposition_menu">تغيير موضع الحقل</string>
-    <string name="model_field_editor_toggle_sticky">تذكّر المدخلات الأخيرة عند الإضافة</string>
     <string name="model_field_editor_changing">يجري تحديث الحقول</string>
     <string name="model_field_editor_sort_field">فرز حسب هذا الحقل</string>
     <!--Warnings-->

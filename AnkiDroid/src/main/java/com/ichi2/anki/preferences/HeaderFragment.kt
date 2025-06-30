@@ -28,12 +28,15 @@ import com.bytehamster.lib.preferencesearch.SearchPreference
 import com.ichi2.anki.BuildConfig
 import com.ichi2.anki.CollectionManager.TR
 import com.ichi2.anki.R
+import com.ichi2.anki.reviewreminders.ScheduleReminders
 import com.ichi2.anki.settings.Prefs
 import com.ichi2.anki.ui.internationalization.toSentenceCase
+import com.ichi2.anki.utils.ext.sharedPrefs
 import com.ichi2.anki.utils.isWindowCompact
 import com.ichi2.compat.CompatHelper
 import com.ichi2.preferences.HeaderPreference
 import com.ichi2.utils.AdaptionUtil
+import timber.log.Timber
 
 class HeaderFragment :
     PreferenceFragmentCompat(),
@@ -60,6 +63,24 @@ class HeaderFragment :
 
         requirePreference<Preference>(R.string.pref_dev_options_screen_key)
             .isVisible = Prefs.isDevOptionsEnabled
+
+        requirePreference<HeaderPreference>(R.string.new_reviewer_options_key)
+            .isVisible = sharedPrefs().getBoolean(getString(R.string.new_reviewer_pref_key), false)
+
+        requirePreference<HeaderPreference>(R.string.pref_review_reminders_screen_key)
+            .setOnPreferenceClickListener {
+                Timber.i("HeaderFragment:: edit review reminders button pressed")
+                val intent = ScheduleReminders.getIntent(requireContext(), true)
+                startActivity(intent)
+                true
+            }
+
+        val reviewRemindersEnabled = requireContext().sharedPrefs().getBoolean(getString(R.string.pref_new_notifications), false)
+        requirePreference<HeaderPreference>(R.string.pref_review_reminders_screen_key)
+            .isVisible = reviewRemindersEnabled
+        requirePreference<HeaderPreference>(R.string.pref_notifications_screen_key)
+            .isVisible = !reviewRemindersEnabled
+
         configureSearchBar(
             requireActivity() as AppCompatActivity,
             requirePreference<SearchPreference>(R.string.search_preference_key).searchConfiguration,
@@ -120,7 +141,16 @@ class HeaderFragment :
                 index(R.xml.preferences_sync)
                 index(R.xml.preferences_custom_sync_server)
                     .addBreadcrumb(R.string.pref_cat_sync)
-                index(R.xml.preferences_notifications)
+
+                if (activity.sharedPrefs().getBoolean(activity.getString(R.string.pref_new_notifications), false)) {
+                    searchConfiguration
+                        .indexItem()
+                        .withKey(activity.getString(R.string.pref_review_reminders_screen_key))
+                        .withTitle("Review reminders")
+                } else {
+                    index(R.xml.preferences_notifications)
+                }
+
                 index(R.xml.preferences_appearance)
                 index(R.xml.preferences_custom_buttons)
                     .addBreadcrumb(R.string.pref_cat_appearance)
@@ -234,7 +264,8 @@ class HeaderFragment :
                 is AccessibilitySettingsFragment -> R.string.pref_accessibility_screen_key
                 is BackupLimitsSettingsFragment -> R.string.pref_backup_limits_screen_key
                 is AdvancedSettingsFragment -> R.string.pref_advanced_screen_key
-                is DevOptionsFragment, is ReviewerOptionsFragment -> R.string.pref_dev_options_screen_key
+                is ReviewerOptionsFragment -> R.string.new_reviewer_options_key
+                is DevOptionsFragment -> R.string.pref_dev_options_screen_key
                 is AboutFragment -> R.string.about_screen_key
                 else -> null
             }

@@ -49,6 +49,7 @@
     <string name="model_browser_template">ბარათების რედაქტირება</string>
     <!--Rename-->
     <string name="rename_model">შენიშვნის ტიპის სახელის შეცვლა</string>
+    <string name="rename_card_type">Rename card type</string>
     <!--Language Hint-->
     <string name="model_field_editor_language_hint_dialog_success_result">%s-თან ენის მინიშნების დაყენება</string>
     <!--Field Editing-->
@@ -58,7 +59,6 @@
     <string name="model_field_editor_rename">ველის სახელის შეცვლა</string>
     <string name="model_field_editor_language_hint">კლავიატურის ენის მინიშნების დაყენება</string>
     <string name="model_field_editor_reposition_menu">ველის გადაადგილება</string>
-    <string name="model_field_editor_toggle_sticky">დამატებისას ბოლოს შეყვანილის დამახსოვრება</string>
     <string name="model_field_editor_changing">ველების განახლება</string>
     <string name="model_field_editor_sort_field">ამ ველის მიხედვით დახარისხება</string>
     <!--Warnings-->

@@ -53,6 +53,7 @@
     <string name="model_browser_template">Править карточки</string>
     <!--Rename-->
     <string name="rename_model">Переименовать тип записи</string>
+    <string name="rename_card_type">Rename card type</string>
     <!--Language Hint-->
     <string name="model_field_editor_language_hint_dialog_success_result">Установить %s как язык подсказок</string>
     <!--Field Editing-->
@@ -62,7 +63,6 @@
     <string name="model_field_editor_rename">Переименовать поле</string>
     <string name="model_field_editor_language_hint">Задать язык подсказок клавиатуры</string>
     <string name="model_field_editor_reposition_menu">Переместить поле</string>
-    <string name="model_field_editor_toggle_sticky">При добавлении запоминать последний ввод</string>
     <string name="model_field_editor_changing">Поля обновляются</string>
     <string name="model_field_editor_sort_field">Сортировать по этому полю</string>
     <!--Warnings-->

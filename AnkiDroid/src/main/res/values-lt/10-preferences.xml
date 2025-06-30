@@ -206,13 +206,13 @@
     <string name="pref_controls_previews_tab" maxLength="41" comment="Name of the tab to configure controls for the previews screen">Peržiūrėti</string>
     <string name="toggle_backside_only" maxLength="41" comment="Control setting that toggles \'Backside only\' in the previews screen">Perjungti tik galinę pusę</string>
     <!-- Appearance settings -->
-    <string name="pref_cat_reviewer" maxLength="41">Vertintojas</string>
+    <string name="pref_cat_reviewer" maxLength="41">Study Screen</string>
     <string name="show_deck_title" maxLength="41">Rodyti rinkinio pavadinimą</string>
     <string name="accessibility" maxLength="41">Prieinamumas</string>
     <!-- Paste clipboard image as png option -->
     <string name="paste_as_png" maxLength="41">Įklijuokite iškarpinės vaizdus kaip PNG</string>
     <string name="exit_via_double_tap_back" maxLength="41">Du kartus paspauskite atgal, kad grįžtumėte atgal / išeitumėte</string>
-    <string name="exit_via_double_tap_back_summ">Kad netyčia nepaliktumėte apžvalgininko arba programėlės</string>
+    <string name="exit_via_double_tap_back_summ">To avoid accidentally leaving the study screen or the app</string>
     <!-- Allow all files in media imports -->
     <string name="media_import_allow_all_files" maxLength="41">Leisti importuoti visus medijos failus</string>
     <string name="media_import_allow_all_files_summ">Jei \"Android\" neatpažįsta medijos failo</string>
@@ -257,7 +257,7 @@
     <string name="note_editor_replace_newlines" maxLength="41">Naujų eilučių pakeitimas HTML</string>
     <string name="note_editor_replace_newlines_summ">Pastabų redaktoriuje redaguodami kortelę visus &lt;br&gt; atvejus paverskite naujomis eilutėmis.</string>
     <string name="type_in_answer_focus" maxLength="41">Dėmesio centre \"įveskite atsakymą</string>
-    <string name="type_in_answer_focus_summ">Automatiškai sukoncentruokite apžvalgininko lauką \"įveskite atsakymą\".</string>
+    <string name="type_in_answer_focus_summ">Automatically focus the ‘type in answer’ field in the study screen</string>
     <!-- About -->
     <string name="open_changelog">Atviras pakeitimų sąrašas</string>
     <string name="pref_cat_about_title" maxLength="41">Apie</string>
@@ -274,7 +274,7 @@
     <string name="binding_add_axis">Pridėti vairalazdę / judesio valdiklį</string>
     <string name="axis_picker_move_joystick">Judinkite vairalazdę / judesio valdiklį</string>
     <string name="user_actions" maxLength="41">Naudotojo veiksmai</string>
-    <string name="user_actions_summary" maxLength="41">JavaScript paleidimas iš peržiūros ekrano</string>
+    <string name="user_actions_summary" maxLength="41">Trigger JavaScript from the study screen</string>
     <string name="user_action_1" maxLength="28">1 naudotojo veiksmas</string>
     <string name="user_action_2" maxLength="28">2 naudotojo veiksmas</string>
     <string name="user_action_3" maxLength="28">3 naudotojo veiksmas</string>
@@ -284,7 +284,7 @@
     <string name="user_action_7" maxLength="28">7 naudotojo veiksmas</string>
     <string name="user_action_8" maxLength="28">8 naudotojo veiksmas</string>
     <string name="user_action_9" maxLength="28">9 naudotojo veiksmas</string>
-    <string name="toggle_auto_advance" maxLength="41">Perjungti automatinį išankstinį apmokėjimą</string>
+    <string name="toggle_auto_advance" maxLength="28">Perjungti automatinį išankstinį apmokėjimą</string>
     <!-- Select card side -->
     <string name="card_side_selection_title">Pasirinkite kortelės pusę</string>
     <string name="card_side_question">Klausimas</string>
@@ -299,6 +299,8 @@
     <string name="pref_cat_experimental" maxLength="41" tools:ignore="UnusedResources">Eksperimentinis</string>
     <string name="readtext_deprecation_warn">\"AnkiDroid\" įdiegtas geresnis TTS mechanizmas, suderinamas su kitais \"Anki\" klientais, jame yra daugiau balsų ir patobulintas kalbų atkūrimas!\n\nPrašome kuo greičiau atnaujinti, nes šis nustatymas netrukus bus pašalintas.</string>
     <string name="readtext_reviewer_warn" tools:ignore="UnusedResources">Atnaujinkite naują teksto į kalbą formatą</string>
+    <string name="pref_fixed_port_title" maxLength="41">localStorage in Study Screen</string>
+    <string name="pref_fixed_port_summary">Enables JavaScript localStorage by using a fixed server port in the Study Screen</string>
     <!-- Developer options -->
     <string name="pref_cat_dev_options" maxLength="41">Kūrėjo parinktys</string>
     <string name="dev_options_enabled_pref" maxLength="41">Įgalinti kūrėjo parinktis</string>
@@ -374,8 +376,16 @@
     <string name="hide_answer_buttons" maxLength="41">Paslėpti atsakymų mygtukus</string>
     <string name="hide_hard_and_easy" maxLength="41">Paslėpti atsakymų mygtukus</string>
     <string name="reviewer_frame_style" maxLength="41">Rėmelio stilius</string>
-    <string name="reviewer_frame_style_card" maxLength="41" comment="Style name of the \'Card\' card frame of the Reviewer">Kortelė</string>
-    <string name="reviewer_frame_style_box" maxLength="41" comment="Style name of the \'Box\' card frame of the Reviewer">Dėžutė</string>
+    <string name="reviewer_frame_style_card" maxLength="41" comment="Style name of the \'Card\' card frame of the Study Screen">Kortelė</string>
+    <string name="reviewer_frame_style_box" maxLength="41" comment="Style name of the \'Box\' card frame of the Study Screen">Dėžutė</string>
+    <string name="reviewer_toolbar_top" maxLength="41" comment="Setting to put the toolbar on the top of the study screen">Top</string>
+    <string name="reviewer_toolbar_bottom" maxLength="41" comment="Setting to put the toolbar on the bottom of the study screen">Bottom</string>
+    <string name="reviewer_toolbar_none" maxLength="41" comment="Setting to remove the toolbar from the study screen">None</string>
+    <string name="toolbar" maxLength="41">Toolbar</string>
+    <string name="toolbar_actions" maxLength="41">Toolbar actions</string>
+    <string name="toolbar_position" maxLength="41">Toolbar position</string>
+    <string name="new_study_screen" maxLength="41">New study screen</string>
+    <string name="new_study_screen_summary">Improved study screen that will succeed the current one. Available for testing and feedback</string>
     <!--Keyboard shortcuts dialog-->
     <string name="open_settings" comment="Description of the shortcut that opens the app settings">Atidaryti nustatymus</string>
 </resources>

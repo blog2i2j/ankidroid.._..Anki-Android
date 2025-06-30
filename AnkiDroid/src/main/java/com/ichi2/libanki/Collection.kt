@@ -40,7 +40,6 @@ import anki.search.BrowserRow
 import anki.search.SearchNode
 import anki.sync.SyncAuth
 import anki.sync.SyncStatusResponse
-import com.ichi2.anki.CollectionFiles
 import com.ichi2.anki.common.time.TimeManager
 import com.ichi2.anki.common.utils.annotation.KotlinCleanup
 import com.ichi2.libanki.Utils.ids2str
@@ -578,12 +577,10 @@ class Collection(
 
     /** Save (flush) the note to the DB. Unlike note.flush(), this is undoable. This should
      * not be used for adding new notes. */
+    @CheckResult
     fun updateNote(note: Note): OpChanges = backend.updateNotes(notes = listOf(note.toBackendNote()), skipUndoEntry = false)
 
     fun updateNotes(notes: Iterable<Note>): OpChanges = backend.updateNotes(notes = notes.map { it.toBackendNote() }, skipUndoEntry = false)
-
-    @NotInLibAnki
-    fun emptyCids(): List<CardId> = getEmptyCards().emptyCids()
 
     /** Fixes and optimizes the database. If any errors are encountered, a list of
      * problems is returned. Throws if DB is unreadable. */
@@ -648,6 +645,10 @@ class Collection(
     fun importJsonStringRaw(input: ByteArray): ByteArray = backend.importJsonStringRaw(input = input)
 
     fun importJsonFileRaw(input: ByteArray): ByteArray = backend.importJsonFileRaw(input = input)
+
+    fun getIgnoredBeforeCountRaw(input: ByteArray): ByteArray = backend.getIgnoredBeforeCountRaw(input = input)
+
+    fun getRetentionWorkloadRaw(input: ByteArray): ByteArray = backend.getRetentionWorkloadRaw(input = input)
 
     fun compareAnswer(
         expected: String,

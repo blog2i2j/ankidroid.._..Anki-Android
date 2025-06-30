@@ -43,14 +43,14 @@ import com.ichi2.anki.CollectionManager
 import com.ichi2.anki.CollectionManager.withCol
 import com.ichi2.anki.DeckSpinnerSelection
 import com.ichi2.anki.R
+import com.ichi2.anki.common.annotations.NeedsTest
 import com.ichi2.anki.common.time.TimeManager
+import com.ichi2.anki.common.time.getTimestamp
 import com.ichi2.anki.exportApkgPackage
 import com.ichi2.anki.exportCollectionPackage
 import com.ichi2.anki.exportSelectedCards
 import com.ichi2.anki.exportSelectedNotes
 import com.ichi2.anki.ui.BasicItemSelectedListener
-import com.ichi2.anki.utils.getTimestamp
-import com.ichi2.annotations.NeedsTest
 import com.ichi2.compat.CompatHelper.Companion.getSerializableCompat
 import com.ichi2.libanki.DeckId
 import com.ichi2.libanki.DeckNameId
@@ -252,21 +252,21 @@ class ExportDialogFragment : DialogFragment() {
     private fun View.initializeNotesExportUi() =
         with(CollectionManager.TR) {
             notesIncludeHtml =
-                findViewById<CheckBox?>(R.id.notes_include_html).apply {
+                findViewById<CheckBox>(R.id.notes_include_html).apply {
                     text = exportingIncludeHtmlAndMediaReferences()
                 }
             notesIncludeTags =
-                findViewById<CheckBox?>(R.id.notes_include_tags).apply { text = exportingIncludeTags() }
+                findViewById<CheckBox>(R.id.notes_include_tags).apply { text = exportingIncludeTags() }
             notesIncludeDeckName =
-                findViewById<CheckBox?>(R.id.notes_include_deck_name).apply {
+                findViewById<CheckBox>(R.id.notes_include_deck_name).apply {
                     text = exportingIncludeDeck()
                 }
             notesIncludeNotetypeName =
-                findViewById<CheckBox?>(R.id.notes_include_notetype_name).apply {
+                findViewById<CheckBox>(R.id.notes_include_notetype_name).apply {
                     text = exportingIncludeNotetype()
                 }
             notesIncludeUniqueIdentifier =
-                findViewById<CheckBox?>(R.id.notes_include_unique_identifier).apply {
+                findViewById<CheckBox>(R.id.notes_include_unique_identifier).apply {
                     text = exportingIncludeGuid()
                 }
         }

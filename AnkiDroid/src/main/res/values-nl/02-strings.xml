@@ -60,16 +60,18 @@
     <string name="filter_tags" maxLength="28">Op labels filteren</string>
     <string name="no_tags">Je hebt nog geen labels toegevoegd.</string>
     <string name="updated_version">Geüpdatet naar versie %s</string>
-    <!-- Reviewer.kt -->
+    <!-- Reviewer.kt (Study Screen) -->
     <string name="save_whiteboard" maxLength="28">Schrijfbord opslaan</string>
     <string name="enable_stylus" maxLength="28">Stylus schrijven inschakelen</string>
     <string name="disable_stylus">Stylus schrijven uitschakelen</string>
     <string name="enable_whiteboard" maxLength="28">Whiteboard inschakelen</string>
     <string name="disable_whiteboard">Whiteboard uitschakelen</string>
     <string name="show_whiteboard">Toon het schrijfbord</string>
+    <string name="enable_eraser" maxLength="28">Enable eraser</string>
+    <string name="disable_eraser" maxLength="28">Disable eraser</string>
     <string name="hide_whiteboard" maxLength="28">Verberg het schrijfbord</string>
     <string name="clear_whiteboard" maxLength="28">Schrijfbord schoonvegen</string>
-    <string name="replay_audio" maxLength="28">Audio herhalen</string>
+    <string name="replay_media" maxLength="28">Replay media</string>
     <string name="leech_suspend_notification">Kaart gemarkeerd als moeilijk en uitgesteld</string>
     <string name="leech_notification">Kaart gemarkeerd als moeilijk</string>
     <string name="webview_crash_unknown">Onbekende fout</string>
@@ -193,7 +195,10 @@
     <!-- Card Template Browser Appearance -->
     <string name="restore_default" maxLength="28">Herstel Standaardinstellingen</string>
     <string name="reviewer_tts_cloze_spoken_replacement">Leeg</string>
-    <!-- Whiteboard save image message in Reviewer -->
+    <!-- Whiteboard eraser mode toggle message in Reviewer -->
+    <string name="white_board_eraser_enabled">Eraser mode activated</string>
+    <string name="white_board_eraser_disabled">Eraser mode deactivated</string>
+    <!-- Whiteboard save image message in the Study Screen -->
     <string name="white_board_image_save_failed">Opslaan van schrijfbordafbeelding is mislukt. %s</string>
     <string name="white_board_image_saved">schrijfbordafbeelding opgeslagen in %s</string>
     <string name="title_whiteboard_editor" maxLength="28">Whiteboard bewerker</string>
@@ -234,7 +239,7 @@
     <string name="note_editor_image_too_large">De afbeelding is te groot, voeg de afbeelding handmatig in</string>
     <string name="note_editor_video_too_large">Het videobestand is te groot, voeg de video handmatig in</string>
     <string name="note_editor_audio_too_large">Het audiobestand is te groot, voeg de audio handmatig in</string>
-    <string name="ankidroid_cannot_open_after_backup_try_again" comment="After an Android backup is restored, AnkiDroid opens and shows this message.         Opening AnkiDroid again will work correctly">Android back-up in uitvoering. Probeer opnieuw alstublieft </string>
+    <string name="ankidroid_cannot_open_after_backup_try_again" comment="After an Android backup is restored, AnkiDroid opens and shows this message.         Opening AnkiDroid again will work correctly">Android back-up in uitvoering. Probeer opnieuw alstublieft</string>
     <string name="create_shortcut_error_vivo" comment="iManager is an app on Vivo phones">Mogelijk moet u iManager gebruiken om AnkiDroid snelkoppelingen te laten toevoegen</string>
     <string name="create_shortcut_failed" comment="home screen == launcher">Uw startscherm staat niet toe dat AnkiDroid snelkoppelingen toevoegt</string>
     <string name="create_shortcut_error">Fout bij het toevoegen van de snelkoppeling: %s</string>
@@ -263,7 +268,7 @@
     <string name="search_using_deck_name">Zoek met setnaam</string>
     <string name="external_storage_unavailable">Download afgebroken, externe opslag is niet beschikbaar</string>
     <string name="home" maxLength="28">Startpagina</string>
-    <!-- Reviewer actions
+    <!-- Study Screen actions
     Each of these strings ends with a period, following the notation of Anki Desktop -->
     <string name="card_buried">Kaart begraven.</string>
     <plurals name="note_suspended">
@@ -349,4 +354,6 @@
     <string name="edit_browser_appearance" comment="Description of the shortcut that edits the browser appearance of card template">Edit browser appearance</string>
     <string name="missing_user_action_dialog_message" comment="%s is the user action number">User action %s is not set in this notetype. Please configure it</string>
     <string name="directory_inaccessible_info">Learn more about how to restore access here %s or go to settings to update collection folder.</string>
+    <!-- Scheduler Upgrade Required Dialog title-->
+    <string name="scheduler_upgrade_required_dialog_title" comment="Shown in a dialog when user has imported a collection using a very old version of the Anki spaced repetition scheduler">Scheduler upgrade required</string>
 </resources>

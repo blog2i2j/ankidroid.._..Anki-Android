@@ -18,14 +18,16 @@
 package com.ichi2.libanki
 
 import androidx.annotation.VisibleForTesting
-import anki.cards.FsrsMemoryState
+import com.ichi2.anki.common.annotations.NeedsTest
 import com.ichi2.anki.common.time.TimeManager
-import com.ichi2.anki.utils.ext.ifZero
-import com.ichi2.annotations.NeedsTest
+import com.ichi2.anki.common.utils.ext.ifZero
 import com.ichi2.libanki.TemplateManager.TemplateRenderContext.TemplateRenderOutput
 import com.ichi2.libanki.utils.LibAnkiAlias
 import com.ichi2.libanki.utils.NotInLibAnki
 import net.ankiweb.rsdroid.RustCleanup
+
+private typealias BackendCard = anki.cards.Card
+private typealias FSRSMemoryState = anki.cards.FsrsMemoryState
 
 /**
  * A Card is the ultimate entity subject to review; it encapsulates the scheduling parameters (from which to derive
@@ -89,13 +91,14 @@ open class Card : Cloneable {
 
     @VisibleForTesting
     var flags = 0
-    private var memoryState: FsrsMemoryState? = null
+    private var memoryState: FSRSMemoryState? = null
     private var desiredRetention: Float? = null
+    private var decay: Float? = null
 
     var renderOutput: TemplateRenderOutput? = null
     var note: Note? = null
 
-    constructor(card: anki.cards.Card) {
+    constructor(card: BackendCard) {
         loadFromBackendCard(card)
     }
 
@@ -104,7 +107,7 @@ open class Card : Cloneable {
             this.id = id
             load(col)
         } else {
-            loadFromBackendCard(anki.cards.Card.getDefaultInstance())
+            loadFromBackendCard(BackendCard.getDefaultInstance())
         }
     }
 
@@ -115,7 +118,7 @@ open class Card : Cloneable {
     }
 
     @LibAnkiAlias("_load_from_backend_card")
-    private fun loadFromBackendCard(card: anki.cards.Card) {
+    private fun loadFromBackendCard(card: BackendCard) {
         renderOutput = null
         note = null
         id = card.id
@@ -139,6 +142,7 @@ open class Card : Cloneable {
         customData = card.customData
         memoryState = if (card.hasMemoryState()) card.memoryState else null
         desiredRetention = if (card.hasDesiredRetention()) card.desiredRetention else null
+        decay = if (card.hasDecay()) card.decay else null
     }
 
     @LibAnkiAlias("_to_backend_card")
@@ -163,6 +167,7 @@ open class Card : Cloneable {
             this@Card.originalPosition?.let { originalPosition = it }
             this@Card.memoryState?.let { memoryState = it }
             this@Card.desiredRetention?.let { desiredRetention = it }
+            this@Card.decay?.let { decay = it }
         }
 
     @LibAnkiAlias("question")
@@ -293,6 +298,7 @@ open class Card : Cloneable {
             throw RuntimeException(e)
         }
 
+    @LibAnkiAlias("description")
     override fun toString(): String {
         val declaredFields = this.javaClass.declaredFields
         val members: MutableList<String?> = ArrayList(declaredFields.size)
@@ -340,26 +346,25 @@ open class Card : Cloneable {
     }
 
     companion object {
-        // A list of class members to skip in the toString() representation
+        /** A list of class members to skip in the [toString] representation */
+        @NotInLibAnki // inlined in pylib: 'description'
         val SKIP_PRINT: Set<String> =
             HashSet(
                 listOf(
+                    "Companion",
                     "SKIP_PRINT",
                     "\$assertionsDisabled",
-                    "TYPE_LRN",
-                    "TYPE_NEW",
-                    "TYPE_REV",
-                    "mNote",
-                    "mQA",
-                    "mCol",
-                    "mTimerStarted",
-                    "mTimerStopped",
+                    "note",
+                    "renderOutput",
+                    "timerStarted",
+                    "col",
                 ),
             )
 
         /**
          * Returns [flags] with the 3 first bits set as in [flag]
          */
+        @NotInLibAnki
         fun setFlagInInt(
             flags: Int,
             flag: Int,

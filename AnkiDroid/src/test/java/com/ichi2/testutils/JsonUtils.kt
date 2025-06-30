@@ -16,7 +16,7 @@
 
 package com.ichi2.testutils
 
-import com.ichi2.utils.JSONObjectHolder
+import com.ichi2.anki.common.json.JSONObjectHolder
 import org.hamcrest.BaseMatcher
 import org.hamcrest.Description
 import org.json.JSONObject
@@ -71,3 +71,10 @@ class IsJsonHolderEqual(
 }
 
 fun isJsonHolderEqual(expectedValue: String) = IsJsonHolderEqual(JSONObject(expectedValue))
+
+private fun jsonObjectOf(vararg pairs: Pair<String, Any>): JSONObject =
+    JSONObject().apply {
+        for ((key, value) in pairs) {
+            put(key, value)
+        }
+    }

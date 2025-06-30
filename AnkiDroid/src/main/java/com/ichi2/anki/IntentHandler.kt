@@ -26,15 +26,17 @@ import androidx.annotation.VisibleForTesting
 import androidx.core.app.TaskStackBuilder
 import androidx.core.content.FileProvider
 import androidx.core.content.IntentCompat
+import com.ichi2.anki.common.annotations.NeedsTest
+import com.ichi2.anki.common.utils.trimToLength
 import com.ichi2.anki.dialogs.DialogHandler.Companion.storeMessage
 import com.ichi2.anki.dialogs.DialogHandlerMessage
 import com.ichi2.anki.preferences.sharedPrefs
 import com.ichi2.anki.servicelayer.ScopedStorageService
 import com.ichi2.anki.services.ReminderService
+import com.ichi2.anki.settings.Prefs
 import com.ichi2.anki.ui.windows.reviewer.ReviewerFragment
 import com.ichi2.anki.utils.MimeTypeUtils
 import com.ichi2.anki.worker.SyncWorker
-import com.ichi2.annotations.NeedsTest
 import com.ichi2.libanki.DeckId
 import com.ichi2.utils.FileUtil
 import com.ichi2.utils.ImportUtils.handleFileImport
@@ -45,7 +47,6 @@ import com.ichi2.utils.NetworkUtils
 import com.ichi2.utils.Permissions
 import com.ichi2.utils.Permissions.hasLegacyStorageAccessPermission
 import com.ichi2.utils.copyToClipboard
-import com.ichi2.utils.trimToLength
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -155,7 +156,7 @@ class IntentHandler : AbstractIntentHandler() {
         Timber.i("Handling intent to review deck '%d'", deckId)
 
         val reviewIntent =
-            if (sharedPrefs().getBoolean("newReviewer", false)) {
+            if (Prefs.isNewStudyScreenEnabled) {
                 ReviewerFragment.getIntent(this)
             } else {
                 Intent(this, Reviewer::class.java).apply {
