@@ -23,15 +23,14 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.view.KeyEvent
-import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.SubMenu
 import android.view.View
-import android.view.ViewGroup
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.BaseAdapter
+import android.widget.LinearLayout
 import android.widget.Spinner
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
@@ -42,7 +41,6 @@ import androidx.annotation.MainThread
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.ThemeUtils
-import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
@@ -50,29 +48,21 @@ import androidx.fragment.app.FragmentContainerView
 import androidx.fragment.app.commit
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import anki.collection.OpChanges
-import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.google.android.material.snackbar.Snackbar
 import com.ichi2.anim.ActivityTransitionAnimation.Direction
 import com.ichi2.anki.CollectionManager.TR
 import com.ichi2.anki.CollectionManager.withCol
 import com.ichi2.anki.android.input.ShortcutGroup
 import com.ichi2.anki.android.input.shortcut
-import com.ichi2.anki.browser.BrowserColumnCollection
-import com.ichi2.anki.browser.BrowserColumnSelectionFragment
-import com.ichi2.anki.browser.BrowserMultiColumnAdapter
 import com.ichi2.anki.browser.BrowserRowCollection
+import com.ichi2.anki.browser.CardBrowserFragment
 import com.ichi2.anki.browser.CardBrowserLaunchOptions
 import com.ichi2.anki.browser.CardBrowserViewModel
 import com.ichi2.anki.browser.CardBrowserViewModel.SearchState
 import com.ichi2.anki.browser.CardBrowserViewModel.SearchState.Initializing
 import com.ichi2.anki.browser.CardBrowserViewModel.SearchState.Searching
 import com.ichi2.anki.browser.CardOrNoteId
-import com.ichi2.anki.browser.ColumnHeading
-import com.ichi2.anki.browser.ColumnSelectionDialogFragment
 import com.ichi2.anki.browser.FindAndReplaceDialogFragment
 import com.ichi2.anki.browser.IdsFile
 import com.ichi2.anki.browser.RepositionCardFragment
@@ -83,6 +73,7 @@ import com.ichi2.anki.browser.SaveSearchResult
 import com.ichi2.anki.browser.SharedPreferencesLastDeckIdRepository
 import com.ichi2.anki.browser.registerFindReplaceHandler
 import com.ichi2.anki.browser.toCardBrowserLaunchOptions
+import com.ichi2.anki.common.annotations.NeedsTest
 import com.ichi2.anki.common.utils.annotation.KotlinCleanup
 import com.ichi2.anki.dialogs.BrowserOptionsDialog
 import com.ichi2.anki.dialogs.CardBrowserMySearchesDialog
@@ -100,38 +91,36 @@ import com.ichi2.anki.dialogs.tags.TagsDialog
 import com.ichi2.anki.dialogs.tags.TagsDialogFactory
 import com.ichi2.anki.dialogs.tags.TagsDialogListener
 import com.ichi2.anki.export.ExportDialogFragment
+import com.ichi2.anki.libanki.CardId
+import com.ichi2.anki.libanki.Collection
+import com.ichi2.anki.libanki.DeckId
+import com.ichi2.anki.libanki.SortOrder
 import com.ichi2.anki.model.CardStateFilter
 import com.ichi2.anki.model.CardsOrNotes
 import com.ichi2.anki.model.CardsOrNotes.CARDS
 import com.ichi2.anki.model.CardsOrNotes.NOTES
 import com.ichi2.anki.model.SortType
 import com.ichi2.anki.noteeditor.NoteEditorLauncher
+import com.ichi2.anki.observability.ChangeManager
+import com.ichi2.anki.observability.undoableOp
 import com.ichi2.anki.preferences.sharedPrefs
 import com.ichi2.anki.previewer.PreviewerFragment
 import com.ichi2.anki.scheduling.ForgetCardsDialog
 import com.ichi2.anki.scheduling.SetDueDateDialog
 import com.ichi2.anki.scheduling.registerOnForgetHandler
+import com.ichi2.anki.settings.Prefs
 import com.ichi2.anki.snackbar.showSnackbar
+import com.ichi2.anki.ui.ResizablePaneManager
 import com.ichi2.anki.ui.internationalization.toSentenceCase
 import com.ichi2.anki.utils.ext.getCurrentDialogFragment
 import com.ichi2.anki.utils.ext.ifNotZero
 import com.ichi2.anki.utils.ext.setFragmentResultListener
 import com.ichi2.anki.utils.ext.showDialogFragment
 import com.ichi2.anki.widgets.DeckDropDownAdapter.SubtitleListener
-import com.ichi2.annotations.NeedsTest
-import com.ichi2.libanki.CardId
-import com.ichi2.libanki.ChangeManager
-import com.ichi2.libanki.Collection
-import com.ichi2.libanki.DeckId
-import com.ichi2.libanki.DeckNameId
-import com.ichi2.libanki.SortOrder
-import com.ichi2.libanki.undoableOp
 import com.ichi2.ui.CardBrowserSearchView
 import com.ichi2.utils.LanguageUtil
 import com.ichi2.utils.TagsUtil.getUpdatedTags
-import com.ichi2.utils.dp
 import com.ichi2.utils.increaseHorizontalPaddingOfOverflowMenuIcons
-import com.ichi2.utils.updatePaddingRelative
 import com.ichi2.widget.WidgetStatus.updateInBackground
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -170,6 +159,12 @@ open class CardBrowser :
         }
     }
 
+    override var fragmented: Boolean
+        get() = viewModel.isFragmented
+        set(value) {
+            throw UnsupportedOperationException()
+        }
+
     private enum class TagsDialogListenerAction {
         FILTER,
         EDIT_TAGS,
@@ -184,15 +179,7 @@ open class CardBrowser :
 
     private lateinit var deckSpinnerSelection: DeckSpinnerSelection
 
-    @VisibleForTesting
-    lateinit var cardsListView: RecyclerView
     private var searchView: CardBrowserSearchView? = null
-
-    @VisibleForTesting
-    lateinit var browserColumnHeadings: ViewGroup
-
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    lateinit var cardsAdapter: BrowserMultiColumnAdapter
 
     private lateinit var tagsDialogFactory: TagsDialogFactory
     private var searchItem: MenuItem? = null
@@ -213,30 +200,32 @@ open class CardBrowser :
 
     private var onEditCardActivityResult =
         registerForActivityResult(StartActivityForResult()) { result: ActivityResult ->
-            Timber.d("onEditCardActivityResult: resultCode=%d", result.resultCode)
+            Timber.i("onEditCardActivityResult: resultCode=%d", result.resultCode)
             if (result.resultCode == DeckPicker.RESULT_DB_ERROR) {
                 closeCardBrowser(DeckPicker.RESULT_DB_ERROR)
+                return@registerForActivityResult
             }
-            if (result.resultCode != RESULT_CANCELED) {
-                Timber.i("CardBrowser:: CardBrowser: Saving card...")
-                saveEditedCard()
-            }
-            val data = result.data
-            if (data != null &&
-                (
-                    data.getBooleanExtra(NoteEditor.RELOAD_REQUIRED_EXTRA_KEY, false) ||
-                        data.getBooleanExtra(NoteEditor.NOTE_CHANGED_EXTRA_KEY, false)
-                )
-            ) {
-                Timber.d("Reloading Card Browser due to activity result")
-                // if reloadRequired or noteChanged flag was sent from note editor then reload card list
-                forceRefreshSearch()
-                // in use by reviewer?
-                if (reviewerCardId == currentCardId) {
-                    reloadRequired = true
+
+            // handle template edits
+
+            // in use by reviewer?
+            result.data?.let {
+                if (
+                    it.getBooleanExtra(NoteEditor.RELOAD_REQUIRED_EXTRA_KEY, false) ||
+                    it.getBooleanExtra(NoteEditor.NOTE_CHANGED_EXTRA_KEY, false)
+                ) {
+                    if (reviewerCardId == currentCardId) {
+                        reloadRequired = true
+                    }
                 }
             }
+
             invalidateOptionsMenu() // maybe the availability of undo changed
+
+            // handle card edits
+            if (result.resultCode == RESULT_OK) {
+                viewModel.onCurrentNoteEdited()
+            }
         }
     private var onAddNoteActivityResult =
         registerForActivityResult(StartActivityForResult()) { result: ActivityResult ->
@@ -271,6 +260,8 @@ open class CardBrowser :
             invalidateOptionsMenu() // maybe the availability of undo changed
         }
     private lateinit var actionBarTitle: TextView
+
+    // TODO: Remove this and use `opChanges`
     private var reloadRequired = false
 
     @VisibleForTesting
@@ -364,29 +355,6 @@ open class CardBrowser :
             showUndoSnackbar(TR.browsingCardsUpdated(changed.count))
         }
 
-    // TODO: Move this to ViewModel and test
-    @VisibleForTesting
-    fun onTap(id: CardOrNoteId) =
-        launchCatchingTask {
-            cardsAdapter.focusedRow = id
-            if (viewModel.isInMultiSelectMode) {
-                val wasSelected = viewModel.selectedRows.contains(id)
-                viewModel.toggleRowSelection(id)
-                viewModel.saveScrollingState(id)
-                viewModel.oldCardTopOffset = calculateTopOffset(viewModel.lastSelectedPosition)
-                // Load NoteEditor on trailing side if card is selected
-                if (wasSelected) {
-                    viewModel.currentCardId = id.toCardId(viewModel.cardsOrNotes)
-                    loadNoteEditorFragmentIfFragmented(editNoteLauncher)
-                }
-            } else {
-                viewModel.lastSelectedPosition = (cardsListView.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
-                viewModel.oldCardTopOffset = calculateTopOffset(viewModel.lastSelectedPosition)
-                val cardId = viewModel.queryDataForCardEdit(id)
-                openNoteEditorForCard(cardId)
-            }
-        }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         if (showedActivityFailedScreen(savedInstanceState)) {
             return
@@ -407,8 +375,6 @@ open class CardBrowser :
         )
 
         val launchOptions = intent?.toCardBrowserLaunchOptions() // must be called after super.onCreate()
-        // must be called once we have an accessible collection
-        viewModel = createViewModel(launchOptions)
 
         setContentView(R.layout.card_browser)
         initNavigationDrawer(findViewById(android.R.id.content))
@@ -421,32 +387,39 @@ open class CardBrowser :
          * [fragmented] will be true if the view size is large otherwise false
          */
         // TODO: Consider refactoring by storing noteEditorFrame and similar views in a sealed class (e.g., FragmentAccessor).
-        fragmented =
-            (noteEditorFrame?.visibility == View.VISIBLE).apply {
-                Timber.i("Using split Browser: %b", fragmented)
+        val fragmented =
+            Prefs.devIsCardBrowserFragmented &&
+                noteEditorFrame?.visibility == View.VISIBLE
+        Timber.i("Using split Browser: %b", fragmented)
+
+        if (fragmented) {
+            val parentLayout = findViewById<LinearLayout>(R.id.card_browser_xl_view)
+            val divider = findViewById<View>(R.id.card_browser_resizing_divider)
+            val leftPane = findViewById<View>(R.id.card_browser_frame)
+            val rightPane = findViewById<View>(R.id.note_editor_frame)
+            if (parentLayout != null && divider != null && leftPane != null && rightPane != null) {
+                ResizablePaneManager(
+                    parentLayout = parentLayout,
+                    divider = divider,
+                    leftPane = leftPane,
+                    rightPane = rightPane,
+                    sharedPrefs = Prefs.getUiConfig(this),
+                    leftPaneWeightKey = PREF_CARD_BROWSER_PANE_WEIGHT,
+                    rightPaneWeightKey = PREF_NOTE_EDITOR_PANE_WEIGHT,
+                )
             }
+        }
+
+        // must be called once we have an accessible collection
+        viewModel = createViewModel(launchOptions, fragmented)
+
+        supportFragmentManager.commit {
+            replace(R.id.card_browser_frame, CardBrowserFragment())
+        }
 
         // initialize the lateinit variables
         // Load reference to action bar title
         actionBarTitle = findViewById(R.id.toolbar_title)
-        cardsListView = findViewById(R.id.card_browser_list)
-        DividerItemDecoration(this, DividerItemDecoration.VERTICAL).apply {
-            setDrawable(ContextCompat.getDrawable(this@CardBrowser, R.drawable.browser_divider)!!)
-            cardsListView.addItemDecoration(this)
-        }
-
-        cardsAdapter =
-            BrowserMultiColumnAdapter(
-                this,
-                viewModel,
-                onTap = ::onTap,
-                onLongPress = viewModel::handleRowLongPress,
-            )
-        cardsListView.adapter = cardsAdapter
-        cardsAdapter.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
-        val layoutManager = LinearLayoutManager(this)
-        cardsListView.layoutManager = layoutManager
-        cardsListView.addItemDecoration(DividerItemDecoration(this@CardBrowser, layoutManager.orientation))
 
         deckSpinnerSelection =
             DeckSpinnerSelection(
@@ -456,8 +429,6 @@ open class CardBrowser :
                 alwaysShowDefault = false,
                 showFilteredDecks = true,
             )
-
-        this.browserColumnHeadings = findViewById<ViewGroup>(R.id.browser_column_headings)
 
         startLoadingCollection()
 
@@ -538,10 +509,8 @@ open class CardBrowser :
 
     /**
      * Loads the NoteEditor fragment in container if the view is x-large.
-     *
-     * @param launcher The NoteEditorLauncher containing the necessary data to initialize the NoteEditor Fragment.
      */
-    private fun loadNoteEditorFragmentIfFragmented(launcher: NoteEditorLauncher) {
+    fun loadNoteEditorFragmentIfFragmented() {
         if (!fragmented) {
             return
         }
@@ -550,15 +519,10 @@ open class CardBrowser :
 
         // If there are unsaved changes in NoteEditor then show dialog for confirmation
         if (fragment?.hasUnsavedChanges() == true) {
-            showSaveChangesDialog(launcher)
+            showSaveChangesDialog(editNoteLauncher)
         } else {
-            loadNoteEditorFragment(launcher)
+            loadNoteEditorFragment(editNoteLauncher)
         }
-    }
-
-    fun notifyDataSetChanged() {
-        cardsAdapter.notifyDataSetChanged()
-        refreshSubtitle()
     }
 
     private fun refreshSubtitle() {
@@ -568,7 +532,6 @@ open class CardBrowser :
     @Suppress("UNUSED_PARAMETER")
     private fun setupFlows() {
         // provides a name for each flow receiver to improve stack traces
-        fun onIsTruncatedChanged(isTruncated: Boolean) = notifyDataSetChanged()
 
         fun onSearchQueryExpanded(searchQueryExpanded: Boolean) {
             Timber.d("query expansion changed: %b", searchQueryExpanded)
@@ -582,11 +545,6 @@ open class CardBrowser :
         }
 
         fun onSelectedRowsChanged(rows: Set<Any>) = onSelectionChanged()
-
-        fun onColumnsChanged(columnCollection: BrowserColumnCollection) {
-            Timber.d("columns changed")
-            notifyDataSetChanged()
-        }
 
         fun onFilterQueryChanged(filterQuery: String) {
             // setQuery before expand does not set the view's value
@@ -611,34 +569,24 @@ open class CardBrowser :
                 // show title and hide spinner
                 actionBarTitle.visibility = View.VISIBLE
                 deckSpinnerSelection.setSpinnerVisibility(View.GONE)
-                // A checkbox is added on the rows, match padding to keep the headings aligned
-                // Due to the ripple on long press, we set padding
-                browserColumnHeadings.updatePaddingRelative(start = 48.dp)
                 multiSelectOnBackPressedCallback.isEnabled = true
-                autoScrollTo(viewModel.lastSelectedPosition, viewModel.oldCardTopOffset)
             } else {
                 Timber.d("end multiselect mode")
-                // update adapter to remove check boxes
-                notifyDataSetChanged()
+                refreshSubtitle()
                 deckSpinnerSelection.setSpinnerVisibility(View.VISIBLE)
                 actionBarTitle.visibility = View.GONE
-                browserColumnHeadings.updatePaddingRelative(start = 0.dp)
                 multiSelectOnBackPressedCallback.isEnabled = false
-                autoScrollTo(viewModel.lastSelectedPosition, viewModel.oldCardTopOffset)
             }
             // reload the actionbar using the multi-select mode actionbar
             invalidateOptionsMenu()
         }
 
-        fun cardsUpdatedChanged(unit: Unit) = notifyDataSetChanged()
+        fun cardsUpdatedChanged(unit: Unit) = refreshSubtitle()
 
         fun searchStateChanged(searchState: SearchState) {
             Timber.d("search state: %s", searchState)
-            notifyDataSetChanged()
+            refreshSubtitle()
 
-            findViewById<LinearProgressIndicator>(R.id.browser_progress).isVisible =
-                searchState == Initializing ||
-                searchState == Searching
             when (searchState) {
                 Initializing -> { }
                 Searching -> {
@@ -654,85 +602,22 @@ open class CardBrowser :
             }
         }
 
-        fun showColumnSelectionDialog(selectedColumn: ColumnHeading) {
-            Timber.d("Fetching available columns for: ${selectedColumn.label}")
-
-            // Prevent multiple dialogs from opening
-            if (supportFragmentManager.findFragmentByTag(ColumnSelectionDialogFragment.TAG) != null) {
-                Timber.d("ColumnSelectionDialog is already shown, ignoring duplicate click.")
-                return
-            }
-
-            lifecycleScope.launch {
-                val (_, availableColumns) = viewModel.previewColumnHeadings(viewModel.cardsOrNotes)
-
-                if (availableColumns.isEmpty()) {
-                    Timber.w("No available columns to replace ${selectedColumn.label}")
-                    showSnackbar(R.string.no_columns_available)
-                    return@launch
-                }
-
-                val dialog = ColumnSelectionDialogFragment.newInstance(selectedColumn)
-                dialog.show(supportFragmentManager, ColumnSelectionDialogFragment.TAG)
-            }
-        }
-
-        fun onColumnNamesChanged(columnCollection: List<ColumnHeading>) {
-            Timber.d("column names changed")
-            browserColumnHeadings.removeAllViews()
-
-            val layoutInflater = LayoutInflater.from(browserColumnHeadings.context)
-            for (column in columnCollection) {
-                Timber.d("setting up column %s", column)
-                layoutInflater.inflate(R.layout.browser_column_heading, browserColumnHeadings, false).apply {
-                    val columnView = this as TextView
-                    columnView.text = column.label
-
-                    // Attach click listener to open the selection dialog
-                    columnView.setOnClickListener {
-                        Timber.d("Clicked column: ${column.label}")
-                        showColumnSelectionDialog(column)
-                    }
-
-                    // Attach long press listener to open the manage column dialog
-                    columnView.setOnLongClickListener {
-                        Timber.d("Long-pressed column: ${column.label}")
-                        val dialog = BrowserColumnSelectionFragment.createInstance(viewModel.cardsOrNotes)
-                        dialog.show(supportFragmentManager, null)
-                        true
-                    }
-                    browserColumnHeadings.addView(columnView)
-                }
-            }
-        }
-
-        fun onSelectedRowUpdated(id: CardOrNoteId?) {
-            cardsAdapter.focusedRow = id
-            if (!viewModel.isInMultiSelectMode || viewModel.lastSelectedId == null) {
-                viewModel.oldCardTopOffset = calculateTopOffset(viewModel.lastSelectedPosition)
-            }
-        }
-
         fun onSelectedCardUpdated(unit: Unit) {
             if (fragmented) {
-                loadNoteEditorFragmentIfFragmented(editNoteLauncher)
+                loadNoteEditorFragmentIfFragmented()
             } else {
                 onEditCardActivityResult.launch(editNoteLauncher.toIntent(this))
             }
         }
 
-        viewModel.flowOfIsTruncated.launchCollectionInLifecycleScope(::onIsTruncatedChanged)
         viewModel.flowOfSearchQueryExpanded.launchCollectionInLifecycleScope(::onSearchQueryExpanded)
         viewModel.flowOfSelectedRows.launchCollectionInLifecycleScope(::onSelectedRowsChanged)
-        viewModel.flowOfActiveColumns.launchCollectionInLifecycleScope(::onColumnsChanged)
         viewModel.flowOfFilterQuery.launchCollectionInLifecycleScope(::onFilterQueryChanged)
         viewModel.flowOfDeckId.launchCollectionInLifecycleScope(::onDeckIdChanged)
         viewModel.flowOfCanSearch.launchCollectionInLifecycleScope(::onCanSaveChanged)
         viewModel.flowOfIsInMultiSelectMode.launchCollectionInLifecycleScope(::isInMultiSelectModeChanged)
         viewModel.flowOfCardsUpdated.launchCollectionInLifecycleScope(::cardsUpdatedChanged)
         viewModel.flowOfSearchState.launchCollectionInLifecycleScope(::searchStateChanged)
-        viewModel.flowOfColumnHeadings.launchCollectionInLifecycleScope(::onColumnNamesChanged)
-        viewModel.rowLongPressFocusFlow.launchCollectionInLifecycleScope(::onSelectedRowUpdated)
         viewModel.cardSelectionEventFlow.launchCollectionInLifecycleScope(::onSelectedCardUpdated)
     }
 
@@ -978,15 +863,14 @@ open class CardBrowser :
     fun toggleMark() =
         launchCatchingTask {
             withProgress { viewModel.toggleMark() }
-            notifyDataSetChanged()
         }
 
     /** Opens the note editor for a card.
      * We use the Card ID to specify the preview target  */
     @NeedsTest("note edits are saved")
     @NeedsTest("I/O edits are saved")
-    private fun openNoteEditorForCard(cardId: CardId) {
-        viewModel.handleCardSelection(cardId, fragmented)
+    fun openNoteEditorForCard(cardId: CardId) {
+        viewModel.handleCardSelection(cardId)
     }
 
     /**
@@ -1036,7 +920,6 @@ open class CardBrowser :
     override fun onResume() {
         super.onResume()
         selectNavigationItem(R.id.nav_browser)
-        autoScrollTo(viewModel.lastSelectedPosition, viewModel.oldCardTopOffset)
         searchView?.post {
             hideKeyboard()
         }
@@ -1406,21 +1289,32 @@ open class CardBrowser :
             }
             R.id.action_edit_tags -> {
                 showEditTagsDialog()
+                return true
             }
             R.id.action_open_options -> {
                 showOptionsDialog()
+                return true
             }
             R.id.action_export_selected -> {
                 exportSelected()
+                return true
             }
             R.id.action_create_filtered_deck -> {
                 showCreateFilteredDeckDialog()
+                return true
             }
             R.id.action_find_replace -> {
                 showFindAndReplaceDialog()
+                return true
             }
         }
-        return fragmented && fragment!!.onMenuItemSelected(item)
+        if (fragment?.onMenuItemSelected(item) == true) {
+            return true
+        }
+        if (fragment == null) {
+            Timber.w("Unexpected onOptionsItemSelected call: %s", item.itemId)
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     private fun showCreateFilteredDeckDialog() {
@@ -1635,7 +1529,8 @@ open class CardBrowser :
                 return@launchCatchingTask
             }
             val selectableDecks =
-                getValidDecksForChangeDeck()
+                viewModel
+                    .getAvailableDecks()
                     .map { d -> SelectableDeck(d) }
             val dialog = getChangeDeckDialog(selectableDecks)
             showDialogFragment(dialog)
@@ -1643,7 +1538,7 @@ open class CardBrowser :
 
     private fun addNoteFromCardBrowser() {
         if (fragmented) {
-            loadNoteEditorFragmentIfFragmented(addNoteLauncher)
+            loadNoteEditorFragmentIfFragmented()
         } else {
             onAddNoteActivityResult.launch(addNoteLauncher.toIntent(this))
         }
@@ -1721,8 +1616,8 @@ open class CardBrowser :
             // Hide note editor frame if deck is empty and fragmented
             noteEditorFrame?.visibility =
                 if (fragmented && !isDeckEmpty) {
-                    viewModel.currentCardId = (cardsAdapter.focusedRow ?: viewModel.cards[0]).toCardId(viewModel.cardsOrNotes)
-                    loadNoteEditorFragmentIfFragmented(editNoteLauncher)
+                    viewModel.currentCardId = (viewModel.focusedRow ?: viewModel.cards[0]).toCardId(viewModel.cardsOrNotes)
+                    loadNoteEditorFragmentIfFragmented()
                     View.VISIBLE
                 } else {
                     invalidateOptionsMenu()
@@ -1766,7 +1661,7 @@ open class CardBrowser :
         updateMultiselectMenu()
         actionBarMenu?.findItem(R.id.action_select_all)?.isVisible = !hasSelectedAllCards()
         actionBarMenu?.findItem(R.id.action_select_none)?.isVisible = viewModel.hasSelectedAnyRows()
-        notifyDataSetChanged()
+        refreshSubtitle()
     }
 
     /**
@@ -1784,9 +1679,6 @@ open class CardBrowser :
                 }
             return resources.getQuantityString(subtitleId, count, count)
         }
-
-    /** Returns the decks which are valid targets for "Change Deck"  */
-    suspend fun getValidDecksForChangeDeck(): List<DeckNameId> = deckSpinnerSelection.computeDropDownDecks(includeFiltered = false)
 
     @RustCleanup("this isn't how Desktop Anki does it")
     override fun onSelectedTags(
@@ -1849,11 +1741,6 @@ open class CardBrowser :
         updateList()
     }
 
-    private fun saveEditedCard() {
-        Timber.d("CardBrowser - saveEditedCard()")
-        updateCardsInList(listOf(viewModel.currentCardId))
-    }
-
     private fun toggleSuspendCards() = launchCatchingTask { withProgress { viewModel.toggleSuspendCards().join() } }
 
     /** @see CardBrowserViewModel.toggleBury */
@@ -1881,7 +1768,7 @@ open class CardBrowser :
         // reload whole view
         forceRefreshSearch()
         viewModel.endMultiSelectMode()
-        notifyDataSetChanged()
+        refreshSubtitle()
         updatePreviewMenuItem()
         invalidateOptionsMenu() // maybe the availability of undo changed
     }
@@ -1924,17 +1811,22 @@ open class CardBrowser :
      *
      * @see showedActivityFailedScreen - we may not have AnkiDroidApp.instance and therefore can't
      * create the ViewModel
+     *
+     * @param fragmented True if `noteEditorFrame` is non-null (x-large displays)
      */
-    private fun createViewModel(launchOptions: CardBrowserLaunchOptions?) =
-        ViewModelProvider(
-            viewModelStore,
-            CardBrowserViewModel.factory(
-                lastDeckIdRepository = AnkiDroidApp.instance.sharedPrefsLastDeckIdRepository,
-                cacheDir = cacheDir,
-                options = launchOptions,
-            ),
-            defaultViewModelCreationExtras,
-        )[CardBrowserViewModel::class.java]
+    private fun createViewModel(
+        launchOptions: CardBrowserLaunchOptions?,
+        fragmented: Boolean,
+    ) = ViewModelProvider(
+        viewModelStore,
+        CardBrowserViewModel.factory(
+            lastDeckIdRepository = AnkiDroidApp.instance.sharedPrefsLastDeckIdRepository,
+            cacheDir = cacheDir,
+            options = launchOptions,
+            isFragmented = fragmented,
+        ),
+        defaultViewModelCreationExtras,
+    )[CardBrowserViewModel::class.java]
 
     @VisibleForTesting(otherwise = VisibleForTesting.NONE)
     fun filterByTag(vararg tags: String) {
@@ -1951,12 +1843,10 @@ open class CardBrowser :
             return
         }
 
-        if ((
-                changes.browserSidebar ||
-                    changes.browserTable ||
-                    changes.noteText ||
-                    changes.card
-            )
+        if (changes.browserSidebar ||
+            changes.browserTable ||
+            changes.noteText ||
+            changes.card
         ) {
             refreshAfterUndo()
         }
@@ -2007,6 +1897,10 @@ open class CardBrowser :
          */
         private const val CHANGE_DECK_KEY = "CHANGE_DECK"
 
+        // Keys for saving pane weights in SharedPreferences
+        private const val PREF_CARD_BROWSER_PANE_WEIGHT = "cardBrowserPaneWeight"
+        private const val PREF_NOTE_EDITOR_PANE_WEIGHT = "noteEditorPaneWeight"
+
         // Values related to persistent state data
         fun clearLastDeckId() = SharedPreferencesLastDeckIdRepository.clearLastDeckId()
 
@@ -2015,20 +1909,6 @@ open class CardBrowser :
             viewModel: CardBrowserViewModel,
             inFragmentedActivity: Boolean = false,
         ): NoteEditorLauncher = NoteEditorLauncher.AddNoteFromCardBrowser(viewModel, inFragmentedActivity)
-    }
-
-    private fun calculateTopOffset(cardPosition: Int): Int {
-        val layoutManager = cardsListView.layoutManager as LinearLayoutManager
-        val firstVisiblePosition = layoutManager.findFirstVisibleItemPosition()
-        val view = cardsListView.getChildAt(cardPosition - firstVisiblePosition)
-        return view?.top ?: 0
-    }
-
-    private fun autoScrollTo(
-        newPosition: Int,
-        offset: Int,
-    ) {
-        (cardsListView.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(newPosition, offset)
     }
 }
 

@@ -27,6 +27,7 @@ import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.os.Message
 import android.os.Parcelable
 import android.text.SpannableString
@@ -59,12 +60,21 @@ import anki.frontend.SetSchedulingStatesRequest
 import com.google.android.material.color.MaterialColors
 import com.google.android.material.snackbar.Snackbar
 import com.ichi2.anim.ActivityTransitionAnimation.getInverseTransition
+import com.ichi2.anki.CollectionManager.TR
 import com.ichi2.anki.CollectionManager.withCol
 import com.ichi2.anki.Whiteboard.Companion.createInstance
 import com.ichi2.anki.Whiteboard.OnPaintColorChangeListener
 import com.ichi2.anki.cardviewer.Gesture
 import com.ichi2.anki.cardviewer.ViewerCommand
+import com.ichi2.anki.common.annotations.NeedsTest
 import com.ichi2.anki.common.time.TimeManager
+import com.ichi2.anki.libanki.Card
+import com.ichi2.anki.libanki.CardId
+import com.ichi2.anki.libanki.Collection
+import com.ichi2.anki.libanki.QueueType
+import com.ichi2.anki.libanki.sched.Counts
+import com.ichi2.anki.libanki.sched.CurrentQueueState
+import com.ichi2.anki.libanki.sched.Ease
 import com.ichi2.anki.multimedia.audio.AudioRecordingController
 import com.ichi2.anki.multimedia.audio.AudioRecordingController.Companion.generateTempAudioFile
 import com.ichi2.anki.multimedia.audio.AudioRecordingController.Companion.isAudioRecordingSaved
@@ -73,6 +83,7 @@ import com.ichi2.anki.multimedia.audio.AudioRecordingController.Companion.setEdi
 import com.ichi2.anki.multimedia.audio.AudioRecordingController.Companion.tempAudioPath
 import com.ichi2.anki.multimedia.audio.AudioRecordingController.RecordingState
 import com.ichi2.anki.noteeditor.NoteEditorLauncher
+import com.ichi2.anki.observability.undoableOp
 import com.ichi2.anki.pages.AnkiServer.Companion.ANKIDROID_JS_PREFIX
 import com.ichi2.anki.pages.AnkiServer.Companion.ANKI_PREFIX
 import com.ichi2.anki.pages.CardInfoDestination
@@ -83,13 +94,13 @@ import com.ichi2.anki.reviewer.AnswerButtons.Companion.getTextColors
 import com.ichi2.anki.reviewer.AnswerTimer
 import com.ichi2.anki.reviewer.AutomaticAnswerAction
 import com.ichi2.anki.reviewer.Binding
+import com.ichi2.anki.reviewer.BindingMap
 import com.ichi2.anki.reviewer.BindingProcessor
 import com.ichi2.anki.reviewer.CardMarker
 import com.ichi2.anki.reviewer.CardSide
 import com.ichi2.anki.reviewer.FullScreenMode
 import com.ichi2.anki.reviewer.FullScreenMode.Companion.fromPreference
 import com.ichi2.anki.reviewer.FullScreenMode.Companion.isFullScreenReview
-import com.ichi2.anki.reviewer.PeripheralKeymap
 import com.ichi2.anki.reviewer.ReviewerBinding
 import com.ichi2.anki.reviewer.ReviewerUi
 import com.ichi2.anki.scheduling.ForgetCardsDialog
@@ -97,6 +108,7 @@ import com.ichi2.anki.scheduling.SetDueDateDialog
 import com.ichi2.anki.scheduling.registerOnForgetHandler
 import com.ichi2.anki.servicelayer.NoteService.isMarked
 import com.ichi2.anki.servicelayer.NoteService.toggleMark
+import com.ichi2.anki.settings.Prefs
 import com.ichi2.anki.snackbar.showSnackbar
 import com.ichi2.anki.ui.internationalization.toSentenceCase
 import com.ichi2.anki.ui.windows.reviewer.ReviewerFragment
@@ -105,14 +117,6 @@ import com.ichi2.anki.utils.ext.setUserFlagForCards
 import com.ichi2.anki.utils.ext.showDialogFragment
 import com.ichi2.anki.utils.navBarNeedsScrim
 import com.ichi2.anki.utils.remainingTime
-import com.ichi2.annotations.NeedsTest
-import com.ichi2.libanki.Card
-import com.ichi2.libanki.CardId
-import com.ichi2.libanki.Collection
-import com.ichi2.libanki.QueueType
-import com.ichi2.libanki.sched.Counts
-import com.ichi2.libanki.sched.CurrentQueueState
-import com.ichi2.libanki.undoableOp
 import com.ichi2.themes.Themes
 import com.ichi2.themes.Themes.currentTheme
 import com.ichi2.utils.HandlerUtils.executeFunctionWithDelay
@@ -147,6 +151,7 @@ open class Reviewer :
     private var prefFullscreenReview = false
     private lateinit var colorPalette: LinearLayout
     private var toggleStylus = false
+    private var isEraserMode = false
 
     // A flag that determines if the SchedulingStates in CurrentQueueState are
     // safe to persist in the database when answering a card. This is used to
@@ -203,7 +208,7 @@ open class Reviewer :
     private lateinit var toolbar: Toolbar
 
     @VisibleForTesting
-    protected open lateinit var processor: PeripheralKeymap<ReviewerBinding, ViewerCommand>
+    protected open lateinit var processor: BindingMap<ReviewerBinding, ViewerCommand>
 
     private val addNoteLauncher =
         registerForActivityResult(
@@ -228,7 +233,7 @@ open class Reviewer :
         textBarReview = findViewById(R.id.review_number)
         toolbar = findViewById(R.id.toolbar)
         micToolBarLayer = findViewById(R.id.mic_tool_bar_layer)
-        processor = PeripheralKeymap(sharedPrefs(), ViewerCommand.entries, this)
+        processor = BindingMap(sharedPrefs(), ViewerCommand.entries, this)
         if (sharedPrefs().getString("answerButtonPosition", "bottom") == "bottom" && !navBarNeedsScrim) {
             setNavigationBarColor(R.attr.showAnswerColor)
         }
@@ -254,11 +259,6 @@ open class Reviewer :
         if (typeAnswer?.autoFocusEditText() == true) {
             answerField?.focusWithKeyboard()
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        server.stop()
     }
 
     protected val flagToDisplay: Flag
@@ -438,8 +438,8 @@ open class Reviewer :
                 onMark(currentCard)
             }
             R.id.action_replay -> {
-                Timber.i("Reviewer:: Replay audio button pressed (from menu)")
-                playSounds(true)
+                Timber.i("Reviewer:: Replay media button pressed (from menu)")
+                playMedia(doMediaReplay = true)
             }
             R.id.action_toggle_mic_tool_bar -> {
                 Timber.i("Reviewer:: Voice playback visibility set to %b", !isMicToolBarVisible)
@@ -463,6 +463,10 @@ open class Reviewer :
             R.id.action_delete -> {
                 Timber.i("Reviewer:: Delete note button pressed")
                 showDeleteNoteDialog()
+            }
+            R.id.action_toggle_auto_advance -> {
+                Timber.i("Reviewer:: Toggle Auto Advance button pressed")
+                toggleAutoAdvance()
             }
             R.id.action_change_whiteboard_pen_color -> {
                 Timber.i("Reviewer:: Pen Color button pressed")
@@ -489,6 +493,10 @@ open class Reviewer :
                 setWhiteboardVisibility(!showWhiteboard)
                 refreshActionBar()
             }
+            R.id.action_toggle_eraser -> { // toggle eraser mode
+                Timber.i("Reviewer:: Eraser button pressed")
+                toggleEraser()
+            }
             R.id.action_toggle_stylus -> { // toggle stylus mode
                 Timber.i("Reviewer:: Stylus set to %b", !toggleStylus)
                 toggleStylus = !toggleStylus
@@ -500,6 +508,7 @@ open class Reviewer :
                 toggleWhiteboard()
             }
             R.id.action_open_deck_options -> {
+                Timber.i("Reviewer:: Opening deck options")
                 val i =
                     com.ichi2.anki.pages.DeckOptions
                         .getIntent(this, getColUnsafe.decks.current().id)
@@ -544,6 +553,67 @@ open class Reviewer :
             colorPalette.visibility = View.GONE
         }
         refreshActionBar()
+    }
+
+    public override fun toggleEraser() {
+        val whiteboardIsShownAndHasStrokes = showWhiteboard && whiteboard?.undoEmpty() == false
+        if (whiteboardIsShownAndHasStrokes) {
+            Timber.i("Reviewer:: Whiteboard eraser mode set to %b", !isEraserMode)
+            isEraserMode = !isEraserMode
+            whiteboard?.reviewerEraserModeIsToggledOn = isEraserMode
+
+            refreshActionBar() // Switch the eraser item's title
+
+            // Keep ripple effect on the eraser button after the eraser mode is activated.
+            toolbar.post {
+                val eraserButtonView = toolbar.findViewById<View>(R.id.action_toggle_eraser)
+                eraserButtonView?.apply {
+                    isPressed = isEraserMode
+                    isActivated = isEraserMode
+                }
+            }
+
+            if (isEraserMode) {
+                startMonitoringEraserButtonRipple()
+                showSnackbar(getString(R.string.white_board_eraser_enabled), 1000)
+            } else {
+                stopMonitoringEraserButtonRipple()
+                showSnackbar(getString(R.string.white_board_eraser_disabled), 1000)
+            }
+        }
+    }
+
+    private val handler = Handler(Looper.getMainLooper())
+
+    /**
+     * The eraser button ripple should be shown while the eraser mode is activated,
+     * but the ripple gets removed after some timings
+     * (e.g., when the three dot menu opens,
+     *        when the side drawer opens & closes,
+     *        when the button is long-pressed)
+     * In such timings, this function re-press the button to re-display the ripple.
+     */
+    private val checkEraserButtonRippleRunnable =
+        object : Runnable {
+            override fun run() {
+                val eraserButtonView = toolbar.findViewById<View>(R.id.action_toggle_eraser)
+                if (isEraserMode && eraserButtonView?.isPressed == false) {
+                    Timber.d("eraser button ripple monitoring: unpressed status detected, and re-pressed")
+                    eraserButtonView.isPressed = true
+                    eraserButtonView.isActivated = true
+                }
+                handler.postDelayed(this, 100) // monitor every 100ms
+            }
+        }
+
+    private fun startMonitoringEraserButtonRipple() {
+        Timber.d("eraser button ripple monitoring: started")
+        handler.post(checkEraserButtonRippleRunnable)
+    }
+
+    private fun stopMonitoringEraserButtonRipple() {
+        Timber.d("eraser button ripple monitoring: stopped")
+        handler.removeCallbacks(checkEraserButtonRippleRunnable)
     }
 
     public override fun clearWhiteboard() {
@@ -632,6 +702,7 @@ open class Reviewer :
 
     private fun openOrToggleMicToolbar() {
         if (!canRecordAudio(this)) {
+            Timber.i("requesting 'RECORD_AUDIO' permission")
             ActivityCompat.requestPermissions(
                 this,
                 arrayOf(Manifest.permission.RECORD_AUDIO),
@@ -643,6 +714,7 @@ open class Reviewer :
     }
 
     private fun toggleMicToolBar() {
+        Timber.i("toggle mic toolbar")
         tempAudioPath = generateTempAudioFile(this)
         if (isMicToolBarVisible) {
             micToolBarLayer.visibility = View.GONE
@@ -694,6 +766,7 @@ open class Reviewer :
 
     private fun showDueDateDialog() =
         launchCatchingTask {
+            Timber.i("showing due date dialog")
             val dialog = SetDueDateDialog.newInstance(listOf(currentCardId!!))
             showDialogFragment(dialog)
         }
@@ -706,6 +779,7 @@ open class Reviewer :
     fun addNote(fromGesture: Gesture? = null) {
         val animation = getAnimationTransitionFromGesture(fromGesture)
         val inverseAnimation = getInverseTransition(animation)
+        Timber.i("launching 'add note'")
         val intent = NoteEditorLauncher.AddNoteFromReviewer(inverseAnimation).toIntent(this)
         addNoteLauncher.launch(intent)
     }
@@ -716,6 +790,7 @@ open class Reviewer :
             showSnackbar(getString(R.string.multimedia_editor_something_wrong), Snackbar.LENGTH_SHORT)
             return
         }
+        Timber.i("opening card info")
         val intent = CardInfoDestination(currentCard!!.id).toIntent(this)
         val animation = getAnimationTransitionFromGesture(fromGesture)
         intent.putExtra(FINISH_ANIMATION_EXTRA, getInverseTransition(animation) as Parcelable)
@@ -761,29 +836,43 @@ open class Reviewer :
         val undoEnabled: Boolean
         val whiteboardIsShownAndHasStrokes = showWhiteboard && whiteboard?.undoEmpty() == false
         if (whiteboardIsShownAndHasStrokes) {
-            undoIconId = R.drawable.eraser
+            undoIconId = R.drawable.ic_arrow_u_left_top
             undoEnabled = true
         } else {
             undoIconId = R.drawable.ic_undo_white
             undoEnabled = colIsOpenUnsafe() && getColUnsafe.undoAvailable()
+            this.isEraserMode = false
         }
         val alphaUndo = Themes.ALPHA_ICON_ENABLED_LIGHT
         val undoIcon = menu.findItem(R.id.action_undo)
         undoIcon.setIcon(undoIconId)
         undoIcon.setEnabled(undoEnabled).iconAlpha = alphaUndo
         undoIcon.actionView!!.isEnabled = undoEnabled
+        val toggleEraserIcon = menu.findItem((R.id.action_toggle_eraser))
         if (colIsOpenUnsafe()) { // Required mostly because there are tests where `col` is null
             if (whiteboardIsShownAndHasStrokes) {
+                // Make Undo action title to whiteboard Undo specific one
                 undoIcon.title = resources.getString(R.string.undo_action_whiteboard_last_stroke)
-            } else if (getColUnsafe.undoAvailable()) {
-                undoIcon.title = getColUnsafe.undoLabel()
-                //  e.g. Undo Bury, Undo Change Deck, Undo Update Note
+
+                // Show whiteboard Eraser action button
+                if (!actionButtons.status.toggleEraserIsDisabled()) {
+                    toggleEraserIcon.isVisible = true
+                }
             } else {
-                // In this case, there is no object word for the verb, "Undo",
-                // so in some languages such as Japanese, which have pre/post-positional particle with the object,
-                // we need to use the string for just "Undo" instead of the string for "Undo %s".
-                undoIcon.title = resources.getString(R.string.undo)
-                undoIcon.iconAlpha = Themes.ALPHA_ICON_DISABLED_LIGHT
+                // Disable whiteboard eraser action button
+                isEraserMode = false
+                whiteboard?.reviewerEraserModeIsToggledOn = isEraserMode
+
+                if (getColUnsafe.undoAvailable()) {
+                    //  e.g. Undo Bury, Undo Change Deck, Undo Update Note
+                    undoIcon.title = getColUnsafe.undoLabel()
+                } else {
+                    // In this case, there is no object word for the verb, "Undo",
+                    // so in some languages such as Japanese, which have pre/post-positional particle with the object,
+                    // we need to use the string for just "Undo" instead of the string for "Undo %s".
+                    undoIcon.title = resources.getString(R.string.undo)
+                    undoIcon.iconAlpha = Themes.ALPHA_ICON_DISABLED_LIGHT
+                }
             }
             menu.findItem(R.id.action_redo)?.apply {
                 if (getColUnsafe.redoAvailable()) {
@@ -797,6 +886,13 @@ open class Reviewer :
                 }
             }
         }
+        menu.findItem(R.id.action_toggle_auto_advance).apply {
+            if (actionButtons.status.autoAdvanceMenuIsNeverShown()) return@apply
+            // always show if enabled (to allow disabling)
+            // otherwise show if it will have an effect
+            isVisible = automaticAnswer.isEnabled() || automaticAnswer.isUsable()
+        }
+
         val toggleWhiteboardIcon = menu.findItem(R.id.action_toggle_whiteboard)
         val toggleStylusIcon = menu.findItem(R.id.action_toggle_stylus)
         val hideWhiteboardIcon = menu.findItem(R.id.action_hide_whiteboard)
@@ -825,11 +921,21 @@ open class Reviewer :
             val whiteboardIcon = ContextCompat.getDrawable(applicationContext, R.drawable.ic_gesture_white)!!.mutate()
             val stylusIcon = ContextCompat.getDrawable(this, R.drawable.ic_gesture_stylus)!!.mutate()
             val whiteboardColorPaletteIcon = ContextCompat.getDrawable(applicationContext, R.drawable.ic_color_lens_white_24dp)!!.mutate()
+            val eraserIcon = ContextCompat.getDrawable(applicationContext, R.drawable.ic_eraser)!!.mutate()
             if (showWhiteboard) {
+                // "hide whiteboard" icon
                 whiteboardIcon.alpha = Themes.ALPHA_ICON_ENABLED_LIGHT
                 hideWhiteboardIcon.icon = whiteboardIcon
                 hideWhiteboardIcon.setTitle(R.string.hide_whiteboard)
                 whiteboardColorPaletteIcon.alpha = Themes.ALPHA_ICON_ENABLED_LIGHT
+                // eraser icon
+                toggleEraserIcon.icon = eraserIcon
+                if (isEraserMode) {
+                    toggleEraserIcon.setTitle(R.string.disable_eraser)
+                } else { // default
+                    toggleEraserIcon.setTitle(R.string.enable_eraser)
+                }
+                // whiteboard editor icon
                 changePenColorIcon.icon = whiteboardColorPaletteIcon
                 if (toggleStylus) {
                     toggleStylusIcon.setTitle(R.string.disable_stylus)
@@ -872,6 +978,8 @@ open class Reviewer :
         val voicePlaybackIcon = menu.findItem(R.id.action_toggle_mic_tool_bar)
         if (isMicToolBarVisible) {
             voicePlaybackIcon.setTitle(R.string.menu_disable_voice_playback)
+            // #18477: always show 'disable', even if 'enable' was invisible
+            voicePlaybackIcon.isVisible = true
         } else {
             voicePlaybackIcon.setTitle(R.string.menu_enable_voice_playback)
         }
@@ -920,7 +1028,7 @@ open class Reviewer :
     }
 
     override fun onGenericMotionEvent(event: MotionEvent?): Boolean {
-        if (motionEventHandler.onGenericMotionEvent(event)) {
+        if (processor.onGenericMotionEvent(event)) {
             return true
         }
         return super.onGenericMotionEvent(event)
@@ -1096,6 +1204,7 @@ open class Reviewer :
         val mins = resources.getQuantityString(R.plurals.in_minutes, nMins, nMins)
         val timeboxMessage = resources.getQuantityString(R.plurals.timebox_reached, nCards, nCards, mins)
         suspendCancellableCoroutine { coroutines ->
+            Timber.i("Showing timebox reached dialog")
             AlertDialog.Builder(this).show {
                 title(R.string.timebox_reached_title)
                 message(text = timeboxMessage)
@@ -1572,16 +1681,13 @@ open class Reviewer :
 
     private fun toggleAutoAdvance() {
         if (automaticAnswer.isDisabled) {
-            Timber.i("Enabling auto advance")
-            automaticAnswer.enable()
-            if (isDisplayingAnswer) {
-                automaticAnswer.delayedShowQuestion(0)
-            } else {
-                automaticAnswer.delayedShowAnswer(0)
-            }
+            Timber.i("Re-enabling auto advance")
+            automaticAnswer.reEnable(isDisplayingAnswer)
+            showSnackbar(TR.actionsAutoAdvanceActivated())
         } else {
             Timber.i("Disabling auto advance")
             automaticAnswer.disable()
+            showSnackbar(TR.actionsAutoAdvanceDeactivated())
         }
     }
 
@@ -1660,7 +1766,7 @@ open class Reviewer :
         const val ACTION_SNACKBAR_TIME = 500
 
         fun getIntent(context: Context): Intent =
-            if (context.sharedPrefs().getBoolean("newReviewer", false)) {
+            if (Prefs.isNewStudyScreenEnabled) {
                 ReviewerFragment.getIntent(context)
             } else {
                 Intent(context, Reviewer::class.java)

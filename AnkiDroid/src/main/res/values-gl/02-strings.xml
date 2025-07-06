@@ -60,16 +60,18 @@
     <string name="filter_tags" maxLength="28">Filtrar etiquetas</string>
     <string name="no_tags">Aínda non engadiches ningunha etiqueta</string>
     <string name="updated_version">Actualizado á versión %s</string>
-    <!-- Reviewer.kt -->
+    <!-- Reviewer.kt (Study Screen) -->
     <string name="save_whiteboard" maxLength="28">Gardar encerado</string>
     <string name="enable_stylus" maxLength="28">Activar escritura con lapis</string>
     <string name="disable_stylus">Desactivar escritura con lapis</string>
     <string name="enable_whiteboard" maxLength="28">Activar encerado</string>
     <string name="disable_whiteboard">Desactivar encerado</string>
     <string name="show_whiteboard">Amosar encerado</string>
+    <string name="enable_eraser" maxLength="28">Activar borrador</string>
+    <string name="disable_eraser" maxLength="28">Desactivar borrador</string>
     <string name="hide_whiteboard" maxLength="28">Agochar encerado</string>
     <string name="clear_whiteboard" maxLength="28">Limpar encerado</string>
-    <string name="replay_audio" maxLength="28">Repetir audio</string>
+    <string name="replay_media" maxLength="28">Reproducir multimedia</string>
     <string name="leech_suspend_notification">Tarxeta marcada como sambesuga e suspendida</string>
     <string name="leech_notification">Tarxeta marcada como sambesuga</string>
     <string name="webview_crash_unknown">Erro descoñecido</string>
@@ -119,7 +121,7 @@
     <string name="fact_adder_intent_title" comment="Label of the \'Add Note\' window. This title can\'t be seen in AnkiDroid directly.">Tarxeta AnkiDroid</string>
     <string name="note_editor_copy_note" maxLength="28">Copiar nota</string>
     <string name="card_editor_reposition_card" comment="reposition a card in the new queue" maxLength="28">Reposicionar</string>
-    <string name="card_editor_reset_card" maxLength="28">Reiniciar progreso</string>
+    <string name="card_editor_reset_card" maxLength="28">Esquecer progreso</string>
     <string name="card_editor_reschedule_card" comment="Action to reschedule a card" maxLength="28">Reprogramar</string>
     <string name="card_editor_preview_card" comment="Button offering to preview some card(s)" maxLength="28">Vista previa</string>
     <string name="copy_as_markdown" comment="Copies text to the clipboard as Markdown" maxLength="28">Copiar como Markdown</string>
@@ -193,7 +195,10 @@
     <!-- Card Template Browser Appearance -->
     <string name="restore_default" maxLength="28">Restablecer predefinidos</string>
     <string name="reviewer_tts_cloze_spoken_replacement">Baleiro</string>
-    <!-- Whiteboard save image message in Reviewer -->
+    <!-- Whiteboard eraser mode toggle message in Reviewer -->
+    <string name="white_board_eraser_enabled">Modo borrador activado</string>
+    <string name="white_board_eraser_disabled">Modo borrador desactivado</string>
+    <!-- Whiteboard save image message in the Study Screen -->
     <string name="white_board_image_save_failed">Fallo ao gardar a imaxe do encerado. %s</string>
     <string name="white_board_image_saved">Imaxe do encerado gardada en %s</string>
     <string name="title_whiteboard_editor" maxLength="28">Editor do encerado</string>
@@ -263,7 +268,7 @@
     <string name="search_using_deck_name">Buscar usando o nome da baralla</string>
     <string name="external_storage_unavailable">Descarga interrompida, o almacenamento externo non está dispoñíbel</string>
     <string name="home" maxLength="28">Inicio</string>
-    <!-- Reviewer actions
+    <!-- Study Screen actions
     Each of these strings ends with a period, following the notation of Anki Desktop -->
     <string name="card_buried">Tarxeta agochada.</string>
     <plurals name="note_suspended">
@@ -303,7 +308,7 @@
     <string name="show_cards" comment="Label for toggle cards button in BrowserOptionsDialog">Tarxetas</string>
     <string name="show_notes" comment="Label for toggle notes button in BrowserOptionsDialog">Notas</string>
     <string name="toggle_cards_notes">Alternar tarxetas/notas</string>
-    <string name="truncate_content_help">Truncate the height of each row of the Browser to show only first 3 lines of content</string>
+    <string name="truncate_content_help">Fixa a altura de cada fila do Explorador para amosar unicamente as 3 primeiras liñas de contido</string>
     <string name="browser_options_dialog_heading">Opcións do explorador</string>
     <string name="audio_saved">Gravación gardada</string>
     <string name="deleting_selected_notes">Eliminando as notas seleccionadas</string>
@@ -349,4 +354,6 @@
     <string name="edit_browser_appearance" comment="Description of the shortcut that edits the browser appearance of card template">Editar aparencia do explorador</string>
     <string name="missing_user_action_dialog_message" comment="%s is the user action number">A acción de usuario %s non está establecida neste tipo de nota. Configúraa</string>
     <string name="directory_inaccessible_info">Obtén máis información sobre como restaurar o acceso aquí %s ou ve á configuración para actualizar o cartafol da colección.</string>
+    <!-- Scheduler Upgrade Required Dialog title-->
+    <string name="scheduler_upgrade_required_dialog_title" comment="Shown in a dialog when user has imported a collection using a very old version of the Anki spaced repetition scheduler">Cómpre actualizar o programador</string>
 </resources>

@@ -53,14 +53,15 @@ import com.ichi2.anki.dialogs.DatabaseErrorDialog.DatabaseErrorDialogType.DIALOG
 import com.ichi2.anki.dialogs.DatabaseErrorDialog.DatabaseErrorDialogType.DIALOG_RESTORE_BACKUP
 import com.ichi2.anki.dialogs.DatabaseErrorDialog.DatabaseErrorDialogType.DIALOG_STORAGE_UNAVAILABLE_AFTER_UNINSTALL
 import com.ichi2.anki.dialogs.DatabaseErrorDialog.DatabaseErrorDialogType.INCOMPATIBLE_DB_VERSION
+import com.ichi2.anki.dialogs.DatabaseErrorDialog.UninstallListItem.Companion.createList
 import com.ichi2.anki.dialogs.ImportFileSelectionFragment.ImportOptions
 import com.ichi2.anki.isLoggedIn
 import com.ichi2.anki.launchCatchingTask
+import com.ichi2.anki.libanki.Consts
 import com.ichi2.anki.requireAnkiActivity
 import com.ichi2.anki.servicelayer.DebugInfoService
 import com.ichi2.anki.showImportDialog
 import com.ichi2.anki.utils.ext.dismissAllDialogFragments
-import com.ichi2.libanki.Consts
 import com.ichi2.utils.UiUtil.makeBold
 import com.ichi2.utils.cancelable
 import com.ichi2.utils.copyToClipboard
@@ -419,14 +420,14 @@ class DatabaseErrorDialog : AsyncDialogFragment() {
      * and copies the combines information to the Android clipboard.
      */
     private suspend fun copyStackTraceAndDebugInfo() {
+        val context = getSafeContext()
         val combinedInfo =
-            listOf(
+            listOfNotNull(
                 exceptionData?.toHumanReadableString(),
-                DebugInfoService.getDebugInfo(requireContext()),
-            ).filterNotNull()
-                .joinToString(separator = "\n")
+                DebugInfoService.getDebugInfo(context),
+            ).joinToString(separator = "\n")
 
-        requireContext().copyToClipboard(
+        context.copyToClipboard(
             combinedInfo,
             failureMessageId = R.string.about_ankidroid_error_copy_debug_info,
         )

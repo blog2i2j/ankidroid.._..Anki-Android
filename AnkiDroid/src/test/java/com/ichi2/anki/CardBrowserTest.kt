@@ -57,6 +57,7 @@ import com.ichi2.anki.browser.CardBrowserColumn.DECK
 import com.ichi2.anki.browser.CardBrowserColumn.QUESTION
 import com.ichi2.anki.browser.CardBrowserColumn.SFLD
 import com.ichi2.anki.browser.CardBrowserColumn.TAGS
+import com.ichi2.anki.browser.CardBrowserFragment
 import com.ichi2.anki.browser.CardBrowserViewModel
 import com.ichi2.anki.browser.CardBrowserViewModelTest
 import com.ichi2.anki.browser.CardOrNoteId
@@ -75,6 +76,12 @@ import com.ichi2.anki.browser.setColumn
 import com.ichi2.anki.common.time.TimeManager
 import com.ichi2.anki.common.utils.isRunningAsUnitTest
 import com.ichi2.anki.dialogs.DeckSelectionDialog
+import com.ichi2.anki.libanki.BrowserConfig
+import com.ichi2.anki.libanki.CardId
+import com.ichi2.anki.libanki.CardType
+import com.ichi2.anki.libanki.Note
+import com.ichi2.anki.libanki.NotetypeJson
+import com.ichi2.anki.libanki.QueueType
 import com.ichi2.anki.model.CardsOrNotes.CARDS
 import com.ichi2.anki.model.CardsOrNotes.NOTES
 import com.ichi2.anki.model.SortType
@@ -85,12 +92,6 @@ import com.ichi2.anki.servicelayer.PreferenceUpgradeService.PreferenceUpgrade.Up
 import com.ichi2.anki.ui.internationalization.toSentenceCase
 import com.ichi2.anki.utils.ext.getCurrentDialogFragment
 import com.ichi2.anki.utils.ext.showDialogFragment
-import com.ichi2.libanki.BrowserConfig
-import com.ichi2.libanki.CardId
-import com.ichi2.libanki.CardType
-import com.ichi2.libanki.Note
-import com.ichi2.libanki.NotetypeJson
-import com.ichi2.libanki.QueueType
 import com.ichi2.testutils.AnkiAssert.assertDoesNotThrow
 import com.ichi2.testutils.IntentAssert
 import com.ichi2.testutils.TestClass
@@ -1639,7 +1640,7 @@ class CardBrowserTest : RobolectricTest() {
 }
 
 private fun CardBrowser.rerenderAllCards() {
-    cardsAdapter.notifyDataSetChanged()
+    cardBrowserFragment.cardsAdapter.notifyDataSetChanged()
     waitForAsyncTasksToComplete()
 }
 
@@ -1662,7 +1663,7 @@ fun CardBrowser.selectRowsWithPositions(vararg positions: Int) {
     }
 }
 
-fun CardBrowser.clickRowAtPosition(pos: Int) = onTap(viewModel.cards[pos])
+fun CardBrowser.clickRowAtPosition(pos: Int) = cardBrowserFragment.onTap(viewModel.cards[pos])
 
 fun CardBrowser.longClickRowAtPosition(pos: Int) = viewModel.handleRowLongPress(viewModel.cards[pos])
 
@@ -1670,7 +1671,7 @@ val CardBrowser.lastDeckId
     get() = viewModel.lastDeckId
 
 val CardBrowser.validDecksForChangeDeck
-    get() = runBlocking { getValidDecksForChangeDeck() }
+    get() = runBlocking { viewModel.getAvailableDecks() }
 
 suspend fun CardBrowser.searchCardsSync(query: String) {
     searchCards(query)
@@ -1698,8 +1699,14 @@ fun TestClass.flagCardForNote(
 
 fun CardBrowser.getVisibleRows() =
     sequence {
+        val cardsListView = cardBrowserFragment.cardsListView
         for (i in 0 until (cardsListView.childCount)) {
-            val row = cardsListView.getChildViewHolder(cardsListView.getChildAt(i))
+            val row =
+                cardsListView.getChildViewHolder(
+                    cardsListView.getChildAt(
+                        i,
+                    ),
+                )
             yield(row as BrowserMultiColumnAdapter.MultiColumnViewHolder)
         }
     }.toList().also {
@@ -1720,7 +1727,7 @@ val CardBrowser.isShowingSelectNone: Boolean
 
 val CardBrowser.columnHeadingViews
     get() =
-        this.browserColumnHeadings.children
+        this.cardBrowserFragment.browserColumnHeadings.children
             .filterIsInstance<TextView>()
             .toList()
 
@@ -1736,3 +1743,6 @@ fun CardBrowser.searchCards(search: String? = null) {
     }
     runBlocking { viewModel.searchJob?.join() }
 }
+
+val CardBrowser.cardBrowserFragment: CardBrowserFragment
+    get() = supportFragmentManager.findFragmentById(R.id.card_browser_frame) as CardBrowserFragment

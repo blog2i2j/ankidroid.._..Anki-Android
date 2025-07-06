@@ -26,14 +26,14 @@ import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AlertDialog
 import androidx.core.net.toUri
 import com.ichi2.anki.cardviewer.SingleCardSide
+import com.ichi2.anki.common.annotations.NeedsTest
+import com.ichi2.anki.libanki.Card
+import com.ichi2.anki.libanki.Collection
+import com.ichi2.anki.libanki.DeckId
+import com.ichi2.anki.libanki.TTSTag
 import com.ichi2.anki.provider.pureAnswer
 import com.ichi2.anki.reviewer.CardSide
 import com.ichi2.anki.snackbar.showSnackbar
-import com.ichi2.annotations.NeedsTest
-import com.ichi2.libanki.Card
-import com.ichi2.libanki.Collection
-import com.ichi2.libanki.DeckId
-import com.ichi2.libanki.TTSTag
 import com.ichi2.utils.HandlerUtils.postDelayedOnNewHandler
 import com.ichi2.utils.message
 import com.ichi2.utils.positiveButton
@@ -127,6 +127,7 @@ object ReadText {
                             .map { Pair(it.isO3Language, it.displayName) },
                     )
                 }
+            Timber.i("showing 'select language' dialog")
             dialog
                 .title(R.string.select_locale_title)
                 .setItems(localeMappings.map { it.second }.toTypedArray()) { _, index ->

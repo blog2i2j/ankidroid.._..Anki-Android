@@ -9,22 +9,27 @@
         <com.ichi2.preferences.ReviewerControlPreference
             android:key="@string/show_answer_command_key"
             android:title="@string/show_answer"
+            android:icon="@drawable/ic_card_answer"
             />
         <com.ichi2.preferences.ReviewerControlPreference
             android:key="@string/answer_again_command_key"
             android:title="@string/answer_again"
+            android:icon="@drawable/ic_ease_again"
             />
         <com.ichi2.preferences.ReviewerControlPreference
             android:key="@string/answer_hard_command_key"
             android:title="@string/answer_hard"
+            android:icon="@drawable/ic_ease_hard"
             />
         <com.ichi2.preferences.ReviewerControlPreference
             android:key="@string/answer_good_command_key"
             android:title="@string/answer_good"
+            android:icon="@drawable/ic_ease_good"
             />
         <com.ichi2.preferences.ReviewerControlPreference
             android:key="@string/answer_easy_command_key"
             android:title="@string/answer_easy"
+            android:icon="@drawable/ic_ease_easy"
             />
     </PreferenceCategory>
 
@@ -148,17 +153,12 @@
             android:title="@string/gesture_abort_learning"
             android:icon="@drawable/close_icon"
             />
-        <com.ichi2.preferences.ReviewerControlPreference
-            android:key="@string/abort_and_sync_command_key"
-            android:title="@string/gesture_abort_sync"
-            android:icon="@drawable/ic_sync"
-            />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/media">
         <com.ichi2.preferences.ReviewerControlPreference
             android:key="@string/play_media_command_key"
-            android:title="@string/gesture_play"
+            android:title="@string/replay_media"
             android:icon="@drawable/ic_play_circle_white"
             />
         <com.ichi2.preferences.ReviewerControlPreference
@@ -182,6 +182,11 @@
             android:key="@string/toggle_whiteboard_command_key"
             android:title="@string/gesture_toggle_whiteboard"
             android:icon="@drawable/ic_enable_whiteboard"
+            />
+        <com.ichi2.preferences.ReviewerControlPreference
+            android:key="@string/toggle_eraser_command_key"
+            android:title="@string/gesture_toggle_eraser"
+            android:icon="@drawable/ic_eraser"
             />
         <com.ichi2.preferences.ReviewerControlPreference
             android:key="@string/clear_whiteboard_command_key"

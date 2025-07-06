@@ -73,6 +73,7 @@ import com.ichi2.anki.dialogs.ExportReadyDialog.Companion.KEY_EXPORT_PATH
 import com.ichi2.anki.dialogs.ExportReadyDialog.Companion.REQUEST_EXPORT_SAVE
 import com.ichi2.anki.dialogs.ExportReadyDialog.Companion.REQUEST_EXPORT_SHARE
 import com.ichi2.anki.dialogs.SimpleMessageDialog
+import com.ichi2.anki.libanki.Collection
 import com.ichi2.anki.preferences.PENDING_NOTIFICATIONS_ONLY
 import com.ichi2.anki.preferences.sharedPrefs
 import com.ichi2.anki.receiver.SdCardReceiver
@@ -85,12 +86,12 @@ import com.ichi2.compat.CompatHelper.Companion.registerReceiverCompat
 import com.ichi2.compat.customtabs.CustomTabActivityHelper
 import com.ichi2.compat.customtabs.CustomTabsFallback
 import com.ichi2.compat.customtabs.CustomTabsHelper
-import com.ichi2.libanki.Collection
 import com.ichi2.themes.Themes
 import com.ichi2.utils.AdaptionUtil
 import com.ichi2.utils.HandlerUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -160,10 +161,6 @@ open class AnkiActivity :
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
             window.navigationBarColor = getColor(R.color.transparent)
         }
-        if (savedInstanceState != null) {
-            val restoredValue = savedInstanceState.getString(KEY_EXPORT_FILE_NAME) ?: return
-            fileExportPath = restoredValue
-        }
         supportFragmentManager.setFragmentResultListener(REQUEST_EXPORT_SAVE, this) { _, bundle ->
             saveExportFile(
                 bundle.getString(KEY_EXPORT_PATH) ?: error("Missing required exportPath!"),
@@ -173,6 +170,10 @@ open class AnkiActivity :
             shareFile(
                 bundle.getString(KEY_EXPORT_PATH) ?: error("Missing required exportPath!"),
             )
+        }
+        if (savedInstanceState != null) {
+            val restoredValue = savedInstanceState.getString(KEY_EXPORT_FILE_NAME) ?: return
+            fileExportPath = restoredValue
         }
     }
 
@@ -736,6 +737,25 @@ open class AnkiActivity :
                         // hack: lifecycleScope/runOnUiThread do not handle our
                         // test dispatcher overriding both IO and Main
                         // in tests, waitForAsyncTasksToComplete may be required.
+                        HandlerUtils.postOnNewHandler { runBlocking { block(it) } }
+                    } else {
+                        block(it)
+                    }
+                }
+            }
+        }
+    }
+
+    // see above:
+    protected fun <T> StateFlow<T>.launchCollectionInLifecycleScope(block: suspend (T) -> Unit) {
+        lifecycleScope.launch {
+            var lastValue: T? = null
+            lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                this@launchCollectionInLifecycleScope.collect {
+                    // on re-resume, an unchanged value will be emitted for a StateFlow
+                    if (lastValue == value) return@collect
+                    lastValue = value
+                    if (isRobolectric) {
                         HandlerUtils.postOnNewHandler { runBlocking { block(it) } }
                     } else {
                         block(it)

@@ -36,18 +36,19 @@ import com.ichi2.anki.AnkiDroidJsAPIConstants.ANKI_JS_ERROR_CODE_SUSPEND_NOTE
 import com.ichi2.anki.AnkiDroidJsAPIConstants.flagCommands
 import com.ichi2.anki.CollectionManager.withCol
 import com.ichi2.anki.cardviewer.ViewerCommand
+import com.ichi2.anki.common.annotations.NeedsTest
 import com.ichi2.anki.common.utils.ext.stringIterable
+import com.ichi2.anki.libanki.Card
+import com.ichi2.anki.libanki.Collection
+import com.ichi2.anki.libanki.Decks
+import com.ichi2.anki.libanki.Note
+import com.ichi2.anki.libanki.SortOrder
+import com.ichi2.anki.libanki.sched.Ease
 import com.ichi2.anki.model.CardsOrNotes
 import com.ichi2.anki.servicelayer.rescheduleCards
 import com.ichi2.anki.servicelayer.resetCards
 import com.ichi2.anki.snackbar.setMaxLines
 import com.ichi2.anki.snackbar.showSnackbar
-import com.ichi2.annotations.NeedsTest
-import com.ichi2.libanki.Card
-import com.ichi2.libanki.Collection
-import com.ichi2.libanki.Decks
-import com.ichi2.libanki.Note
-import com.ichi2.libanki.SortOrder
 import com.ichi2.utils.NetworkUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -380,7 +381,7 @@ open class AnkiDroidJsAPI(
 
             "setNoteTags" -> {
                 val jsonObject = JSONObject(apiParams)
-                val noteId = jsonObject.getLong("noteId")
+                val noteId = currentCard.nid
                 val tags = jsonObject.getJSONArray("tags")
                 withCol {
                     fun Note.setTagsFromList(tagList: List<String>) {
@@ -403,8 +404,7 @@ open class AnkiDroidJsAPI(
             }
 
             "getNoteTags" -> {
-                val jsonObject = JSONObject(apiParams)
-                val noteId = jsonObject.getLong("noteId")
+                val noteId = currentCard.nid
                 val noteTags =
                     withCol {
                         getNote(noteId).tags

@@ -16,22 +16,28 @@
 
 package com.ichi2.testutils
 
+import android.annotation.SuppressLint
+import android.view.Menu
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.appcompat.widget.Toolbar
+import anki.collection.OpChanges
+import com.ichi2.anki.AnkiActivity
 import com.ichi2.anki.CollectionManager
+import com.ichi2.anki.R
 import com.ichi2.anki.ioDispatcher
 import com.ichi2.anki.isCollectionEmpty
-import com.ichi2.libanki.Card
-import com.ichi2.libanki.CardType
-import com.ichi2.libanki.Collection
-import com.ichi2.libanki.Consts
-import com.ichi2.libanki.DeckConfig
-import com.ichi2.libanki.DeckId
-import com.ichi2.libanki.Note
-import com.ichi2.libanki.NotetypeJson
-import com.ichi2.libanki.Notetypes
-import com.ichi2.libanki.QueueType
-import com.ichi2.libanki.exception.ConfirmModSchemaException
-import com.ichi2.libanki.utils.set
+import com.ichi2.anki.libanki.Card
+import com.ichi2.anki.libanki.CardType
+import com.ichi2.anki.libanki.Collection
+import com.ichi2.anki.libanki.Consts
+import com.ichi2.anki.libanki.DeckConfig
+import com.ichi2.anki.libanki.DeckId
+import com.ichi2.anki.libanki.Note
+import com.ichi2.anki.libanki.NotetypeJson
+import com.ichi2.anki.libanki.Notetypes
+import com.ichi2.anki.libanki.QueueType
+import com.ichi2.anki.libanki.exception.ConfirmModSchemaException
+import com.ichi2.anki.observability.undoableOp
 import com.ichi2.testutils.ext.addNote
 import com.ichi2.utils.LanguageUtil
 import kotlinx.coroutines.Dispatchers
@@ -43,6 +49,7 @@ import net.ankiweb.rsdroid.exceptions.BackendDeckIsFilteredException
 import timber.log.Timber
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
+import kotlin.test.assertNotNull
 import kotlin.time.Duration.Companion.milliseconds
 
 /**
@@ -106,6 +113,17 @@ interface TestClass {
         return n
     }
 
+    suspend fun addBasicNoteWithOp(
+        fields: List<String> = listOf("foo", "bar"),
+        noteType: NotetypeJson = col.notetypes.byName("Basic")!!,
+    ): Note =
+        col.newNote(noteType).also { note ->
+            for ((i, field) in fields.withIndex()) {
+                note.setField(i, field)
+            }
+            undoableOp<OpChanges> { col.addNote(note, Consts.DEFAULT_DECK_ID) }
+        }
+
     /**
      * Create a new note type in the collection.
      * @param name the name of the note type
@@ -122,14 +140,14 @@ interface TestClass {
     ): String {
         val noteType = col.notetypes.new(name)
         for (field in fields) {
-            col.notetypes.addFieldInNewNoteType(noteType, col.notetypes.newField(field))
+            col.notetypes.addFieldLegacy(noteType, col.notetypes.newField(field))
         }
         val t =
             Notetypes.newTemplate("Card 1").also { tmpl ->
                 tmpl.qfmt = qfmt
                 tmpl.afmt = afmt
             }
-        col.notetypes.addTemplateInNewNoteType(noteType, t)
+        col.notetypes.addTemplate(noteType, t)
         col.notetypes.add(noteType)
         return name
     }
@@ -241,11 +259,20 @@ interface TestClass {
     }
 
     /** Helper method to update a note */
+    @SuppressLint("CheckResult")
     fun Note.update(block: Note.() -> Unit): Note {
         block(this)
         col.updateNote(this)
         return this
     }
+
+    /** Helper method to update a note */
+    @SuppressLint("CheckResult")
+    suspend fun Note.updateOp(block: Note.() -> Unit): Note =
+        this.also { note ->
+            block(note)
+            undoableOp<OpChanges> { col.updateNote(note) }
+        }
 
     /** Helper method to all cards of a note */
     fun Note.updateCards(update: Card.() -> Unit): Note {
@@ -304,9 +331,12 @@ interface TestClass {
     fun Note.numberOfCards() = this.numberOfCards(col)
 
     // TODO remove this. not in libanki
+    @SuppressLint("CheckResult")
     fun Note.flush() {
         col.updateNote(this)
     }
+
+    fun AnkiActivity.menu(): Menu = assertNotNull(findViewById<Toolbar>(R.id.toolbar)?.menu)
 
     /** * A wrapper around the standard [kotlinx.coroutines.test.runTest] that
      * takes care of updating the dispatcher used by CollectionManager as well.

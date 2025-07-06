@@ -33,6 +33,8 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
+import android.widget.ScrollView
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -58,6 +60,7 @@ import anki.notetypes.StockNotetype.OriginalStockKind.ORIGINAL_STOCK_KIND_UNKNOW
 import anki.notetypes.notetypeId
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.card.MaterialCardView
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
@@ -65,6 +68,7 @@ import com.ichi2.anki.CollectionManager.TR
 import com.ichi2.anki.CollectionManager.withCol
 import com.ichi2.anki.android.input.ShortcutGroup
 import com.ichi2.anki.android.input.shortcut
+import com.ichi2.anki.common.annotations.NeedsTest
 import com.ichi2.anki.common.utils.annotation.KotlinCleanup
 import com.ichi2.anki.dialogs.ConfirmationDialog
 import com.ichi2.anki.dialogs.DeckSelectionDialog
@@ -73,33 +77,33 @@ import com.ichi2.anki.dialogs.DeckSelectionDialog.SelectableDeck
 import com.ichi2.anki.dialogs.DiscardChangesDialog
 import com.ichi2.anki.dialogs.InsertFieldDialog
 import com.ichi2.anki.dialogs.InsertFieldDialog.Companion.REQUEST_FIELD_INSERT
+import com.ichi2.anki.libanki.CardTemplates
+import com.ichi2.anki.libanki.Collection
+import com.ichi2.anki.libanki.Note
+import com.ichi2.anki.libanki.NoteId
+import com.ichi2.anki.libanki.NoteTypeId
+import com.ichi2.anki.libanki.NotetypeJson
+import com.ichi2.anki.libanki.Notetypes
+import com.ichi2.anki.libanki.Notetypes.Companion.NOT_FOUND_NOTE_TYPE
+import com.ichi2.anki.libanki.exception.ConfirmModSchemaException
+import com.ichi2.anki.libanki.getStockNotetype
+import com.ichi2.anki.libanki.getStockNotetypeKinds
+import com.ichi2.anki.libanki.utils.append
 import com.ichi2.anki.notetype.RenameCardTemplateDialog
 import com.ichi2.anki.notetype.RepositionCardTemplateDialog
+import com.ichi2.anki.observability.undoableOp
 import com.ichi2.anki.previewer.TemplatePreviewerArguments
 import com.ichi2.anki.previewer.TemplatePreviewerFragment
 import com.ichi2.anki.previewer.TemplatePreviewerPage
+import com.ichi2.anki.settings.Prefs
 import com.ichi2.anki.snackbar.showSnackbar
+import com.ichi2.anki.ui.ResizablePaneManager
 import com.ichi2.anki.utils.ext.dismissAllDialogFragments
 import com.ichi2.anki.utils.ext.showDialogFragment
 import com.ichi2.anki.utils.postDelayed
-import com.ichi2.annotations.NeedsTest
 import com.ichi2.compat.CompatHelper.Companion.getSerializableCompat
-import com.ichi2.libanki.CardTemplates
-import com.ichi2.libanki.Collection
-import com.ichi2.libanki.Note
-import com.ichi2.libanki.NoteId
-import com.ichi2.libanki.NoteTypeId
-import com.ichi2.libanki.NotetypeJson
-import com.ichi2.libanki.Notetypes
-import com.ichi2.libanki.Notetypes.Companion.NOT_FOUND_NOTE_TYPE
-import com.ichi2.libanki.exception.ConfirmModSchemaException
-import com.ichi2.libanki.getStockNotetype
-import com.ichi2.libanki.getStockNotetypeKinds
-import com.ichi2.libanki.restoreNotetypeToStock
-import com.ichi2.libanki.undoableOp
 import com.ichi2.themes.Themes
 import com.ichi2.ui.FixedEditText
-import com.ichi2.ui.FixedTextView
 import com.ichi2.utils.copyToClipboard
 import com.ichi2.utils.dp
 import com.ichi2.utils.listItems
@@ -115,7 +119,7 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.time.Duration.Companion.seconds
 
-private typealias BackendCardTemplate = com.ichi2.libanki.CardTemplate
+private typealias BackendCardTemplate = com.ichi2.anki.libanki.CardTemplate
 
 /**
  * Allows the user to view the template for the current note type
@@ -209,6 +213,24 @@ open class CardTemplateEditor :
         enableToolbar()
         startLoadingCollection()
 
+        if (fragmented) {
+            val parentLayout = findViewById<LinearLayout>(R.id.card_template_editor_xl_view)
+            val divider = findViewById<View>(R.id.card_template_editor_resizing_divider)
+            val leftPane = findViewById<View>(R.id.template_editor)
+            val rightPane = findViewById<View>(R.id.fragment_container)
+            if (parentLayout != null && divider != null && leftPane != null && rightPane != null) {
+                ResizablePaneManager(
+                    parentLayout = parentLayout,
+                    divider = divider,
+                    leftPane = leftPane,
+                    rightPane = rightPane,
+                    sharedPrefs = Prefs.getUiConfig(this),
+                    leftPaneWeightKey = PREF_TEMPLATE_EDITOR_PANE_WEIGHT,
+                    rightPaneWeightKey = PREF_TEMPLATE_PREVIEWER_PANE_WEIGHT,
+                )
+            }
+        }
+
         // Open TemplatePreviewerFragment if in fragmented mode
         loadTemplatePreviewerFragmentIfFragmented()
         onBackPressedDispatcher.addCallback(this, displayDiscardChangesCallback)
@@ -248,6 +270,15 @@ open class CardTemplateEditor :
                 showAnswerButton?.let { button ->
                     button.layoutParams.height = 80.dp.toPx(button.context)
                     button.requestLayout()
+                }
+
+                // Adjust the top margin of the webview container to match template editor top margin
+                val webView = fragment.view?.findViewById<MaterialCardView>(R.id.webview_container)
+                webView?.let { container ->
+                    val params = container.layoutParams as ViewGroup.MarginLayoutParams
+                    val topMargin = resources.getDimensionPixelSize(R.dimen.reviewer_side_margin)
+                    params.topMargin = topMargin
+                    container.layoutParams = params
                 }
             }
         }
@@ -489,7 +520,6 @@ open class CardTemplateEditor :
 
     class CardTemplateFragment : Fragment() {
         private val refreshFragmentHandler = Handler(Looper.getMainLooper())
-        private var currentEditorTitle: FixedTextView? = null
         private lateinit var editorEditText: FixedEditText
 
         var currentEditorViewId = 0
@@ -518,25 +548,57 @@ open class CardTemplateEditor :
                     return mainView
                 }
 
-            currentEditorTitle = mainView.findViewById(R.id.title_edit)
             editorEditText = mainView.findViewById(R.id.editor_editText)
             cursorPosition = requireArguments().getInt(CURSOR_POSITION_KEY)
 
             editorEditText.customInsertionActionModeCallback = ActionModeCallback()
 
             bottomNavigation = mainView.findViewById(R.id.card_template_editor_bottom_navigation)
+
+            // If in fragmented mode, wrap the edit area in a MaterialCardView
+            if (templateEditor.fragmented) {
+                val mainLayout = mainView.findViewById<LinearLayout>(R.id.main_layout)
+
+                // Set the background color of the main layout to match the previewer
+                mainLayout.setBackgroundColor(Themes.getColorFromAttr(requireContext(), R.attr.alternativeBackgroundColor))
+
+                // Create a MaterialCardView to wrap the editorEditText
+                val cardView =
+                    MaterialCardView(requireContext()).apply {
+                        layoutParams =
+                            LinearLayout
+                                .LayoutParams(
+                                    LinearLayout.LayoutParams.MATCH_PARENT,
+                                    0,
+                                    1f,
+                                ).apply {
+                                    val sideMargin = resources.getDimensionPixelSize(R.dimen.reviewer_side_margin)
+                                    setMargins(sideMargin, 0, sideMargin, 0)
+                                }
+                    }
+
+                // Remove the ScrollView from the main layout and add it to the cardView
+                val editScrollView = mainLayout.findViewById<ScrollView>(R.id.card_template_editor_scroll_view)
+                mainLayout.removeViewInLayout(editScrollView)
+
+                cardView.addView(
+                    editScrollView,
+                    ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                    ),
+                )
+
+                mainLayout.addView(cardView, 0)
+            }
+
             bottomNavigation.setOnItemSelectedListener { item: MenuItem ->
                 val currentSelectedId = item.itemId
                 templateEditor.tabToViewId[cardIndex] = currentSelectedId
                 when (currentSelectedId) {
-                    R.id.styling_edit -> setCurrentEditorView(currentSelectedId, tempModel.css, R.string.card_template_editor_styling)
-                    R.id.back_edit ->
-                        setCurrentEditorView(
-                            currentSelectedId,
-                            template.afmt,
-                            R.string.card_template_editor_back,
-                        )
-                    else -> setCurrentEditorView(currentSelectedId, template.qfmt, R.string.card_template_editor_front)
+                    R.id.styling_edit -> setCurrentEditorView(currentSelectedId, tempModel.css)
+                    R.id.back_edit -> setCurrentEditorView(currentSelectedId, template.afmt)
+                    else -> setCurrentEditorView(currentSelectedId, template.qfmt)
                 }
                 // contents of menu have changed and menu should be redrawn
                 templateEditor.invalidateOptionsMenu()
@@ -606,6 +668,14 @@ open class CardTemplateEditor :
                 insets
             }
 
+            /**
+             * We focus on the editText to indicate it's editable, but we don't automatically
+             * show the keyboard. This is intentional - the keyboard should only appear
+             * when the user taps on the edit field, not every time the fragment loads.
+             */
+            editorEditText.post {
+                editorEditText.requestFocus()
+            }
             return mainView
         }
 
@@ -713,13 +783,11 @@ open class CardTemplateEditor :
         fun setCurrentEditorView(
             id: Int,
             editorContent: String,
-            editorTitleId: Int,
         ) {
             currentEditorViewId = id
             editorEditText.setText(editorContent)
-            currentEditorTitle!!.text = resources.getString(editorTitleId)
-            editorEditText.setSelection(cursorPosition)
             editorEditText.requestFocus()
+            editorEditText.setSelection(cursorPosition)
         }
 
         override fun onViewCreated(
@@ -907,7 +975,7 @@ open class CardTemplateEditor :
         @NeedsTest("Notetype is restored to stock kind")
         private suspend fun restoreNotetypeToStock(kind: StockNotetype.Kind? = null) {
             val nid = notetypeId { ntid = tempModel.noteTypeId }
-            undoableOp { restoreNotetypeToStock(nid, kind) }
+            undoableOp { notetypes.restoreNotetypeToStock(nid, kind) }
             onModelSaved()
             showThemedToast(
                 requireContext(),
@@ -1344,7 +1412,7 @@ open class CardTemplateEditor :
                 if (!m.find()) {
                     afmt.replace("{{FrontSide}}", "")
                 } else {
-                    m.group(2)!!.trim { it <= ' ' }
+                    m.group(2)!!.trim()
                 }
             template.afmt = "{{FrontSide}}\n\n<hr id=answer>\n\n$qfmt"
         }
@@ -1414,6 +1482,10 @@ open class CardTemplateEditor :
         private const val EDITOR_NOTE_ID = "noteId"
         private const val EDITOR_START_ORD_ID = "ordId"
         private const val CARD_INDEX = "card_ord"
+
+        // Keys for saving pane weights in SharedPreferences
+        private const val PREF_TEMPLATE_EDITOR_PANE_WEIGHT = "cardTemplateEditorPaneWeight"
+        private const val PREF_TEMPLATE_PREVIEWER_PANE_WEIGHT = "cardTemplatePreviewerPaneWeight"
 
         // Time to wait before refreshing the previewer
         private val REFRESH_PREVIEW_DELAY = 1.seconds

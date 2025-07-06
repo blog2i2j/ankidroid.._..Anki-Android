@@ -1,6 +1,6 @@
 Onthoud alles met AnkiDroid!
 
-AnkiDroid stelt u in staat om op een efficiënte manier woordjes te leren, door u flitskaarten te tonen vlak voordat u ze zou vergeten. Werkt volledig samen met het gespreide-herhalingsprogramma Anki (met synchronisatie), die beschikbaar is voor Windows, Linux en Mac OS X.
+AnkiDroid stelt u in staat om op een efficiënte manier woordjes te leren, door u flitskaarten te tonen vlak voordat u ze zou vergeten. It is fully compatible with the spaced repetition software Anki (including synchronization), which is available for Windows, Linux and macOS.
 
 Leer van alles, waar en wanneer u maar wilt. Maak nuttig gebruik van wachttijden zoals tijdens een busreis of in de rij bij de kassa.
 
@@ -10,9 +10,9 @@ Voeg materiaal toe via de desktopapplicatie Anki of rechtstreeks via AnkiDroid. 
 
 ★ Belangrijkste functies:
 • flitskaarten maken met tekst, afbeeldingen, geluiden en LaTeX
-• spaced repetition (AI-optimized FSRS algorithm)
+• gespreide herhaling (door AI-geoptimaliseerd FSRS-algoritme)
 • tekst-naar-spraak integratie
-• more than 10,000 premade decks
+• meer dan 10.000 vooraf gemaakte sets
 • voortgangswidget
 • gedetailleerde statistieken
 • synchronisatie met AnkiWeb

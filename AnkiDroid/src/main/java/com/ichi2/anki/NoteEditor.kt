@@ -91,6 +91,7 @@ import com.ichi2.anki.android.input.ShortcutGroup
 import com.ichi2.anki.android.input.ShortcutGroupProvider
 import com.ichi2.anki.android.input.shortcut
 import com.ichi2.anki.bottomsheet.ImageOcclusionBottomSheetFragment
+import com.ichi2.anki.common.annotations.NeedsTest
 import com.ichi2.anki.common.utils.annotation.KotlinCleanup
 import com.ichi2.anki.dialogs.ConfirmationDialog
 import com.ichi2.anki.dialogs.DeckSelectionDialog.DeckSelectionListener
@@ -100,6 +101,19 @@ import com.ichi2.anki.dialogs.IntegerDialog
 import com.ichi2.anki.dialogs.tags.TagsDialog
 import com.ichi2.anki.dialogs.tags.TagsDialogFactory
 import com.ichi2.anki.dialogs.tags.TagsDialogListener
+import com.ichi2.anki.libanki.Card
+import com.ichi2.anki.libanki.Collection
+import com.ichi2.anki.libanki.DeckId
+import com.ichi2.anki.libanki.Decks.Companion.CURRENT_DECK
+import com.ichi2.anki.libanki.Field
+import com.ichi2.anki.libanki.Fields
+import com.ichi2.anki.libanki.Note
+import com.ichi2.anki.libanki.Note.ClozeUtils
+import com.ichi2.anki.libanki.NoteTypeId
+import com.ichi2.anki.libanki.NotetypeJson
+import com.ichi2.anki.libanki.Notetypes
+import com.ichi2.anki.libanki.Notetypes.Companion.NOT_FOUND_NOTE_TYPE
+import com.ichi2.anki.libanki.Utils
 import com.ichi2.anki.model.CardStateFilter
 import com.ichi2.anki.multimedia.AudioRecordingFragment
 import com.ichi2.anki.multimedia.AudioVideoFragment
@@ -124,6 +138,7 @@ import com.ichi2.anki.noteeditor.NoteEditorLauncher
 import com.ichi2.anki.noteeditor.Toolbar
 import com.ichi2.anki.noteeditor.Toolbar.TextFormatListener
 import com.ichi2.anki.noteeditor.Toolbar.TextWrapper
+import com.ichi2.anki.observability.undoableOp
 import com.ichi2.anki.pages.ImageOcclusion
 import com.ichi2.anki.preferences.sharedPrefs
 import com.ichi2.anki.previewer.TemplatePreviewerArguments
@@ -138,31 +153,18 @@ import com.ichi2.anki.utils.ext.sharedPrefs
 import com.ichi2.anki.utils.ext.showDialogFragment
 import com.ichi2.anki.utils.ext.window
 import com.ichi2.anki.widgets.DeckDropDownAdapter.SubtitleListener
-import com.ichi2.annotations.NeedsTest
 import com.ichi2.compat.CompatHelper.Companion.getSerializableCompat
 import com.ichi2.compat.setTooltipTextCompat
 import com.ichi2.imagecropper.ImageCropper
 import com.ichi2.imagecropper.ImageCropper.Companion.CROP_IMAGE_RESULT
 import com.ichi2.imagecropper.ImageCropperLauncher
-import com.ichi2.libanki.Card
-import com.ichi2.libanki.Collection
-import com.ichi2.libanki.DeckId
-import com.ichi2.libanki.Decks.Companion.CURRENT_DECK
-import com.ichi2.libanki.Field
-import com.ichi2.libanki.Fields
-import com.ichi2.libanki.Note
-import com.ichi2.libanki.Note.ClozeUtils
-import com.ichi2.libanki.NoteTypeId
-import com.ichi2.libanki.NotetypeJson
-import com.ichi2.libanki.Notetypes
-import com.ichi2.libanki.Notetypes.Companion.NOT_FOUND_NOTE_TYPE
-import com.ichi2.libanki.Utils
-import com.ichi2.libanki.undoableOp
 import com.ichi2.themes.Themes
+import com.ichi2.utils.AndroidUiUtils.showSoftInput
 import com.ichi2.utils.ClipboardUtil
 import com.ichi2.utils.ClipboardUtil.MEDIA_MIME_TYPES
 import com.ichi2.utils.ClipboardUtil.hasMedia
 import com.ichi2.utils.ClipboardUtil.items
+import com.ichi2.utils.ContentResolverUtil
 import com.ichi2.utils.HashUtil
 import com.ichi2.utils.ImportUtils
 import com.ichi2.utils.IntentUtil.resolveMimeType
@@ -598,9 +600,28 @@ class NoteEditor :
             } else {
                 data.data
             }
-        Timber.d("Image Uri : $imageUri")
-        // ImageIntentManager.saveImageUri(imageUri)
-        // the field won't exist so it will always be a new card
+
+        if (imageUri == null) {
+            Timber.d("NoteEditor:: Image Uri is null")
+            showSnackbar(R.string.something_wrong)
+            return
+        }
+
+        try {
+            requireContext().contentResolver.takePersistableUriPermission(imageUri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            Timber.d("Persisted URI permission for $imageUri")
+        } catch (e: SecurityException) {
+            Timber.w(e, "Unable to persist URI permission")
+        }
+
+        val cachedImagePath = copyUriToInternalCache(imageUri)
+        if (cachedImagePath == null) {
+            Timber.w("Failed to cache image")
+            showSnackbar(R.string.something_wrong)
+            return
+        }
+        val cachedUri = Uri.fromFile(File(requireContext().cacheDir, cachedImagePath))
+
         val note = getCurrentMultimediaEditableNote()
         if (note.isEmpty) {
             Timber.w("Note is null, returning")
@@ -610,8 +631,50 @@ class NoteEditor :
             fieldIndex = 0,
             field = ImageField(),
             multimediaNote = note,
-            imageUri = imageUri,
+            imageUri = cachedUri,
         )
+    }
+
+    /**
+     * Copies a given [Uri] to the app's internal cache directory.
+     *
+     * This is necessary because URIs provided by other apps (e.g., WhatsApp, gallery apps) via
+     * `Intent` are usually content URIs with temporary permissions that are only valid
+     * in the originating context (like an Activity). Once passed to other components (like Fragments),
+     * these permissions may be lost, resulting in a SecurityException.
+     *
+     * By caching the file in internal storage and referencing it via a file URI,
+     * we ensure persistent access to the image without relying on external content providers.
+     *
+     * @param uri The [Uri] pointing to the external image content.
+     * @return The name of the cached file, or `null` if the operation failed.
+     */
+    private fun copyUriToInternalCache(uri: Uri): String? {
+        return try {
+            val inputStream = requireContext().contentResolver.openInputStream(uri) ?: return null
+
+            val fileName = ContentResolverUtil.getFileName(requireContext().contentResolver, uri) ?: return null
+            val cacheDir = requireContext().cacheDir
+            val destFile = File(cacheDir, fileName)
+
+            val canonicalCacheDir = cacheDir.canonicalFile
+            val canonicalDestFile = destFile.canonicalFile
+
+            if (!canonicalDestFile.path.startsWith(canonicalCacheDir.path)) {
+                Timber.w("Rejected path due to directory traversal risk: $fileName")
+                return null
+            }
+
+            destFile.outputStream().use { output ->
+                inputStream.copyTo(output)
+            }
+
+            Timber.d("copyUriToInternalCache() copied to ${destFile.absolutePath}")
+            destFile.name
+        } catch (e: Exception) {
+            Timber.w(e, "Failed to copy URI to internal cache")
+            null
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -709,14 +772,17 @@ class NoteEditor :
         if (addNote) {
             editOcclusionsButton?.visibility = View.GONE
             selectImageForOcclusionButton?.setOnClickListener {
+                Timber.i("selecting image for occlusion")
                 val imageOcclusionBottomSheet = ImageOcclusionBottomSheetFragment()
                 imageOcclusionBottomSheet.listener =
                     object : ImageOcclusionBottomSheetFragment.ImagePickerListener {
                         override fun onCameraClicked() {
+                            Timber.i("onCameraClicked")
                             dispatchCameraEvent()
                         }
 
                         override fun onGalleryClicked() {
+                            Timber.i("onGalleryClicked")
                             try {
                                 ioEditorLauncher.launch("image/*")
                             } catch (ex: ActivityNotFoundException) {
@@ -918,6 +984,7 @@ class NoteEditor :
         }
 
     private fun startCrop(imageUri: Uri) {
+        Timber.i("launching crop")
         val intent = ImageCropperLauncher.ImageUri(imageUri).getIntent(requireContext())
         cropImageLauncher.launch(intent)
     }
@@ -1433,10 +1500,10 @@ class NoteEditor :
             }
             R.id.action_font_size -> {
                 Timber.i("NoteEditor:: Font Size button pressed")
-                val repositionDialog = IntegerDialog()
-                repositionDialog.setArgs(getString(R.string.menu_font_size), editTextFontSize, 2)
-                repositionDialog.setCallbackRunnable { fontSizeSp: Int? -> setFontSize(fontSizeSp) }
-                showDialogFragment(repositionDialog)
+                val fontSizeDialog = IntegerDialog()
+                fontSizeDialog.setArgs(getString(R.string.menu_font_size), editTextFontSize, 2)
+                fontSizeDialog.setCallbackRunnable { fontSizeSp: Int? -> setFontSize(fontSizeSp) }
+                showDialogFragment(fontSizeDialog)
                 return true
             }
             R.id.action_show_toolbar -> {
@@ -2076,14 +2143,21 @@ class NoteEditor :
         toggleStickyButton: ImageButton,
         index: Int,
     ) {
+        val updatedStickyState = !currentFields[index].sticky
+        currentFields[index].sticky = updatedStickyState
         val text = editFields!![index].fieldText
-        if (toggleStickyText[index] == null) {
+        if (updatedStickyState) {
             toggleStickyText[index] = text
             toggleStickyButton.background.alpha = 255
             Timber.d("Saved Text:: %s", toggleStickyText[index])
         } else {
             toggleStickyText.remove(index)
             toggleStickyButton.background.alpha = 64
+        }
+        launchCatchingTask {
+            withCol {
+                this.notetypes.save(editorNote!!.notetype)
+            }
         }
     }
 
@@ -2394,7 +2468,15 @@ class NoteEditor :
                 text = b.buttonText
             }
             val bmp = toolbar.createDrawableForString(text)
-            val v = toolbar.insertItem(0, bmp, b.toFormatter())
+
+            val v =
+                toolbar.insertItem(0, bmp) {
+                    // Attempt to open keyboard for the currently focused view in the hosting Activity
+                    val activity = context as? Activity
+                    activity.showSoftInput()
+
+                    toolbar.onFormat(b.toFormatter())
+                }
             v.contentDescription = text
 
             // Allow Ctrl + 1...Ctrl + 0 for item 10.
@@ -2565,7 +2647,7 @@ class NoteEditor :
                 R.string.CardEditorTags,
                 getColUnsafe.tags
                     .join(getColUnsafe.tags.canonify(selectedTags!!))
-                    .trim { it <= ' ' }
+                    .trim()
                     .replace(" ", ", "),
             )
     }

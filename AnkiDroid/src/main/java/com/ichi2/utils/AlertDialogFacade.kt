@@ -42,8 +42,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textfield.TextInputLayout
 import com.ichi2.anki.R
+import com.ichi2.themes.Theme
 import com.ichi2.themes.Themes
 import com.ichi2.ui.FixedTextView
+import com.ichi2.utils.HandlerUtils.executeOnMainThread
 import timber.log.Timber
 
 /** Wraps [DialogInterface.OnClickListener] as we don't need the `which` parameter */
@@ -314,6 +316,12 @@ fun AlertDialog.input(
     if (!this.isShowing) throw IllegalStateException("input() requires .show()")
 
     getInputTextLayout().hint = hint
+    // TODO Fix this:
+    //  Disable the error icon when the black theme is applied. With this theme, showing an error
+    //  makes the wrapped TextInputEditText's outline to disappear around the error icon(#18535, #18596)
+    if (Themes.currentTheme == Theme.BLACK) {
+        getInputTextLayout().errorIconDrawable = null
+    }
 
     getInputField().apply {
         if (displayKeyboard) {
@@ -372,6 +380,8 @@ fun AlertDialog.getInputField() = getInputTextLayout().editText!!
 /** @see AlertDialog.getButton */
 val AlertDialog.positiveButton: Button
     get() = getButton(DialogInterface.BUTTON_POSITIVE)
+val AlertDialog.negativeButton: Button
+    get() = getButton(DialogInterface.BUTTON_NEGATIVE)
 
 /**
  * Extension function for AlertDialog.Builder to set a list of items.
@@ -451,5 +461,22 @@ fun AlertDialog.Builder.titleWithHelpIcon(
     customTitleView.findViewById<ImageView>(R.id.help_icon).setOnClickListener { v ->
         Timber.i("dialog help icon click")
         block.onClick(v)
+    }
+}
+
+/** Calls [AlertDialog.dismiss], ignoring errors */
+fun AlertDialog.dismissSafely() {
+    // The exception will be uncaught if not run on the main thread.
+    executeOnMainThread {
+        try {
+            // safer to catch the exception to be sure dismiss() was called
+            dismiss()
+        } catch (e: IllegalArgumentException) {
+            if (window == null || !isShowing) {
+                Timber.d(e, "Dialog not attached to window manager")
+                return@executeOnMainThread
+            }
+            Timber.w(e, "Dialog not attached to window manager")
+        }
     }
 }

@@ -60,16 +60,18 @@
     <string name="filter_tags" maxLength="28">ఫిల్టర్ ట్యాగ్లు</string>
     <string name="no_tags">మీరు ఇంకా ఏ ట్యాగ్లను జోడించలేదు</string>
     <string name="updated_version">సంస్కరణకు నవీకరించబడింది %s</string>
-    <!-- Reviewer.kt -->
+    <!-- Reviewer.kt (Study Screen) -->
     <string name="save_whiteboard" maxLength="28">వైట్‌బోర్డ్‌ను సేవ్ చేయండి</string>
     <string name="enable_stylus" maxLength="28">స్టైలస్ రాయడం ప్రారంభించండి</string>
     <string name="disable_stylus">స్టైలస్ రైటింగ్‌ని నిలిపివేయండి</string>
     <string name="enable_whiteboard" maxLength="28">వైట్బోర్డ్ ప్రారంభించండి</string>
     <string name="disable_whiteboard">వైట్బోర్డ్ను ఆపివేయి</string>
     <string name="show_whiteboard">వైట్బోర్డ్ చూపించు</string>
+    <string name="enable_eraser" maxLength="28">Enable eraser</string>
+    <string name="disable_eraser" maxLength="28">Disable eraser</string>
     <string name="hide_whiteboard" maxLength="28">వైట్బోర్డ్ని దాచిపెట్టు</string>
     <string name="clear_whiteboard" maxLength="28">క్లియర్ వైట్బోర్డ్</string>
-    <string name="replay_audio" maxLength="28">ఆడియోను రీప్లే చేయండి</string>
+    <string name="replay_media" maxLength="28">Replay media</string>
     <string name="leech_suspend_notification">కార్డ్ జ్వాల మరియు సస్పెండ్ గా గుర్తించబడింది</string>
     <string name="leech_notification">కార్డు లీచ్గా గుర్తించబడింది</string>
     <string name="webview_crash_unknown">గుర్తించలేని లోపం</string>
@@ -193,7 +195,10 @@
     <!-- Card Template Browser Appearance -->
     <string name="restore_default" maxLength="28">డిఫాల్ట్‌ని పునరుద్ధరించండి</string>
     <string name="reviewer_tts_cloze_spoken_replacement">ఖాళీ</string>
-    <!-- Whiteboard save image message in Reviewer -->
+    <!-- Whiteboard eraser mode toggle message in Reviewer -->
+    <string name="white_board_eraser_enabled">Eraser mode activated</string>
+    <string name="white_board_eraser_disabled">Eraser mode deactivated</string>
+    <!-- Whiteboard save image message in the Study Screen -->
     <string name="white_board_image_save_failed">వైట్‌బోర్డ్ చిత్రాన్ని సేవ్ చేయడంలో విఫలమైంది. %s</string>
     <string name="white_board_image_saved">వైట్‌బోర్డ్ చిత్రం %sకి సేవ్ చేయబడింది</string>
     <string name="title_whiteboard_editor" maxLength="28">వైట్‌బోర్డ్ ఎడిటర్</string>
@@ -263,7 +268,7 @@
     <string name="search_using_deck_name">డెక్ పేరును ఉపయోగించి శోధించండి</string>
     <string name="external_storage_unavailable">డౌన్‌లోడ్ ఆగిపోయింది, బాహ్య నిల్వ అందుబాటులో లేదు</string>
     <string name="home" maxLength="28">హోమ్</string>
-    <!-- Reviewer actions
+    <!-- Study Screen actions
     Each of these strings ends with a period, following the notation of Anki Desktop -->
     <string name="card_buried">కార్డు పాతిపెట్టబడింది.</string>
     <plurals name="note_suspended">
@@ -349,4 +354,6 @@
     <string name="edit_browser_appearance" comment="Description of the shortcut that edits the browser appearance of card template">బ్రౌజర్ రూపాన్ని సవరించండి</string>
     <string name="missing_user_action_dialog_message" comment="%s is the user action number">ఈ నోట్‌టైప్‌లో వినియోగదారు చర్య %s సెట్ చేయబడలేదు. దయచేసి దీన్ని కాన్ఫిగర్ చేయండి</string>
     <string name="directory_inaccessible_info">ఇక్కడ యాక్సెస్‌ని ఎలా పునరుద్ధరించాలనే దాని గురించి మరింత తెలుసుకోండి %s లేదా సేకరణ ఫోల్డర్‌ని నవీకరించడానికి సెట్టింగ్‌లకు వెళ్లండి.</string>
+    <!-- Scheduler Upgrade Required Dialog title-->
+    <string name="scheduler_upgrade_required_dialog_title" comment="Shown in a dialog when user has imported a collection using a very old version of the Anki spaced repetition scheduler">Scheduler upgrade required</string>
 </resources>

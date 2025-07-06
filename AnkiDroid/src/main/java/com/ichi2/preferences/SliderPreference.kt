@@ -26,8 +26,8 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceViewHolder
 import com.google.android.material.slider.Slider
 import com.ichi2.anki.R
+import com.ichi2.anki.common.annotations.NeedsTest
 import com.ichi2.anki.utils.getFormattedStringOrPlurals
-import com.ichi2.annotations.NeedsTest
 
 /**
  * Similar to [androidx.preference.SeekBarPreference],
@@ -150,6 +150,20 @@ class SliderPreference(
                 ?: value.toString()
         } else {
             displayValueTextView.visibility = View.GONE
+        }
+    }
+
+    /**
+     * Sets the callback to be invoked when this preference is changed by the user
+     * (but before the internal state has been updated) on the internal onPreferenceChangeListener,
+     * returning true on it by default
+     * @param onPreferenceChangeListener The callback to be invoked
+     */
+    fun setOnPreferenceChangeListener(onPreferenceChangeListener: (newValue: Int) -> Unit) {
+        setOnPreferenceChangeListener { _, newValue ->
+            if (newValue !is Int) return@setOnPreferenceChangeListener false
+            onPreferenceChangeListener(newValue)
+            true
         }
     }
 

@@ -40,27 +40,28 @@ import com.ichi2.anki.PreviewerDestination
 import com.ichi2.anki.browser.FindAndReplaceDialogFragment.Companion.ALL_FIELDS_AS_FIELD
 import com.ichi2.anki.browser.FindAndReplaceDialogFragment.Companion.TAGS_AS_FIELD
 import com.ichi2.anki.browser.RepositionCardsRequest.RepositionData
+import com.ichi2.anki.common.annotations.NeedsTest
 import com.ichi2.anki.export.ExportDialogFragment.ExportType
 import com.ichi2.anki.launchCatchingIO
+import com.ichi2.anki.libanki.Card
+import com.ichi2.anki.libanki.CardId
+import com.ichi2.anki.libanki.CardType
+import com.ichi2.anki.libanki.DeckId
+import com.ichi2.anki.libanki.DeckNameId
+import com.ichi2.anki.libanki.QueueType
+import com.ichi2.anki.libanki.QueueType.ManuallyBuried
+import com.ichi2.anki.libanki.QueueType.SiblingBuried
 import com.ichi2.anki.model.CardStateFilter
 import com.ichi2.anki.model.CardsOrNotes
 import com.ichi2.anki.model.CardsOrNotes.CARDS
 import com.ichi2.anki.model.CardsOrNotes.NOTES
 import com.ichi2.anki.model.SortType
+import com.ichi2.anki.observability.ChangeManager
+import com.ichi2.anki.observability.undoableOp
 import com.ichi2.anki.pages.CardInfoDestination
 import com.ichi2.anki.preferences.SharedPreferencesProvider
 import com.ichi2.anki.utils.ext.normalizeForSearch
 import com.ichi2.anki.utils.ext.setUserFlagForCards
-import com.ichi2.annotations.NeedsTest
-import com.ichi2.libanki.Card
-import com.ichi2.libanki.CardId
-import com.ichi2.libanki.CardType
-import com.ichi2.libanki.ChangeManager
-import com.ichi2.libanki.DeckId
-import com.ichi2.libanki.QueueType
-import com.ichi2.libanki.QueueType.ManuallyBuried
-import com.ichi2.libanki.QueueType.SiblingBuried
-import com.ichi2.libanki.undoableOp
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
@@ -95,16 +96,25 @@ import kotlin.math.max
 import kotlin.math.min
 
 // TODO: move the tag computation to ViewModel
+
+/**
+ * @param lastDeckIdRepository returns the last selected ID. See [LastDeckIdRepository]
+ * @param cacheDir Temporary location to store data too large to pass via intent
+ * @param options Options passed to CardBrowser on startup
+ * @param preferences Accessor for `SharedPreferences`
+ * @param isFragmented `true` if a NoteEditor side panel is displayed (x-large displays)
+ * @param manualInit test-only: defer `initCompleted` until `manualInit()` is called
+ */
 @NeedsTest("reverseDirectionFlow/sortTypeFlow are not updated on .launch { }")
 @NeedsTest("columIndex1/2 config is not not updated on init")
 @NeedsTest("13442: selected deck is not changed, as this affects the reviewer")
 @NeedsTest("search is called after launch()")
-@NeedsTest("default search text updated on init")
 class CardBrowserViewModel(
     private val lastDeckIdRepository: LastDeckIdRepository,
     private val cacheDir: File,
     options: CardBrowserLaunchOptions?,
     preferences: SharedPreferencesProvider,
+    val isFragmented: Boolean,
     private val manualInit: Boolean = false,
 ) : ViewModel(),
     SharedPreferencesProvider by preferences {
@@ -192,8 +202,6 @@ class CardBrowserViewModel(
 
     var shouldIgnoreAccents: Boolean = false
 
-    var defaultBrowserSearch: String? = null
-
     private val _selectedRows: MutableSet<CardOrNoteId> = Collections.synchronizedSet(LinkedHashSet())
 
     // immutable accessor for _selectedRows
@@ -206,6 +214,17 @@ class CardBrowserViewModel(
     val rowLongPressFocusFlow = MutableStateFlow<CardOrNoteId?>(null)
 
     val cardSelectionEventFlow = MutableSharedFlow<Unit>()
+
+    /**
+     * If cards are marked or flagged
+     */
+    val flowOfCardStateChanged = MutableSharedFlow<Unit>()
+
+    var focusedRow: CardOrNoteId? = null
+        set(value) {
+            if (!isFragmented) return
+            field = value
+        }
 
     suspend fun queryAllSelectedCardIds() = selectedRows.queryCardIds(this.cardsOrNotes)
 
@@ -226,12 +245,6 @@ class CardBrowserViewModel(
 
     val lastDeckId: DeckId?
         get() = lastDeckIdRepository.lastDeckId
-
-    private suspend fun initDefaultSearch() =
-        withCol {
-            shouldIgnoreAccents = config.getBool(ConfigKey.Bool.IGNORE_ACCENTS_IN_SEARCH)
-            defaultBrowserSearch = config.getString(ConfigKey.String.DEFAULT_SEARCH_TEXT)
-        }
 
     suspend fun setDeckId(deckId: DeckId) {
         Timber.i("setting deck: %d", deckId)
@@ -355,16 +368,7 @@ class CardBrowserViewModel(
             }.launchIn(viewModelScope)
 
         viewModelScope.launch {
-            initDefaultSearch()
-            // Prioritize intent-based search
-            if (searchTerms.isEmpty()) {
-                val defaultSearchText = withCol { config.getString(ConfigKey.String.DEFAULT_SEARCH_TEXT) }
-
-                Timber.d("Default search term text: $defaultSearchText")
-                if (defaultSearchText.isNotEmpty()) {
-                    searchTerms = defaultSearchText
-                }
-            }
+            shouldIgnoreAccents = withCol { config.getBool(ConfigKey.Bool.IGNORE_ACCENTS_IN_SEARCH) }
 
             val initialDeckId = if (selectAllDecks) ALL_DECKS_ID else getInitialDeck()
             // PERF: slightly inefficient if the source was lastDeckId
@@ -440,14 +444,12 @@ class CardBrowserViewModel(
                 saveScrollingState(id)
                 toggleRowSelection(id)
             }
+            focusedRow = id
             rowLongPressFocusFlow.emit(id)
         }
 
-    fun handleCardSelection(
-        cardId: CardId,
-        fragmented: Boolean,
-    ) {
-        createCardSelector(this)(cardId, fragmented)
+    fun handleCardSelection(cardId: CardId) {
+        createCardSelector(this)(cardId, isFragmented)
     }
 
     /** Whether any rows are selected */
@@ -477,6 +479,7 @@ class CardBrowserViewModel(
                 tags.bulkRemove(noteIds, "marked")
             }
         }
+        flowOfCardStateChanged.emit(Unit)
     }
 
     /**
@@ -519,14 +522,6 @@ class CardBrowserViewModel(
         viewModelScope.launch {
             shouldIgnoreAccents = value
             withCol { config.setBool(ConfigKey.Bool.IGNORE_ACCENTS_IN_SEARCH, value) }
-        }
-    }
-
-    fun setDefaultSearchText(text: String) {
-        Timber.d("Setting default search text to: $text")
-        viewModelScope.launch {
-            defaultBrowserSearch = text
-            withCol { config.setString(ConfigKey.String.DEFAULT_SEARCH_TEXT, text) }
         }
     }
 
@@ -799,7 +794,7 @@ class CardBrowserViewModel(
     }
 
     /**
-     * @see [com.ichi2.libanki.sched.Scheduler.sortCards]
+     * @see [com.ichi2.anki.libanki.sched.Scheduler.sortCards]
      * @return the number of cards which were repositioned
      */
     suspend fun repositionSelectedRows(
@@ -830,7 +825,7 @@ class CardBrowserViewModel(
 
     suspend fun savedSearches(): Map<String, String> = withCol { config.get("savedFilters") } ?: hashMapOf()
 
-    fun savedSearchesUnsafe(col: com.ichi2.libanki.Collection): Map<String, String> = col.config.get("savedFilters") ?: hashMapOf()
+    fun savedSearchesUnsafe(col: com.ichi2.anki.libanki.Collection): Map<String, String> = col.config.get("savedFilters") ?: hashMapOf()
 
     suspend fun removeSavedSearch(searchName: String): Map<String, String> {
         Timber.d("removing user search")
@@ -962,7 +957,8 @@ class CardBrowserViewModel(
 
     suspend fun updateSelectedCardsFlag(flag: Flag): List<CardId> {
         val idsToChange = queryAllSelectedCardIds()
-        undoableOp { setUserFlagForCards(cids = idsToChange, flag = flag) }
+        undoableOp(this) { setUserFlagForCards(cids = idsToChange, flag = flag) }
+        flowOfCardStateChanged.emit(Unit)
         return idsToChange
     }
 
@@ -1071,8 +1067,8 @@ class CardBrowserViewModel(
      * Replaces occurrences of search with the new value.
      *
      * @return the number of affected notes
-     * @see com.ichi2.libanki.Collection.findReplace
-     * @see com.ichi2.libanki.Tags.findAndReplace
+     * @see com.ichi2.anki.libanki.Collection.findReplace
+     * @see com.ichi2.anki.libanki.Tags.findAndReplace
      */
     fun findAndReplace(result: FindReplaceResult) =
         viewModelScope.async {
@@ -1105,6 +1101,12 @@ class CardBrowserViewModel(
         updateActiveColumns(replacements, cardsOrNotes)
     }
 
+    // TODO: Do a selective update, and accept a noteId as parameter
+    fun onCurrentNoteEdited() {
+        Timber.i("Reloading search due to note edit")
+        launchSearchForCards()
+    }
+
     companion object {
         fun createCardSelector(viewModel: CardBrowserViewModel) =
             { cardId: CardId, fragmented: Boolean ->
@@ -1120,6 +1122,7 @@ class CardBrowserViewModel(
         fun factory(
             lastDeckIdRepository: LastDeckIdRepository,
             cacheDir: File,
+            isFragmented: Boolean,
             preferencesProvider: SharedPreferencesProvider? = null,
             options: CardBrowserLaunchOptions?,
         ) = viewModelFactory {
@@ -1129,6 +1132,7 @@ class CardBrowserViewModel(
                     cacheDir,
                     options,
                     preferencesProvider ?: AnkiDroidApp.sharedPreferencesProvider,
+                    isFragmented,
                 )
             }
         }
@@ -1180,6 +1184,11 @@ class CardBrowserViewModel(
             lastSelectedPosition = position
         }
     }
+
+    /**
+     * Returns the decks which are suitable for [moveSelectedCardsToDeck]
+     */
+    suspend fun getAvailableDecks(): List<DeckNameId> = withCol { decks.allNamesAndIds(includeFiltered = false) }
 }
 
 enum class SaveSearchResult {

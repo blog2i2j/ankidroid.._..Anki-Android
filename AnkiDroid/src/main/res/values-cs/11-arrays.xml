@@ -83,8 +83,7 @@
     <string name="answer_hard" maxLength="41">Odpovědět těžké</string>
     <string name="answer_good" maxLength="41">Odpovědět dobré</string>
     <string name="answer_easy" maxLength="41">Odpovědět snadné</string>
-    <string name="gesture_play" maxLength="41">Přehrát multimédia</string>
-    <string name="gesture_abort_learning" maxLength="41">Ukončit opakování karet</string>
+    <string name="gesture_abort_learning" maxLength="41">Zavřít obrazovku učení</string>
     <string name="gesture_flag_red" maxLength="41">Přepnout červený příznak</string>
     <string name="gesture_flag_orange" maxLength="41">Přepnout oranžový příznak</string>
     <string name="gesture_flag_green" maxLength="41">Přepnout zelený příznak</string>
@@ -95,8 +94,8 @@
     <string name="gesture_flag_remove" maxLength="41">Odstranit příznak</string>
     <string name="gesture_page_up" maxLength="41">Stránka nahoru</string>
     <string name="gesture_page_down" maxLength="41">Stránka dolů</string>
-    <string name="gesture_abort_sync" maxLength="41">Ukončit opakování karet a synchronizovat</string>
     <string name="gesture_toggle_whiteboard" maxLength="41">Přepnout tabuli</string>
+    <string name="gesture_toggle_eraser" maxLength="41">Toggle eraser</string>
     <string name="gesture_show_hint" maxLength="41">Zobrazit nápovědu</string>
     <string name="gesture_show_all_hints" maxLength="41">Zobrazit všechny nápovědy</string>
     <string name="record_voice" maxLength="41">Nahrát hlas</string>

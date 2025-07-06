@@ -20,12 +20,12 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.ichi2.anki.RobolectricTest
+import com.ichi2.anki.libanki.Consts
 import com.ichi2.anki.noteeditor.CustomToolbarButton
 import com.ichi2.anki.preferences.sharedPrefs
 import com.ichi2.anki.servicelayer.PreferenceUpgradeService
 import com.ichi2.anki.servicelayer.PreferenceUpgradeService.PreferenceUpgrade
 import com.ichi2.anki.servicelayer.RemovedPreferences
-import com.ichi2.libanki.Consts
 import com.ichi2.utils.HashUtil
 import com.ichi2.utils.LanguageUtil
 import org.hamcrest.CoreMatchers.equalTo
@@ -101,7 +101,7 @@ class PreferenceUpgradeServiceTest : RobolectricTest() {
 
         assertThat(
             "Different count of nested classes ($nestedClassCount) and upgrades ($upgradeCount). \n" +
-                "nested classes:\n ${nestedClasses.map { it.simpleName }.joinToString("\n")}",
+                "nested classes:\n ${nestedClasses.joinToString("\n") { it.simpleName.toString() }}",
             nestedClassCount,
             equalTo(upgradeCount),
         )
@@ -172,6 +172,23 @@ class PreferenceUpgradeServiceTest : RobolectricTest() {
         prefs.edit { putBoolean(RemovedPreferences.SYNC_FETCHES_MEDIA, false) }
         PreferenceUpgrade.UpgradeFetchMedia().performUpgrade(prefs)
         assertThat(prefs.getString("syncFetchMedia", null), equalTo("never"))
+    }
+
+    @Test
+    fun `Double tap timeout is converted correctly`() {
+        fun testValue(
+            oldValue: Int,
+            expectedValue: Int,
+        ) {
+            prefs.edit { putInt("doubleTapTimeInterval", oldValue) }
+            PreferenceUpgrade.UpgradeDoubleTapTimeout().performUpgrade(prefs)
+            assertThat(prefs.getInt("doubleTapTimeout", -1), equalTo(expectedValue))
+        }
+        testValue(oldValue = 395, expectedValue = 400)
+        testValue(oldValue = 25, expectedValue = 20)
+        testValue(oldValue = 200, expectedValue = 200)
+        testValue(oldValue = 0, expectedValue = 0)
+        testValue(oldValue = 1350, expectedValue = 1000)
     }
 
     // ############################

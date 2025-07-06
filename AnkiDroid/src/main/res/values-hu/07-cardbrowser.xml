@@ -98,7 +98,7 @@
     <string name="card_browser_search_all_decks">Összes pakli keresése</string>
     <string name="card_browser_unknown_deck_name">Ismeretlen</string>
     <string name="card_browser_truncate" comment="allows users to show less of a field value">Tartalom csonkolása</string>
-    <string name="set_due_date_hintText" comment="plural set_due_date_label_suffix is used for parameters, parameter 1 is the plural for 0, parameter 2 is the plural for 1">Today is ‘0 %1$s’, tomorrow is ‘1 %2$s’, etc&#8230;</string>
+    <string name="set_due_date_hintText" comment="plural set_due_date_label_suffix is used for parameters, parameter 1 is the plural for 0, parameter 2 is the plural for 1">A mai nap \"0 %1$s\", a holnapi nap \"1 %2$s\", stb&#8230;</string>
     <plurals name="card_browser_export_cards">
         <item quantity="one">Kártya exportálása</item>
         <item quantity="other">Kártyák exportálása</item>
@@ -117,10 +117,10 @@
     <!-- Manage columns dialog -->
     <string name="browse_manage_columns_main_heading">Oszlopok</string>
     <string name="browse_manage_columns">Oszlopok kezelése</string>
-    <string name="user_active_columns">Active</string>
-    <string name="user_potential_columns">Available</string>
-    <string name="include_column">Include column</string>
-    <string name="exclude_column">Exclude column</string>
+    <string name="user_active_columns">Aktív</string>
+    <string name="user_potential_columns">Elérhető</string>
+    <string name="include_column">Oszlop hozzáadása</string>
+    <string name="exclude_column">Oszlop eltávolítása</string>
     <string name="save_changes_message">Please save your changes first</string>
     <string name="browser_find_replace_loading_fields">Retrieving fields names&#8230;</string>
 </resources>

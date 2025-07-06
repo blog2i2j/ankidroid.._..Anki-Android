@@ -53,6 +53,7 @@
     <string name="model_browser_template">Змяніць карткі</string>
     <!--Rename-->
     <string name="rename_model">Перайменаваць тып нататкі</string>
+    <string name="rename_card_type">Rename card type</string>
     <!--Language Hint-->
     <string name="model_field_editor_language_hint_dialog_success_result">Прызначыць %s у якасці мовы падказак</string>
     <!--Field Editing-->
@@ -62,7 +63,6 @@
     <string name="model_field_editor_rename">Перайменаваць поле</string>
     <string name="model_field_editor_language_hint">Прызначыць мову падказак клавіятуры</string>
     <string name="model_field_editor_reposition_menu">Перамясціць поле</string>
-    <string name="model_field_editor_toggle_sticky">Пры дабаўленні памятаць апошні ўвод</string>
     <string name="model_field_editor_changing">Адбываецца абнаўленне палёў</string>
     <string name="model_field_editor_sort_field">Сартаваць па гэтым полі</string>
     <!--Warnings-->

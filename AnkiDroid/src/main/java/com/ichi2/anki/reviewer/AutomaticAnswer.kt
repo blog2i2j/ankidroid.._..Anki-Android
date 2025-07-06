@@ -18,19 +18,21 @@ package com.ichi2.anki.reviewer
 
 import androidx.annotation.CheckResult
 import androidx.annotation.VisibleForTesting
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import com.ichi2.anki.CollectionManager.TR
 import com.ichi2.anki.Reviewer
 import com.ichi2.anki.cardviewer.ViewerCommand
+import com.ichi2.anki.common.annotations.NeedsTest
+import com.ichi2.anki.libanki.Collection
+import com.ichi2.anki.libanki.DeckConfig
+import com.ichi2.anki.libanki.DeckConfig.Companion.ANSWER_ACTION
+import com.ichi2.anki.libanki.DeckId
 import com.ichi2.anki.reviewer.AnswerButtons.AGAIN
 import com.ichi2.anki.reviewer.AnswerButtons.GOOD
 import com.ichi2.anki.reviewer.AnswerButtons.HARD
 import com.ichi2.anki.reviewer.AutomaticAnswerAction.Companion.answerAction
 import com.ichi2.anki.snackbar.showSnackbar
-import com.ichi2.annotations.NeedsTest
-import com.ichi2.libanki.Collection
-import com.ichi2.libanki.DeckConfig
-import com.ichi2.libanki.DeckConfig.Companion.ANSWER_ACTION
-import com.ichi2.libanki.DeckId
 import com.ichi2.utils.HandlerUtils
 import timber.log.Timber
 
@@ -68,12 +70,15 @@ import timber.log.Timber
 class AutomaticAnswer(
     target: AutomaticallyAnswered,
     @VisibleForTesting val settings: AutomaticAnswerSettings,
-) {
+) : DefaultLifecycleObserver {
+    private var activityIsPaused = false
+
     /** Whether any tasks should be executed/scheduled.
      *
      * Ensures that auto answer does not occur if the reviewer is minimised
      */
-    var isDisabled: Boolean = false
+    var isDisabled: Boolean = true
+        get() = field || activityIsPaused
         private set
 
     /**
@@ -106,6 +111,18 @@ class AutomaticAnswer(
      */
     @VisibleForTesting
     val timeoutHandler = HandlerUtils.newHandler()
+
+    override fun onPause(owner: LifecycleOwner) {
+        super.onPause(owner)
+        activityIsPaused = true
+        stopShowAnswerTask()
+        stopShowQuestionTask()
+    }
+
+    override fun onResume(owner: LifecycleOwner) {
+        super.onResume(owner)
+        activityIsPaused = false
+    }
 
     @VisibleForTesting
     fun delayedShowQuestion(delay: Long) {
@@ -145,6 +162,19 @@ class AutomaticAnswer(
         isDisabled = true
         stopShowAnswerTask()
         stopShowQuestionTask()
+    }
+
+    fun reEnable(isDisplayingAnswer: Boolean) {
+        isDisabled = false
+        // required for the schedule methods below to work
+        hasPlayedSounds = false
+
+        // Schedule automatic display
+        if (isDisplayingAnswer) {
+            scheduleAutomaticDisplayQuestion()
+        } else {
+            scheduleAutomaticDisplayAnswer()
+        }
     }
 
     /** Stop any "Automatic show answer" tasks in order to avoid race conditions */
@@ -204,6 +234,11 @@ class AutomaticAnswer(
 
     fun isEnabled(): Boolean = !isDisabled
 
+    /**
+     * Whether auto-advance performs actions if enabled
+     */
+    fun isUsable() = settings.isUsable
+
     @VisibleForTesting(otherwise = VisibleForTesting.NONE)
     internal fun simulateCardFlip() {
         Timber.d("simulateCardFlip")
@@ -260,6 +295,9 @@ class AutomaticAnswerSettings(
         get() = secondsToShowAnswerFor > 0
     val autoAdvanceIfShowingQuestion
         get() = secondsToShowQuestionFor > 0
+
+    val isUsable
+        get() = autoAdvanceIfShowingQuestion || autoAdvanceIfShowingAnswer
 
     companion object {
         /**

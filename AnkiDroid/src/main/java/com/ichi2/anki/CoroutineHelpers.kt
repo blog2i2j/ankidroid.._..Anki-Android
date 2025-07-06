@@ -33,8 +33,8 @@ import anki.collection.Progress
 import com.ichi2.anki.CollectionManager.TR
 import com.ichi2.anki.CollectionManager.withCol
 import com.ichi2.anki.exception.StorageAccessException
+import com.ichi2.anki.libanki.Collection
 import com.ichi2.anki.snackbar.showSnackbar
-import com.ichi2.libanki.Collection
 import com.ichi2.utils.message
 import com.ichi2.utils.negativeButton
 import com.ichi2.utils.positiveButton
@@ -105,7 +105,7 @@ interface OnErrorListener {
     val onError: MutableSharedFlow<String>
 }
 
-fun <T> T.launchCatchingIO(block: suspend T.() -> Unit): Job where T : ViewModel, T : OnErrorListener =
+fun <T, U> T.launchCatchingIO(block: suspend T.() -> U): Job where T : ViewModel, T : OnErrorListener =
     viewModelScope.launchCatching(
         ioDispatcher,
         { onError.emit(it) },
@@ -137,6 +137,7 @@ fun <T> ViewModel.asyncIO(block: suspend CoroutineScope.() -> T): Deferred<T> = 
  */
 suspend fun <T> FragmentActivity.runCatching(
     errorMessage: String? = null,
+    skipCrashReport: ((Exception) -> Boolean)? = null,
     block: suspend () -> T?,
 ): T? {
     // appends the pre-coroutine stack to the error message. Example:
@@ -158,6 +159,11 @@ suspend fun <T> FragmentActivity.runCatching(
     try {
         return block()
     } catch (exc: Exception) {
+        if (skipCrashReport?.invoke(exc) == true) {
+            Timber.i("Showing error dialog but not sending a crash report.")
+            showError(this, exc.localizedMessage!!, exc, false, enableEnterKeyHandler = true)
+            return null
+        }
         when (exc) {
             is CancellationException -> {
                 throw exc // CancellationException should be re-thrown to propagate it to the parent coroutine
@@ -225,19 +231,35 @@ fun getCoroutineExceptionHandler(
  */
 fun FragmentActivity.launchCatchingTask(
     errorMessage: String? = null,
+    skipCrashReport: ((Exception) -> Boolean)? = null,
     block: suspend CoroutineScope.() -> Unit,
 ): Job =
     lifecycle.coroutineScope.launch {
-        runCatching(errorMessage) { block() }
+        runCatching(errorMessage, skipCrashReport = skipCrashReport) { block() }
+    }
+
+/**
+ * Launch a job that catches any uncaught errors and reports them to the user.
+ * Errors from the backend contain localized text that is often suitable to show to the user as-is.
+ * Other errors should ideally be handled in the block.
+ */
+fun <T> FragmentActivity.asyncCatching(
+    errorMessage: String? = null,
+    skipCrashReport: ((Exception) -> Boolean)? = null,
+    block: suspend CoroutineScope.() -> T,
+): Deferred<T?> =
+    lifecycle.coroutineScope.async {
+        runCatching(errorMessage, skipCrashReport = skipCrashReport) { block() }
     }
 
 /** See [FragmentActivity.launchCatchingTask] */
 fun Fragment.launchCatchingTask(
     errorMessage: String? = null,
+    skipCrashReport: ((Exception) -> Boolean)? = null,
     block: suspend CoroutineScope.() -> Unit,
 ): Job =
     lifecycle.coroutineScope.launch {
-        requireActivity().runCatching(errorMessage) { block() }
+        requireActivity().runCatching(errorMessage, skipCrashReport = skipCrashReport) { block() }
     }
 
 fun showError(
@@ -273,6 +295,7 @@ fun showError(
             message(text = msg)
             positiveButton(R.string.dialog_ok)
             if (crashReport) {
+                Timber.w("sending crash report on close")
                 setOnDismissListener {
                     CrashReportService.sendExceptionReport(
                         exception,

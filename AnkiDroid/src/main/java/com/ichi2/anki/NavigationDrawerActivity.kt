@@ -45,11 +45,11 @@ import com.google.android.material.color.MaterialColors
 import com.google.android.material.navigation.NavigationView
 import com.ichi2.anki.NoteEditor.Companion.NoteEditorCaller
 import com.ichi2.anki.dialogs.help.HelpDialog
+import com.ichi2.anki.libanki.CardId
 import com.ichi2.anki.preferences.PreferencesActivity
 import com.ichi2.anki.preferences.sharedPrefs
 import com.ichi2.anki.utils.ext.showDialogFragment
 import com.ichi2.anki.workarounds.FullDraggableContainerFix
-import com.ichi2.libanki.CardId
 import com.ichi2.utils.HandlerUtils
 import com.ichi2.utils.IntentUtil
 import timber.log.Timber
@@ -60,12 +60,12 @@ abstract class NavigationDrawerActivity :
     /**
      * Navigation Drawer
      */
-    var fragmented = false
+    open var fragmented = false
         protected set
     private var navButtonGoesBack = false
 
     // Navigation drawer list item entries
-    private lateinit var drawerLayout: DrawerLayout
+    lateinit var drawerLayout: DrawerLayout
     private var navigationView: NavigationView? = null
     lateinit var drawerToggle: ActionBarDrawerToggle
         private set
@@ -365,6 +365,7 @@ abstract class NavigationDrawerActivity :
      * Opens the Statistics Screen.
      */
     protected fun openStatistics() {
+        Timber.i("launching statistics")
         val intent =
             com.ichi2.anki.pages.Statistics
                 .getIntent(this)

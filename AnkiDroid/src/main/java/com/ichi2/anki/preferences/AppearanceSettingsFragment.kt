@@ -23,16 +23,14 @@ import androidx.core.app.ActivityCompat
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.SwitchPreferenceCompat
-import anki.config.copy
 import com.ichi2.anki.CollectionManager
-import com.ichi2.anki.CollectionManager.withCol
 import com.ichi2.anki.R
 import com.ichi2.anki.deckpicker.BackgroundImage
 import com.ichi2.anki.deckpicker.BackgroundImage.FileSizeResult
 import com.ichi2.anki.launchCatchingTask
 import com.ichi2.anki.showThemedToast
 import com.ichi2.anki.snackbar.showSnackbar
-import com.ichi2.libanki.undoableOp
+import com.ichi2.anki.utils.CollectionPreferences
 import com.ichi2.themes.Theme
 import com.ichi2.themes.Themes
 import com.ichi2.themes.Themes.systemIsInNightMode
@@ -127,22 +125,18 @@ class AppearanceSettingsFragment : SettingsFragment() {
         // Represents the collection pref "estTime": i.e.
         // whether the buttons should indicate the duration of the interval if we click on them.
         requirePreference<SwitchPreferenceCompat>(R.string.show_estimates_preference).apply {
-            launchCatchingTask { isChecked = getShowIntervalOnButtons() }
-            setOnPreferenceChangeListener { _, newETA ->
-                val newETABool = newETA as? Boolean ?: return@setOnPreferenceChangeListener false
-                launchCatchingTask { setShowIntervalsOnButtons(newETABool) }
-                true
+            launchCatchingTask { isChecked = CollectionPreferences.getShowIntervalOnButtons() }
+            setOnPreferenceChangeListener { newValue ->
+                launchCatchingTask { CollectionPreferences.setShowIntervalsOnButtons(newValue) }
             }
         }
         // Show progress
         // Represents the collection pref "dueCounts": i.e.
         // whether the remaining number of cards should be shown.
         requirePreference<SwitchPreferenceCompat>(R.string.show_progress_preference).apply {
-            launchCatchingTask { isChecked = getShowRemainingDueCounts() }
-            setOnPreferenceChangeListener { _, newDueCountsValue ->
-                val newDueCountsValueBool = newDueCountsValue as? Boolean ?: return@setOnPreferenceChangeListener false
-                launchCatchingTask { setShowRemainingDueCounts(newDueCountsValueBool) }
-                true
+            launchCatchingTask { isChecked = CollectionPreferences.getShowRemainingDueCounts() }
+            setOnPreferenceChangeListener { newValue ->
+                launchCatchingTask { CollectionPreferences.setShowRemainingDueCounts(newValue) }
             }
         }
 
@@ -150,11 +144,9 @@ class AppearanceSettingsFragment : SettingsFragment() {
         // Note: Stored inverted in the collection as HIDE_AUDIO_PLAY_BUTTONS
         requirePreference<SwitchPreferenceCompat>(R.string.show_audio_play_buttons_key).apply {
             title = CollectionManager.TR.preferencesShowPlayButtonsOnCardsWith()
-            launchCatchingTask { isChecked = !getHidePlayAudioButtons() }
-            setOnPreferenceChangeListener { _, newValue ->
-                val newValueBool = newValue as? Boolean ?: return@setOnPreferenceChangeListener false
-                launchCatchingTask { setHideAudioPlayButtons(!newValueBool) }
-                true
+            launchCatchingTask { isChecked = !CollectionPreferences.getHidePlayAudioButtons() }
+            setOnPreferenceChangeListener { newValue ->
+                launchCatchingTask { CollectionPreferences.setHideAudioPlayButtons(!newValue) }
             }
         }
     }
@@ -214,40 +206,4 @@ class AppearanceSettingsFragment : SettingsFragment() {
                 showSnackbar(getString(R.string.error_selecting_image, e.localizedMessage))
             }
         }
-
-    private suspend fun setShowIntervalsOnButtons(value: Boolean) {
-        val prefs = withCol { getPreferences() }
-        val newPrefs =
-            prefs.copy {
-                reviewing = reviewing.copy { showIntervalsOnButtons = value }
-            }
-        undoableOp { setPreferences(newPrefs) }
-        Timber.i("Set showIntervalsOnButtons to %b", value)
-    }
-
-    private suspend fun getShowRemainingDueCounts(): Boolean = withCol { getPreferences().reviewing.showRemainingDueCounts }
-
-    private suspend fun setShowRemainingDueCounts(value: Boolean) {
-        val prefs = withCol { getPreferences() }
-        val newPrefs =
-            prefs.copy {
-                reviewing = reviewing.copy { showRemainingDueCounts = value }
-            }
-        undoableOp { setPreferences(newPrefs) }
-        Timber.i("Set showRemainingDueCounts to %b", value)
-    }
-
-    private suspend fun setHideAudioPlayButtons(value: Boolean) {
-        val prefs = withCol { getPreferences() }
-        val newPrefs =
-            prefs.copy {
-                reviewing = reviewing.copy { hideAudioPlayButtons = value }
-            }
-        undoableOp { setPreferences(newPrefs) }
-        Timber.i("Set hideAudioPlayButtons to %b", value)
-    }
 }
-
-suspend fun getShowIntervalOnButtons(): Boolean = withCol { getPreferences().reviewing.showIntervalsOnButtons }
-
-suspend fun getHidePlayAudioButtons(): Boolean = withCol { getPreferences().reviewing.hideAudioPlayButtons }

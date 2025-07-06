@@ -18,8 +18,8 @@ package com.ichi2.async
 
 import com.ichi2.anki.CardTemplateNotetype
 import com.ichi2.anki.common.utils.annotation.KotlinCleanup
-import com.ichi2.libanki.Collection
-import com.ichi2.libanki.NotetypeJson
+import com.ichi2.anki.libanki.Collection
+import com.ichi2.anki.libanki.NotetypeJson
 import timber.log.Timber
 
 /**
@@ -30,9 +30,22 @@ fun deleteMedia(
     col: Collection,
     unused: List<String>,
 ): Int {
-    // FIXME: this provides progress info that is not currently used
-    col.media.removeFiles(unused)
+    col.media.trashFiles(unused)
     return unused.size
+}
+
+/**
+ * Trashes the specified media files and immediately empties the trash in the given [Collection].
+ *
+ * @param col The [Collection] from which media files should be removed.
+ * @param unused A list of media file names to be deleted.
+ */
+fun clearMediaAndTrash(
+    col: Collection,
+    unused: List<String>,
+) {
+    col.media.trashFiles(unused)
+    col.media.emptyTrash()
 }
 
 /**

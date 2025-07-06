@@ -53,9 +53,11 @@ class ActionButtonStatus {
         setupButton(preferences, R.id.action_delete, "customButtonDelete", SHOW_AS_ACTION_NEVER)
         setupButton(preferences, R.id.action_toggle_mic_tool_bar, "customButtonToggleMicToolBar", SHOW_AS_ACTION_NEVER)
         setupButton(preferences, R.id.action_toggle_whiteboard, "customButtonEnableWhiteboard", SHOW_AS_ACTION_NEVER)
+        setupButton(preferences, R.id.action_toggle_eraser, "customButtonToggleEraser", SHOW_AS_ACTION_ALWAYS)
         setupButton(preferences, R.id.action_toggle_stylus, "customButtonToggleStylus", SHOW_AS_ACTION_IF_ROOM)
         setupButton(preferences, R.id.action_save_whiteboard, "customButtonSaveWhiteboard", SHOW_AS_ACTION_NEVER)
         setupButton(preferences, R.id.action_change_whiteboard_pen_color, "customButtonWhiteboardPenColor", SHOW_AS_ACTION_IF_ROOM)
+        setupButton(preferences, R.id.action_toggle_auto_advance, "customButtonToggleAutoAdvance", SHOW_AS_ACTION_NEVER)
         setupButton(preferences, R.id.user_action_1, "customButtonUserAction1", MENU_DISABLED)
         setupButton(preferences, R.id.user_action_2, "customButtonUserAction2", MENU_DISABLED)
         setupButton(preferences, R.id.user_action_3, "customButtonUserAction3", MENU_DISABLED)
@@ -95,6 +97,8 @@ class ActionButtonStatus {
 
     fun hideWhiteboardIsDisabled(): Boolean = customButtons[R.id.action_hide_whiteboard] == MENU_DISABLED
 
+    fun toggleEraserIsDisabled(): Boolean = customButtons[R.id.action_toggle_eraser] == MENU_DISABLED
+
     fun toggleStylusIsDisabled(): Boolean = customButtons[R.id.action_toggle_stylus] == MENU_DISABLED
 
     fun clearWhiteboardIsDisabled(): Boolean = customButtons[R.id.action_clear_whiteboard] == MENU_DISABLED
@@ -110,6 +114,8 @@ class ActionButtonStatus {
     fun buryIsDisabled(): Boolean = customButtons[R.id.action_bury] == MENU_DISABLED
 
     fun flagsIsOverflown(): Boolean = customButtons[R.id.action_flag] == SHOW_AS_ACTION_NEVER
+
+    fun autoAdvanceMenuIsNeverShown(): Boolean = customButtons[R.id.action_toggle_auto_advance] == MENU_DISABLED
 
     companion object {
         const val SHOW_AS_ACTION_NEVER = MenuItem.SHOW_AS_ACTION_NEVER

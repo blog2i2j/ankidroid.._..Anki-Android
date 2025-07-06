@@ -39,10 +39,10 @@ import anki.search.BrowserRow.Color
 import com.ichi2.anki.AnkiDroidApp.Companion.sharedPrefs
 import com.ichi2.anki.Flag
 import com.ichi2.anki.R
+import com.ichi2.anki.common.annotations.NeedsTest
 import com.ichi2.anki.utils.android.darkenColor
 import com.ichi2.anki.utils.android.lightenColorAbsolute
 import com.ichi2.anki.utils.ext.findViewById
-import com.ichi2.annotations.NeedsTest
 import com.ichi2.utils.removeChildren
 import net.ankiweb.rsdroid.BackendException
 import timber.log.Timber
@@ -63,8 +63,6 @@ class BrowserMultiColumnAdapter(
     private val onLongPress: (CardOrNoteId) -> Unit,
     private val onTap: (CardOrNoteId) -> Unit,
 ) : RecyclerView.Adapter<BrowserMultiColumnAdapter.MultiColumnViewHolder>() {
-    var focusedRow: CardOrNoteId? = null
-
     val fontSizeScalePercent =
         sharedPrefs().getInt("relativeCardBrowserFontSize", DEFAULT_FONT_SIZE_RATIO)
 
@@ -249,7 +247,7 @@ class BrowserMultiColumnAdapter(
             }
             holder.setIsSelected(isSelected)
             val rowColor =
-                if (focusedRow == id) {
+                if (viewModel.focusedRow == id) {
                     ThemeUtils.getThemeAttrColor(context, R.attr.focusedRowBackgroundColor)
                 } else {
                     backendColorToColor(row.color)
