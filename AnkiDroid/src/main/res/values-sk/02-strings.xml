@@ -47,6 +47,7 @@
     <!-- Navigation drawer strings -->
     <string name="drawer_open">Otvoriť lištu</string>
     <string name="drawer_close">Zavrieť lištu</string>
+    <string name="note_message">Note saved</string>
     <string name="CardEditorCardDeck">Balíček kartičky:</string>
     <string name="CardEditorNoteDeck">Balíček:</string>
     <string name="CardEditorModel">Typ:</string>
@@ -60,16 +61,18 @@
     <string name="filter_tags" maxLength="28">Filtrovať štítky</string>
     <string name="no_tags">Ešte ste nepridali žiadne štítky.</string>
     <string name="updated_version">Aktualizované na verziu %s</string>
-    <!-- Reviewer.kt -->
+    <!-- Reviewer.kt (Study Screen) -->
     <string name="save_whiteboard" maxLength="28">Uložiť tabuľu</string>
     <string name="enable_stylus" maxLength="28">Povoliť pero</string>
     <string name="disable_stylus">Zakázať pero</string>
     <string name="enable_whiteboard" maxLength="28">Povoliť tabuľu</string>
     <string name="disable_whiteboard">Zakázať tabuľu</string>
     <string name="show_whiteboard">Zobraziť tabuľu</string>
+    <string name="enable_eraser" maxLength="28">Enable eraser</string>
+    <string name="disable_eraser" maxLength="28">Disable eraser</string>
     <string name="hide_whiteboard" maxLength="28">Skryť tabuľu</string>
     <string name="clear_whiteboard" maxLength="28">Vyčistiť tabuľu</string>
-    <string name="replay_audio" maxLength="28">Znovu prehrať zvuk</string>
+    <string name="replay_media" maxLength="28">Replay media</string>
     <string name="leech_suspend_notification">Kartička označená ako pijavica a pozastavená</string>
     <string name="leech_notification">Kartička označená ako pijavica</string>
     <string name="webview_crash_unknown">Neznáma chyba</string>
@@ -107,6 +110,11 @@
     <string name="confirm_map_cards_to_nothing">Akékoľvek kartičky, ktoré nie sú na nič mapované, budú zmazané. Ak poznámka nemá žiadne zostávajúce kartičky, bude stratená. Ste si istý, že chcete pokračovať?</string>
     <string name="missing_note_type">Chýba typ poznámky</string>
     <string name="card_previewer_empty_front_indicator" comment="Extra text appended onto a tab title in the card previewer so that the user can see at a glance whether a card has no front.">%1$s (empty)</string>
+    <!-- Image cropper -->
+    <string name="image_cropper_action_rotate" maxLength="28" comment="Action in image cropper screen">Rotate</string>
+    <string name="image_cropper_action_flip" maxLength="28" comment="Action in image cropper screen">Flip</string>
+    <string name="image_cropper_action_flip_horizontally" maxLength="28" comment="Submenu action in image cropper screen">Flip horizontally</string>
+    <string name="image_cropper_action_flip_vertically" maxLength="28" comment="Submenu action in image cropper screen">Flip vertically</string>
     <!-- Timebox -->
     <string name="timebox_reached_title">Dosiahol sa limit pre časový box</string>
     <plurals name="timebox_reached">
@@ -201,7 +209,10 @@
     <!-- Card Template Browser Appearance -->
     <string name="restore_default" maxLength="28">Obnoviť predvolené</string>
     <string name="reviewer_tts_cloze_spoken_replacement">Prázdny</string>
-    <!-- Whiteboard save image message in Reviewer -->
+    <!-- Whiteboard eraser mode toggle message in Reviewer -->
+    <string name="white_board_eraser_enabled">Eraser mode activated</string>
+    <string name="white_board_eraser_disabled">Eraser mode deactivated</string>
+    <!-- Whiteboard save image message in the Study Screen -->
     <string name="white_board_image_save_failed">Nepodarilo sa uložiť obrázok tabule. %s</string>
     <string name="white_board_image_saved">Obrázok tabule sa uložil do %s</string>
     <string name="title_whiteboard_editor" maxLength="28">Editor tabule</string>
@@ -271,7 +282,7 @@
     <string name="search_using_deck_name">Hľadať pomocou názvu balíčka</string>
     <string name="external_storage_unavailable">Download aborted, the external storage is not available</string>
     <string name="home" maxLength="28">Domov</string>
-    <!-- Reviewer actions
+    <!-- Study Screen actions
     Each of these strings ends with a period, following the notation of Anki Desktop -->
     <string name="card_buried">Karta zahrabaná.</string>
     <plurals name="note_suspended">
@@ -361,4 +372,6 @@
     <string name="edit_browser_appearance" comment="Description of the shortcut that edits the browser appearance of card template">Edit browser appearance</string>
     <string name="missing_user_action_dialog_message" comment="%s is the user action number">User action %s is not set in this notetype. Please configure it</string>
     <string name="directory_inaccessible_info">Learn more about how to restore access here %s or go to settings to update collection folder.</string>
+    <!-- Scheduler Upgrade Required Dialog title-->
+    <string name="scheduler_upgrade_required_dialog_title" comment="Shown in a dialog when user has imported a collection using a very old version of the Anki spaced repetition scheduler">Scheduler upgrade required</string>
 </resources>

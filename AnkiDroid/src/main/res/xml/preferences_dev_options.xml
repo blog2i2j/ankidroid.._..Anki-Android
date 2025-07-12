@@ -96,14 +96,13 @@
         android:summary="Only for testing. Not suited for use. Don't create reports about them">
 
         <SwitchPreferenceCompat
-            android:title="New reviewer"
+            android:title="@string/new_study_screen"
             android:key="@string/new_reviewer_pref_key"
             android:defaultValue="false"/>
-        <Preference
-            android:title="New reviewer options"
-            android:key="@string/new_reviewer_options_key"
-            android:dependency="@string/new_reviewer_pref_key"
-            android:fragment="com.ichi2.anki.preferences.ReviewerOptionsFragment"/>
+        <SwitchPreferenceCompat
+            android:title="[Tablet] Side-by-side Browser and Editor"
+            android:key="@string/dev_card_browser_fragmented"
+            android:defaultValue="false"/>
         <SwitchPreferenceCompat
             android:title="Find and replace in browser"
             android:summary="Caution, this can be very destructive for your collection!"
@@ -111,7 +110,7 @@
             android:defaultValue="false"/>
         <SwitchPreferenceCompat
             android:title="Enable new notifications"
-            android:key="@string/pref_new_notifications"
+            android:key="@string/pref_new_review_reminders"
             android:defaultValue="false"/>
     </com.ichi2.anki.preferences.ExtendedPreferenceCategory>
 </PreferenceScreen>

@@ -19,12 +19,10 @@
 
 package com.ichi2.anki.multimediacard.fields
 
-import android.net.Uri
 import androidx.annotation.CheckResult
 import androidx.annotation.VisibleForTesting
 import com.ichi2.anki.common.utils.annotation.KotlinCleanup
-import com.ichi2.annotations.NeedsTest
-import com.ichi2.libanki.Collection
+import com.ichi2.anki.libanki.Collection
 import org.jsoup.Jsoup
 import timber.log.Timber
 import java.io.File
@@ -77,11 +75,9 @@ class ImageField :
 
     companion object {
         @VisibleForTesting
-        @NeedsTest("files with HTML illegal chars can be imported and rendered")
         fun formatImageFileName(file: File): String =
             if (file.exists()) {
-                val encodedName = Uri.encode(file.name)
-                """<img src="$encodedName">"""
+                """<img src="${file.name}">"""
             } else {
                 ""
             }

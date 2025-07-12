@@ -71,8 +71,10 @@ class SyncMediaWorker(
                     }
                 }
 
+            // The collection must be open, but we should not block collection operations while
+            // `syncMedia` is executing, the app should be usable during a background media sync
+            CollectionManager.getColUnsafe().backend.syncMedia(auth)
             val backend = CollectionManager.getBackend()
-            backend.syncMedia(auth)
 
             delay(1000) // avoid notifications if sync occurs too quickly
             if (backend.mediaSyncStatus().active) {
@@ -88,12 +90,14 @@ class SyncMediaWorker(
             Timber.w(throwable)
             notify {
                 setContentTitle(CollectionManager.TR.syncMediaFailed())
+                throwable.localizedMessage?.let { message ->
+                    setContentText(message)
+                }
             }
             return Result.failure()
-        } finally {
-            Timber.d("SyncMediaWorker: cancelling notification")
-            notificationManager?.cancel(NotificationId.SYNC_MEDIA)
         }
+        Timber.d("SyncMediaWorker: cancelling notification")
+        notificationManager?.cancel(NotificationId.SYNC_MEDIA)
 
         Timber.d("SyncMediaWorker: success")
         return Result.success()
@@ -152,7 +156,6 @@ class SyncMediaWorker(
                 setSmallIcon(R.drawable.ic_star_notify)
                 setCategory(NotificationCompat.CATEGORY_PROGRESS)
                 setSilent(true)
-                contentView
                 block()
             }.build()
 

@@ -17,6 +17,7 @@ package com.ichi2.anki.cardviewer
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.os.Build
 import com.ichi2.anki.R
 import com.ichi2.anki.cardviewer.TapGestureMode.FOUR_POINT
 import com.ichi2.anki.cardviewer.TapGestureMode.NINE_POINT
@@ -30,7 +31,10 @@ const val GESTURE_PREFIX = "\u235D"
 /**
  * https://www.fileformat.info/info/unicode/char/1fa87/index.htm (Maracas)
  */
-const val SHAKE_GESTURE_PREFIX = "\uD83E\uDE87"
+// #17090: maracas emoji is unusable on API 30 or below.
+// androidX emoji2 doesn't work by default on an API 30 emulator.
+// either requires a GMS dependency, or bloats the APK size by 9.8MB
+val SHAKE_GESTURE_PREFIX = if (Build.VERSION.SDK_INT > 30) "\uD83E\uDE87" else ""
 
 fun interface GestureListener {
     fun onGesture(gesture: Gesture)
@@ -40,7 +44,6 @@ enum class Gesture(
     @get:JvmName("getResourceId") val resourceId: Int,
     private val displayPrefix: String = GESTURE_PREFIX,
 ) {
-    SHAKE(R.string.gestures_shake, SHAKE_GESTURE_PREFIX),
     SWIPE_UP(R.string.gestures_swipe_up),
     SWIPE_DOWN(R.string.gestures_swipe_down),
     SWIPE_LEFT(R.string.gestures_swipe_left),
@@ -55,9 +58,22 @@ enum class Gesture(
     TAP_BOTTOM_LEFT(R.string.gestures_corner_tap_bottom_left),
     TAP_BOTTOM(R.string.gestures_tap_bottom),
     TAP_BOTTOM_RIGHT(R.string.gestures_corner_tap_bottom_right),
+    TWO_FINGER_TAP(R.string.gestures_two_finger_tap),
+    THREE_FINGER_TAP(R.string.gestures_three_finger_tap),
+    FOUR_FINGER_TAP(R.string.gestures_four_finger_tap),
+    SHAKE(R.string.gestures_shake, SHAKE_GESTURE_PREFIX),
     ;
 
-    fun toDisplayString(context: Context): String = displayPrefix + ' ' + context.getString(resourceId)
+    fun toDisplayString(context: Context): String =
+        if (displayPrefix.isNotEmpty()) {
+            displayPrefix + ' ' + context.getString(resourceId)
+            // e.g., (maracas emoji) + (space) + "Shake device"
+        } else {
+            context.getString(resourceId)
+            // e.g., "Shake device"
+            // (Not only the empty prefix (""), but also the space in the middle (" ") is not shown.)
+            // Related to #17090
+        }
 }
 
 /**

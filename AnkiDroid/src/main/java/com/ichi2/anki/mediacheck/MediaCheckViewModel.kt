@@ -21,9 +21,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import anki.media.CheckMediaResponse
 import com.ichi2.anki.CollectionManager.withCol
-import com.ichi2.annotations.NeedsTest
+import com.ichi2.anki.common.annotations.NeedsTest
+import com.ichi2.anki.observability.undoableOp
 import com.ichi2.async.deleteMedia
-import com.ichi2.libanki.undoableOp
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -57,6 +57,13 @@ class MediaCheckViewModel : ViewModel() {
         viewModelScope.launch {
             val result = withCol { media.check() }
             _mediaCheckResult.value = result
+        }
+
+    fun deleteTrash(): Job = viewModelScope.launch { withCol { media.emptyTrash() } }
+
+    fun restoreTrash(): Job =
+        viewModelScope.launch {
+            withCol { media.restoreTrash() }
         }
 
     // TODO: investigate: the underlying implementation exposes progress, which we do not yet handle.

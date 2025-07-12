@@ -16,6 +16,7 @@
 
 package com.ichi2.anki
 
+import com.ichi2.anki.libanki.sched.Ease
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

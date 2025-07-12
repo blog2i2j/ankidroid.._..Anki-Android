@@ -20,7 +20,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.IdRes
 import com.ichi2.anki.CollectionManager.TR
 import com.ichi2.anki.CollectionManager.withCol
-import com.ichi2.anki.utils.ext.getStringOrNull
+import com.ichi2.anki.common.utils.ext.getStringOrNull
 import org.json.JSONObject
 
 enum class Flag(
@@ -38,7 +38,7 @@ enum class Flag(
      */
     @ColorRes val browserColorRes: Int?,
 ) {
-    NONE(0, R.id.flag_none, R.drawable.ic_flag_transparent, null),
+    NONE(0, R.id.flag_none, R.drawable.ic_flag_transparent, browserColorRes = null),
     RED(1, R.id.flag_red, R.drawable.ic_flag_red, R.color.flag_red),
     ORANGE(
         2,

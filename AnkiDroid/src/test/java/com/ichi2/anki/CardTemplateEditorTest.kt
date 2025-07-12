@@ -25,8 +25,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.ichi2.anki.CardTemplateEditor.CardTemplateFragment.CardTemplate
 import com.ichi2.anki.CollectionManager.withCol
 import com.ichi2.anki.dialogs.DeckSelectionDialog.SelectableDeck
+import com.ichi2.anki.libanki.NotetypeJson
 import com.ichi2.anki.previewer.CardViewerActivity
-import com.ichi2.libanki.NotetypeJson
 import com.ichi2.testutils.assertFalse
 import com.ichi2.testutils.ext.addNote
 import org.hamcrest.MatcherAssert
@@ -74,10 +74,8 @@ class CardTemplateEditorTest : RobolectricTest() {
         assertTrue("Note type did not change after edit?", testEditor.noteTypeHasChanged())
         assertEquals(
             "Change already in database?",
-            collectionBasicNoteTypeOriginal.toString().trim {
-                it <= ' '
-            },
-            getCurrentDatabaseNoteTypeCopy(noteTypeName).toString().trim { it <= ' ' },
+            collectionBasicNoteTypeOriginal.toString().trim(),
+            getCurrentDatabaseNoteTypeCopy(noteTypeName).toString().trim(),
         )
 
         // Kill and restart the Activity, make sure note type edit is preserved
@@ -97,10 +95,8 @@ class CardTemplateEditorTest : RobolectricTest() {
         assertTrue("note type change not preserved across activity lifecycle?", testEditor.noteTypeHasChanged())
         assertEquals(
             "Change already in database?",
-            collectionBasicNoteTypeOriginal.toString().trim {
-                it <= ' '
-            },
-            getCurrentDatabaseNoteTypeCopy(noteTypeName).toString().trim { it <= ' ' },
+            collectionBasicNoteTypeOriginal.toString().trim(),
+            getCurrentDatabaseNoteTypeCopy(noteTypeName).toString().trim(),
         )
 
         // Make sure we get a confirmation dialog if we hit the back button
@@ -143,10 +139,8 @@ class CardTemplateEditorTest : RobolectricTest() {
         assertEquals("Previewer not started?", CardViewerActivity::class.java.name, shadowIntent.intentClass.name)
         assertEquals(
             "Change already in database?",
-            collectionBasicNoteTypeOriginal.toString().trim {
-                it <= ' '
-            },
-            getCurrentDatabaseNoteTypeCopy(noteTypeName).toString().trim { it <= ' ' },
+            collectionBasicNoteTypeOriginal.toString().trim(),
+            getCurrentDatabaseNoteTypeCopy(noteTypeName).toString().trim(),
         )
         shadowTestEditor.receiveResult(startedIntent, Activity.RESULT_OK, Intent())
 
@@ -159,10 +153,8 @@ class CardTemplateEditorTest : RobolectricTest() {
         assertNotEquals("Note type is unchanged?", collectionBasicNoteTypeOriginal, collectionBasicNoteTypeCopyEdited)
         assertEquals(
             "note type did not save?",
-            testEditorNoteTypeEdited.toString().trim {
-                it <= ' '
-            },
-            collectionBasicNoteTypeCopyEdited.toString().trim { it <= ' ' },
+            testEditorNoteTypeEdited.toString().trim(),
+            collectionBasicNoteTypeCopyEdited.toString().trim(),
         )
         assertTrue("Note type does not have our change?", collectionBasicNoteTypeCopyEdited.toString().contains(testNoteTypeQfmtEdit))
     }
@@ -207,10 +199,8 @@ class CardTemplateEditorTest : RobolectricTest() {
         )
         assertEquals(
             "Change already in database?",
-            collectionBasicNoteTypeOriginal.toString().trim {
-                it <= ' '
-            },
-            getCurrentDatabaseNoteTypeCopy(noteTypeName).toString().trim { it <= ' ' },
+            collectionBasicNoteTypeOriginal.toString().trim(),
+            getCurrentDatabaseNoteTypeCopy(noteTypeName).toString().trim(),
         )
 
         // Save the change to the database and make sure there's only one template after
@@ -221,10 +211,8 @@ class CardTemplateEditorTest : RobolectricTest() {
         assertNotEquals("Note type is unchanged?", collectionBasicNoteTypeOriginal, collectionBasicNoteTypeCopyEdited)
         assertEquals(
             "Note type did not save?",
-            testEditorNoteTypeEdited.toString().trim {
-                it <= ' '
-            },
-            collectionBasicNoteTypeCopyEdited.toString().trim { it <= ' ' },
+            testEditorNoteTypeEdited.toString().trim(),
+            collectionBasicNoteTypeCopyEdited.toString().trim(),
         )
     }
 
@@ -266,10 +254,8 @@ class CardTemplateEditorTest : RobolectricTest() {
         assertEquals("Previewer not started?", CardViewerActivity::class.java.name, shadowIntent.intentClass.name)
         assertEquals(
             "Change already in database?",
-            collectionBasicNoteTypeOriginal.toString().trim {
-                it <= ' '
-            },
-            getCurrentDatabaseNoteTypeCopy(noteTypeName).toString().trim { it <= ' ' },
+            collectionBasicNoteTypeOriginal.toString().trim(),
+            getCurrentDatabaseNoteTypeCopy(noteTypeName).toString().trim(),
         )
 
         // Save the change to the database and make sure there are two templates after
@@ -280,10 +266,8 @@ class CardTemplateEditorTest : RobolectricTest() {
         assertNotEquals("Note type is unchanged?", collectionBasicNoteTypeOriginal, collectionBasicNoteTypeCopyEdited)
         assertEquals(
             "Note type did not save?",
-            testEditorNoteTypeEdited.toString().trim {
-                it <= ' '
-            },
-            collectionBasicNoteTypeCopyEdited.toString().trim { it <= ' ' },
+            testEditorNoteTypeEdited.toString().trim(),
+            collectionBasicNoteTypeCopyEdited.toString().trim(),
         )
     }
 
@@ -366,10 +350,8 @@ class CardTemplateEditorTest : RobolectricTest() {
             )
             assertEquals(
                 "Change already in database?",
-                collectionBasicNoteTypeOriginal.toString().trim {
-                    it <= ' '
-                },
-                getCurrentDatabaseNoteTypeCopy(noteTypeName).toString().trim { it <= ' ' },
+                collectionBasicNoteTypeOriginal.toString().trim(),
+                getCurrentDatabaseNoteTypeCopy(noteTypeName).toString().trim(),
             )
             assertFalse("Ordinal pending add?", testEditor.tempNoteType.isOrdinalPendingAdd(0))
             assertEquals("Change incorrectly added to list?", 0, testEditor.templateChangeCount)
@@ -453,10 +435,8 @@ class CardTemplateEditorTest : RobolectricTest() {
             assertNull("Can delete both templates?", collectionBasicNoteTypeOriginal.getCardIds(0, 1))
             assertEquals(
                 "Change in database despite no change?",
-                collectionBasicNoteTypeOriginal.toString().trim {
-                    it <= ' '
-                },
-                getCurrentDatabaseNoteTypeCopy(noteTypeName).toString().trim { it <= ' ' },
+                collectionBasicNoteTypeOriginal.toString().trim(),
+                getCurrentDatabaseNoteTypeCopy(noteTypeName).toString().trim(),
             )
             assertEquals("Note type should have 2 templates still", 2, testEditor.tempNoteType?.templateCount)
 
@@ -549,10 +529,8 @@ class CardTemplateEditorTest : RobolectricTest() {
             assertNull("Can delete all templates?", collectionBasicNoteTypeOriginal.getCardIds(0, 1, 2))
             assertEquals(
                 "Change already in database?",
-                collectionBasicNoteTypeOriginal.toString().trim {
-                    it <= ' '
-                },
-                getCurrentDatabaseNoteTypeCopy(noteTypeName).toString().trim { it <= ' ' },
+                collectionBasicNoteTypeOriginal.toString().trim(),
+                getCurrentDatabaseNoteTypeCopy(noteTypeName).toString().trim(),
             )
             assertEquals(
                 "Change added but not adjusted correctly?",
@@ -576,10 +554,8 @@ class CardTemplateEditorTest : RobolectricTest() {
             advanceRobolectricLooperWithSleep()
             assertNotEquals(
                 "Change not in database?",
-                collectionBasicNoteTypeOriginal.toString().trim {
-                    it <= ' '
-                },
-                getCurrentDatabaseNoteTypeCopy(noteTypeName).toString().trim { it <= ' ' },
+                collectionBasicNoteTypeOriginal.toString().trim(),
+                getCurrentDatabaseNoteTypeCopy(noteTypeName).toString().trim(),
             )
             assertEquals("Note type should have 2 templates now", 2, getCurrentDatabaseNoteTypeCopy(noteTypeName).templates.length())
             assertEquals("should be two cards", 2, getNoteTypeCardCount(collectionBasicNoteTypeOriginal))
@@ -639,10 +615,8 @@ class CardTemplateEditorTest : RobolectricTest() {
             assertNull("Can delete both templates?", collectionBasicNoteTypeOriginal.getCardIds(0, 1))
             assertEquals(
                 "Change in database despite no save?",
-                collectionBasicNoteTypeOriginal.toString().trim {
-                    it <= ' '
-                },
-                getCurrentDatabaseNoteTypeCopy(noteTypeName).toString().trim { it <= ' ' },
+                collectionBasicNoteTypeOriginal.toString().trim(),
+                getCurrentDatabaseNoteTypeCopy(noteTypeName).toString().trim(),
             )
             assertEquals("Note type should have 1 template", 1, testEditor.tempNoteType?.templateCount)
 
@@ -675,10 +649,8 @@ class CardTemplateEditorTest : RobolectricTest() {
             assertNull("Can delete both templates?", collectionBasicNoteTypeOriginal.getCardIds(0, 1))
             assertEquals(
                 "Change in database despite no save?",
-                collectionBasicNoteTypeOriginal.toString().trim {
-                    it <= ' '
-                },
-                getCurrentDatabaseNoteTypeCopy(noteTypeName).toString().trim { it <= ' ' },
+                collectionBasicNoteTypeOriginal.toString().trim(),
+                getCurrentDatabaseNoteTypeCopy(noteTypeName).toString().trim(),
             )
             assertEquals("Note type should have 1 template", 1, testEditor.tempNoteType?.templateCount)
 
@@ -731,15 +703,12 @@ class CardTemplateEditorTest : RobolectricTest() {
         advanceRobolectricLooperWithSleep()
         val cardTemplateFragment = testEditor.currentFragment
         val tempNoteType = testEditor.tempNoteType
+        val cardId = 0
         // set Bottom Navigation View to Style
-        cardTemplateFragment!!.setCurrentEditorView(R.id.styling_edit, tempNoteType!!.css, R.string.card_template_editor_styling)
+        cardTemplateFragment!!.setCurrentEditorView(R.id.styling_edit, cardId, tempNoteType!!.css)
 
         // set Bottom Navigation View to Front
-        cardTemplateFragment.setCurrentEditorView(
-            R.id.front_edit,
-            tempNoteType.getTemplate(0).qfmt,
-            R.string.card_template_editor_front,
-        )
+        cardTemplateFragment.setCurrentEditorView(R.id.front_edit, cardId, tempNoteType.getTemplate(0).qfmt)
 
         // check if current content is updated or not
         assumeThat(templateEditText.text.toString(), Matchers.equalTo(updatedFrontContent))
@@ -773,8 +742,9 @@ class CardTemplateEditorTest : RobolectricTest() {
         assumeThat(templateEditText.text.toString(), Matchers.equalTo(tempNoteType!!.getTemplate(0).qfmt))
         assumeThat(cardTemplateFragment!!.currentEditorViewId, Matchers.equalTo(R.id.front_edit))
 
+        val cardId = 0
         // set Bottom Navigation View to Style
-        cardTemplateFragment.setCurrentEditorView(R.id.styling_edit, tempNoteType.css, R.string.card_template_editor_styling)
+        cardTemplateFragment.setCurrentEditorView(R.id.styling_edit, cardId, tempNoteType.css)
 
         // check if current view is changed or not
         assumeThat(templateEditText.text.toString(), Matchers.equalTo(tempNoteType.css))

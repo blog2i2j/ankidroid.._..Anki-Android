@@ -6,7 +6,7 @@
     <color name="theme_black_primary_text">#fff</color> <!-- Alternative: #808080 -->
     <color name="theme_black_row_current">#1a1a1a</color>
 
-    <style name="Theme_Dark.Black" parent="Theme_Dark">
+    <style name="Base.Theme.Dark.Black" parent="Theme_Dark">
         <!-- Android colors -->
         <item name="colorPrimary">@color/material_blue_400</item>
         <item name="colorPrimaryDark">@color/black</item>
@@ -41,7 +41,8 @@
         <item name="reviewCountColor">@color/material_green_400</item>
         <item name="buryCountColor">@color/disabled_gray_dark</item>
         <item name="zeroCountColor">#202020</item>
-        <!-- Reviewer colors -->
+        <!-- Study Screen colors -->
+        <item name="showAnswerButtonBackground">#0c1215</item>
         <item name="showAnswerColor">@color/theme_black_primary</item>
         <item name="topBarColor">@color/theme_black_primary</item>
         <item name="maxTimerColor">@color/material_red_300</item>
@@ -50,8 +51,17 @@
         <item name="hardButtonTextColor">@color/white</item>
         <item name="goodButtonTextColor">@color/material_green_400</item>
         <item name="easyButtonTextColor">@color/material_blue_700</item>
-        <item name="alternativeBackgroundColor">#101010</item>
-        <!-- Reviewer button drawables -->
+
+        <item name="alternativeBackgroundColor">#0C0C0C</item>
+        <item name="againTextColor">@color/material_red_200</item>
+        <item name="hardTextColor">@color/material_orange_200</item>
+        <item name="goodTextColor">@color/material_light_green_200</item>
+        <item name="easyTextColor">@color/material_light_blue_A100</item>
+        <item name="againBackgroundColor">#170e0e</item>
+        <item name="hardBackgroundColor">#19120c</item>
+        <item name="goodBackgroundColor">#0e1310</item>
+        <item name="easyBackgroundColor">#0c1317</item>
+        <!-- Study Screen button drawables -->
         <item name="againButtonRef">@drawable/footer_button_all_black</item>
         <item name="hardButtonRef">@drawable/footer_button_all_black</item>
         <item name="goodButtonRef">@drawable/footer_button_all_black</item>
@@ -101,6 +111,8 @@
         <!-- Introduction -->
         <item name="introductionLogoTransparent">#55111111</item>
 
+        <!-- Card-->
+        <item name="cardViewStyle">@style/BlackCardBackground</item>
 
         <!-- ProgressDialog-->
         <item name="dialogBackground">@color/theme_black_primary_light</item>
@@ -111,7 +123,13 @@
         <item name="android:textColor">@color/white</item>
     </style>
 
+    <style name="BlackCardBackground" parent="CardView">
+        <item name="cardBackgroundColor">@color/theme_black_primary_light</item>
+    </style>
+
     <style name="ThemeOverlay.AnkiDroid.AlertDialog.Black" parent="ThemeOverlay.AnkiDroid.AlertDialog">
         <item name="android:background">@color/theme_black_primary_light</item>
     </style>
+
+    <style name="Theme_Dark.Black" parent="Base.Theme.Dark.Black"/>
 </resources>

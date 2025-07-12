@@ -16,6 +16,7 @@
 
 package com.ichi2.anki.deckpicker
 
+import android.annotation.SuppressLint
 import androidx.annotation.CheckResult
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import anki.card_rendering.EmptyCardsReport
@@ -23,11 +24,11 @@ import anki.card_rendering.emptyCardsReport
 import app.cash.turbine.test
 import com.ichi2.anki.CollectionManager.withCol
 import com.ichi2.anki.RobolectricTest
-import com.ichi2.libanki.Consts
-import com.ichi2.libanki.DeckId
-import com.ichi2.libanki.Note
-import com.ichi2.libanki.emptyCids
-import com.ichi2.libanki.undoStatus
+import com.ichi2.anki.libanki.Consts
+import com.ichi2.anki.libanki.DeckId
+import com.ichi2.anki.libanki.Note
+import com.ichi2.anki.libanki.emptyCids
+import com.ichi2.anki.libanki.undoStatus
 import com.ichi2.testutils.ensureOpsExecuted
 import org.hamcrest.CoreMatchers.not
 import org.hamcrest.MatcherAssert.assertThat
@@ -153,6 +154,7 @@ class DeckPickerViewModelTest : RobolectricTest() {
      * This allows us to test the 'keep note' functionality only affects the first card
      */
     @CheckResult
+    @SuppressLint("CheckResult")
     private suspend fun createEmptyCards(): EmptyCardsReport {
         addNoteUsingNoteTypeName("Cloze", "{{c1::Hello}} {{c3::There}} {{c2::World}}", "").apply {
             setField(0, "No cloze")

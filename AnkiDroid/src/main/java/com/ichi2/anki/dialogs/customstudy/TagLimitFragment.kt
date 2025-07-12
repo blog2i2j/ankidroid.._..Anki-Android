@@ -34,9 +34,9 @@ import com.ichi2.anki.CollectionManager.withCol
 import com.ichi2.anki.R
 import com.ichi2.anki.dialogs.customstudy.IncludedExcludedTagsAdapter.TagsSelectionMode.Exclude
 import com.ichi2.anki.dialogs.customstudy.IncludedExcludedTagsAdapter.TagsSelectionMode.Include
+import com.ichi2.anki.libanki.DeckId
 import com.ichi2.anki.snackbar.showSnackbar
 import com.ichi2.anki.ui.internationalization.toSentenceCase
-import com.ichi2.libanki.DeckId
 import com.ichi2.utils.customView
 import com.ichi2.utils.negativeButton
 import com.ichi2.utils.positiveButton
@@ -121,8 +121,8 @@ class TagLimitFragment : DialogFragment() {
                 setFragmentResult(
                     REQUEST_CUSTOM_STUDY_TAGS,
                     bundleOf(
-                        KEY_INCLUDED_TAGS to tagsToInclude,
-                        KEY_EXCLUDED_TAGS to tagsToExclude,
+                        KEY_INCLUDED_TAGS to ArrayList(tagsToInclude),
+                        KEY_EXCLUDED_TAGS to ArrayList(tagsToExclude),
                     ),
                 )
                 dismiss()

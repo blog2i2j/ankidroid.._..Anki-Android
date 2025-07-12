@@ -22,31 +22,34 @@ import androidx.annotation.VisibleForTesting
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import anki.collection.OpChanges
+import com.ichi2.anki.CollectionManager
 import com.ichi2.anki.CollectionManager.withCol
-import com.ichi2.anki.NoteEditor
+import com.ichi2.anki.NoteEditorFragment
 import com.ichi2.anki.importAnkiPackageUndoable
 import com.ichi2.anki.importCsvRaw
 import com.ichi2.anki.launchCatchingTask
+import com.ichi2.anki.libanki.Collection
+import com.ichi2.anki.libanki.completeTagRaw
+import com.ichi2.anki.libanki.getCsvMetadataRaw
+import com.ichi2.anki.libanki.getDeckConfigsForUpdateRaw
+import com.ichi2.anki.libanki.getDeckNamesRaw
+import com.ichi2.anki.libanki.getFieldNamesRaw
+import com.ichi2.anki.libanki.getImportAnkiPackagePresetsRaw
+import com.ichi2.anki.libanki.getNotetypeNamesRaw
+import com.ichi2.anki.libanki.sched.computeFsrsParamsRaw
+import com.ichi2.anki.libanki.sched.computeOptimalRetentionRaw
+import com.ichi2.anki.libanki.sched.simulateFsrsReviewRaw
+import com.ichi2.anki.libanki.stats.cardStatsRaw
+import com.ichi2.anki.libanki.stats.getGraphPreferencesRaw
+import com.ichi2.anki.libanki.stats.graphsRaw
+import com.ichi2.anki.libanki.stats.setGraphPreferencesRaw
+import com.ichi2.anki.observability.undoableOp
 import com.ichi2.anki.searchInBrowser
-import com.ichi2.libanki.Collection
-import com.ichi2.libanki.completeTagRaw
-import com.ichi2.libanki.getCsvMetadataRaw
-import com.ichi2.libanki.getDeckConfigsForUpdateRaw
-import com.ichi2.libanki.getDeckNamesRaw
-import com.ichi2.libanki.getFieldNamesRaw
-import com.ichi2.libanki.getImportAnkiPackagePresetsRaw
-import com.ichi2.libanki.getNotetypeNamesRaw
-import com.ichi2.libanki.sched.computeOptimalRetentionRaw
-import com.ichi2.libanki.sched.evaluateParamsRaw
-import com.ichi2.libanki.sched.simulateFsrsReviewRaw
-import com.ichi2.libanki.stats.cardStatsRaw
-import com.ichi2.libanki.stats.getGraphPreferencesRaw
-import com.ichi2.libanki.stats.graphsRaw
-import com.ichi2.libanki.stats.setGraphPreferencesRaw
-import com.ichi2.libanki.undoableOp
 import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 interface PostRequestHandler {
@@ -77,12 +80,12 @@ val collectionMethods =
         "cardStats" to { bytes -> cardStatsRaw(bytes) },
         "getDeckConfigsForUpdate" to { bytes -> getDeckConfigsForUpdateRaw(bytes) },
         "computeOptimalRetention" to { bytes -> computeOptimalRetentionRaw(bytes) },
-        "evaluateParams" to { bytes -> evaluateParamsRaw(bytes) },
+        "computeFsrsParams" to { bytes -> computeFsrsParamsRaw(bytes) },
+        "evaluateParamsLegacy" to { bytes -> evaluateParamsLegacyRaw(bytes) },
         "simulateFsrsReview" to { bytes -> simulateFsrsReviewRaw(bytes) },
         "getImageForOcclusion" to { bytes -> getImageForOcclusionRaw(bytes) },
         "getImageOcclusionNote" to { bytes -> getImageOcclusionNoteRaw(bytes) },
         "setWantsAbort" to { bytes -> setWantsAbortRaw(bytes) },
-        "latestProgress" to { bytes -> latestProgressRaw(bytes) },
         "getSchedulingStatesWithContext" to { bytes -> getSchedulingStatesWithContextRaw(bytes) },
         "setSchedulingStates" to { bytes -> setSchedulingStatesRaw(bytes) },
         "getChangeNotetypeInfo" to { bytes -> getChangeNotetypeInfoRaw(bytes) },
@@ -91,6 +94,8 @@ val collectionMethods =
         "importJsonFile" to { bytes -> importJsonFileRaw(bytes) },
         "congratsInfo" to { bytes -> congratsInfoRaw(bytes) },
         "getImageOcclusionFields" to { bytes -> getImageOcclusionFieldsRaw(bytes) },
+        "getIgnoredBeforeCount" to { bytes -> getIgnoredBeforeCountRaw(bytes) },
+        "getRetentionWorkload" to { bytes -> getRetentionWorkloadRaw(bytes) },
     )
 
 suspend fun handleCollectionPostRequest(
@@ -110,6 +115,20 @@ val uiMethods =
     hashMapOf<String, UIBackendInterface>(
         "searchInBrowser" to { bytes -> lifecycleScope.async { searchInBrowser(bytes) } },
         "updateDeckConfigs" to { bytes -> lifecycleScope.async { updateDeckConfigsRaw(bytes) } },
+        "latestProgress" to { bytes ->
+            lifecycleScope.async {
+                withContext(Dispatchers.IO) {
+                    CollectionManager.getBackend().latestProgressRaw(bytes)
+                }
+            }
+        },
+        "i18nResources" to { bytes ->
+            lifecycleScope.async {
+                withContext(Dispatchers.IO) {
+                    CollectionManager.getBackend().i18nResourcesRaw(bytes)
+                }
+            }
+        },
         "importCsv" to { bytes -> lifecycleScope.async { importCsvRaw(bytes) } },
         "importAnkiPackage" to { bytes -> lifecycleScope.async { importAnkiPackageUndoable(bytes) } },
         "addImageOcclusionNote" to { bytes ->
@@ -122,7 +141,6 @@ val uiMethods =
                 withCol { updateImageOcclusionNoteRaw(bytes) }
             }
         },
-        "computeFsrsParams" to { bytes -> lifecycleScope.async { computeFsrsParams(bytes) } },
         "deckOptionsReady" to { bytes -> lifecycleScope.async { deckOptionsReady(bytes) } },
         "deckOptionsRequireClose" to { bytes -> lifecycleScope.async { deckOptionsRequireClose(bytes) } },
     )
@@ -158,7 +176,7 @@ suspend fun FragmentActivity?.handleUiPostRequest(
             launchCatchingTask {
                 // Allow time for toast message to appear before closing editor
                 delay(1000)
-                setResult(NoteEditor.RESULT_UPDATED_IO_NOTE)
+                setResult(NoteEditorFragment.RESULT_UPDATED_IO_NOTE)
                 finish()
             }
         }

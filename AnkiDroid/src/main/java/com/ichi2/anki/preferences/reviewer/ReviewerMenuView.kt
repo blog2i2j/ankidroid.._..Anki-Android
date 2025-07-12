@@ -32,6 +32,7 @@ import androidx.lifecycle.lifecycleScope
 import com.ichi2.anki.Flag
 import com.ichi2.anki.R
 import com.ichi2.anki.preferences.sharedPrefs
+import com.ichi2.utils.increaseHorizontalPaddingOfMenuIcons
 import kotlinx.coroutines.launch
 
 /**
@@ -90,8 +91,7 @@ class ReviewerMenuView
             val submenuActions = ViewerAction.entries.filter { it.parentMenu != null }
             for (action in submenuActions) {
                 val subMenu = findItem(action.parentMenu!!.menuId)?.subMenu ?: continue
-                val title = resources.getString(action.titleRes)
-                subMenu.add(Menu.NONE, action.menuId, Menu.NONE, title)?.apply {
+                subMenu.add(Menu.NONE, action.menuId, Menu.NONE, action.title(context))?.apply {
                     action.drawableRes?.let { setIcon(it) }
                 }
             }
@@ -111,7 +111,7 @@ class ReviewerMenuView
         ) {
             val subMenus = ViewerAction.getSubMenus()
             for (action in actions) {
-                val title = resources.getString(action.titleRes)
+                val title = action.title(context)
                 val menuItem =
                     if (action in subMenus) {
                         menu.addSubMenu(Menu.NONE, action.menuId, Menu.NONE, title).item
@@ -128,6 +128,9 @@ class ReviewerMenuView
         private fun setupMenus() {
             val menuItems = repository.getActionsByMenuDisplayTypes(MenuDisplayType.ALWAYS, MenuDisplayType.MENU_ONLY)
             addActions(menuItems.getValue(MenuDisplayType.ALWAYS), menuItems.getValue(MenuDisplayType.MENU_ONLY))
+
+            context.increaseHorizontalPaddingOfMenuIcons(overflowMenu)
+
             // wait until attached to a fragment or activity to launch the coroutine to setup flags
             viewTreeObserver.addOnGlobalLayoutListener(
                 object : OnGlobalLayoutListener {

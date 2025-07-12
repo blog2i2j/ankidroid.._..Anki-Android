@@ -23,9 +23,10 @@ import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.ichi2.anki.R
 import com.ichi2.anki.RobolectricTest
+import com.ichi2.anki.libanki.exception.ConfirmModSchemaException
 import com.ichi2.anki.preferences.HeaderFragment.Companion.getHeaderKeyForFragment
 import com.ichi2.anki.preferences.PreferenceTestUtils.getAttrFromXml
-import com.ichi2.libanki.exception.ConfirmModSchemaException
+import com.ichi2.anki.utils.CollectionPreferences
 import com.ichi2.preferences.HeaderPreference
 import com.ichi2.testutils.getInstanceFromClassName
 import com.ichi2.testutils.getJavaMethodAsAccessible
@@ -35,7 +36,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
-import kotlin.reflect.jvm.jvmName
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
@@ -61,7 +61,7 @@ class PreferencesTest : RobolectricTest() {
         runTest {
             for (i in 0..23) {
                 setDayOffset(preferences, i)
-                assertThat(getDayOffset(), equalTo(i))
+                assertThat(CollectionPreferences.getDayOffset(), equalTo(i))
             }
         }
     }
@@ -72,7 +72,7 @@ class PreferencesTest : RobolectricTest() {
         runTest {
             for (i in 0..23) {
                 setDayOffset(preferences, i)
-                assertThat(getDayOffset(), equalTo(i))
+                assertThat(CollectionPreferences.getDayOffset(), equalTo(i))
             }
         }
     }
@@ -88,22 +88,6 @@ class PreferencesTest : RobolectricTest() {
                     add(R.id.settings_container, it)
                 }
             }
-        }
-    }
-
-    @Test
-    fun `All preferences fragments are TitleProvider`() {
-        val fragments =
-            PreferenceTestUtils
-                .getAllPreferencesFragments(targetContext)
-                .filter { it !is ReviewerOptionsFragment } // WIP dev options
-
-        fragments.forEach { fragment ->
-            assertThat(
-                "${fragment::class.jvmName} should implement TitleProvider",
-                fragment is TitleProvider,
-                equalTo(true),
-            )
         }
     }
 
@@ -127,7 +111,7 @@ class PreferencesTest : RobolectricTest() {
             val headerFragmentClass = parentFragmentClass ?: fragmentClass
             val expectedKey = headers.first { it["fragment"] == headerFragmentClass }["key"]!!.removePrefix("@").toInt()
             val key = getHeaderKeyForFragment(fragment)
-            assertEquals(expectedKey, key)
+            assertEquals(expectedKey, key, "$fragment (parent $parentFragmentClass) handle error")
 
             if (fragment is SettingsFragment) {
                 val subFragments = getAttrFromXml(targetContext, fragment.preferenceResource, "fragment")

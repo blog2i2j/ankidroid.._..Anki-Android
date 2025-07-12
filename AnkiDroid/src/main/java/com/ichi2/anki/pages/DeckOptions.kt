@@ -33,14 +33,13 @@ import com.ichi2.anki.CrashReportService
 import com.ichi2.anki.ProgressContext
 import com.ichi2.anki.R
 import com.ichi2.anki.SingleFragmentActivity
+import com.ichi2.anki.common.annotations.NeedsTest
 import com.ichi2.anki.launchCatchingTask
+import com.ichi2.anki.libanki.DeckId
+import com.ichi2.anki.libanki.updateDeckConfigsRaw
+import com.ichi2.anki.observability.undoableOp
 import com.ichi2.anki.utils.openUrl
 import com.ichi2.anki.withProgress
-import com.ichi2.annotations.NeedsTest
-import com.ichi2.libanki.DeckId
-import com.ichi2.libanki.sched.computeFsrsParamsRaw
-import com.ichi2.libanki.undoableOp
-import com.ichi2.libanki.updateDeckConfigsRaw
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -77,6 +76,12 @@ class DeckOptions : PageFragment() {
                         //  * A 'discard changes' dialog may be shown, using confirm()
                         //  * if no changes, or changes discarded, `deckOptionsRequireClose` is called
                         //    which PostRequestHandler handles and calls on this fragment
+
+                        // Used to handle an edge-case when the page could not be fully loaded and therefore the anki-call is unavailable
+                        value ->
+                        if (value == "null") {
+                            actuallyClose()
+                        }
                     }
                 } else {
                     // The webview is not yet loaded, no change could have occurred, we can safely close it.
@@ -263,17 +268,6 @@ suspend fun FragmentActivity.updateDeckConfigsRaw(input: ByteArray): ByteArray {
     return output
 }
 
-suspend fun FragmentActivity.computeFsrsParams(input: ByteArray): ByteArray =
-    withContext(Dispatchers.Main) {
-        withProgress(extractProgress = {
-            text = this.toUpdatingCardsString() ?: getString(R.string.dialog_processing)
-        }) {
-            withContext(Dispatchers.IO) {
-                withCol { computeFsrsParamsRaw(input) }
-            }
-        }
-    }
-
 /**
  * ```
  * Optimizing preset 1/20
@@ -299,24 +293,6 @@ private fun ProgressContext.toOptimizingPresetString(): String? {
             reviews = value.reviews,
         )
     return label + "\n" + reviewsLabel
-}
-
-/**
- * ```
- * Updating Cards: 45/23687
- * ```
- *
- * @return the above string, or `null` if [ProgressContext] has no
- * [compute parameters][Progress.hasComputeParams]
- */
-private fun ProgressContext.toUpdatingCardsString(): String? {
-    if (!progress.hasComputeParams()) return null
-
-    val params = progress.computeParams
-    return TR.deckConfigUpdatingCards(
-        currentCardsCount = params.current,
-        totalCardsCount = params.total,
-    )
 }
 
 private fun FragmentActivity.requireDeckOptionsFragment(): DeckOptions {

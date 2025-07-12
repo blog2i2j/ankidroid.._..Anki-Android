@@ -47,6 +47,7 @@
     <!-- Navigation drawer strings -->
     <string name="drawer_open">Buksan ang kahon</string>
     <string name="drawer_close">Isara ang kahon</string>
+    <string name="note_message">Note saved</string>
     <string name="CardEditorCardDeck">Card deck:</string>
     <string name="CardEditorNoteDeck">Deck:</string>
     <string name="CardEditorModel">Uri:</string>
@@ -60,16 +61,18 @@
     <string name="filter_tags" maxLength="28">I-filter ang mga tag</string>
     <string name="no_tags">Wala ka pang naidagdag na anumang mga tag</string>
     <string name="updated_version">Nai-update na sa bersyong %s</string>
-    <!-- Reviewer.kt -->
+    <!-- Reviewer.kt (Study Screen) -->
     <string name="save_whiteboard" maxLength="28">I-save ang puting pisara</string>
     <string name="enable_stylus" maxLength="28">Paganahin ang stylus mode</string>
     <string name="disable_stylus">Hindi paganahin ang stylus mode</string>
     <string name="enable_whiteboard" maxLength="28">Paganahin ang puting pisara</string>
     <string name="disable_whiteboard">Hindi paganahin ang puting pisara</string>
     <string name="show_whiteboard">Ipakita ang puting pisara</string>
+    <string name="enable_eraser" maxLength="28">Enable eraser</string>
+    <string name="disable_eraser" maxLength="28">Disable eraser</string>
     <string name="hide_whiteboard" maxLength="28">Itago ang puting pisara</string>
     <string name="clear_whiteboard" maxLength="28">Burahin ang puting pisara</string>
-    <string name="replay_audio" maxLength="28">Muling i-play ang audio</string>
+    <string name="replay_media" maxLength="28">Replay media</string>
     <string name="leech_suspend_notification">Ang card ay minarkahan bilang linta at sinuspinde</string>
     <string name="leech_notification">Ang card ay minarkahan bilang linta</string>
     <string name="webview_crash_unknown">Hindi matukoy na kamalian</string>
@@ -105,6 +108,11 @@
     <string name="confirm_map_cards_to_nothing">Ang anumang mga kard na nakabalangkas sa wala ay matatanggal. Kung ang isang tala ay walang natitirang mga kard, ito ay mawawala. Sigurado ka bang gusto mong magpatuloy?</string>
     <string name="missing_note_type">Walang mahanap na uri ng tala</string>
     <string name="card_previewer_empty_front_indicator" comment="Extra text appended onto a tab title in the card previewer so that the user can see at a glance whether a card has no front.">%1$s (empty)</string>
+    <!-- Image cropper -->
+    <string name="image_cropper_action_rotate" maxLength="28" comment="Action in image cropper screen">Rotate</string>
+    <string name="image_cropper_action_flip" maxLength="28" comment="Action in image cropper screen">Flip</string>
+    <string name="image_cropper_action_flip_horizontally" maxLength="28" comment="Submenu action in image cropper screen">Flip horizontally</string>
+    <string name="image_cropper_action_flip_vertically" maxLength="28" comment="Submenu action in image cropper screen">Flip vertically</string>
     <!-- Timebox -->
     <string name="timebox_reached_title">Naabot ang Timebox</string>
     <plurals name="timebox_reached">
@@ -193,7 +201,10 @@
     <!-- Card Template Browser Appearance -->
     <string name="restore_default" maxLength="28">Ibalik sa Default</string>
     <string name="reviewer_tts_cloze_spoken_replacement">Blanko</string>
-    <!-- Whiteboard save image message in Reviewer -->
+    <!-- Whiteboard eraser mode toggle message in Reviewer -->
+    <string name="white_board_eraser_enabled">Eraser mode activated</string>
+    <string name="white_board_eraser_disabled">Eraser mode deactivated</string>
+    <!-- Whiteboard save image message in the Study Screen -->
     <string name="white_board_image_save_failed">Bigo sa pag-save ng litrato ng puting pisara. %s</string>
     <string name="white_board_image_saved">Isinave ang litrato ng puting pisara sa %s</string>
     <string name="title_whiteboard_editor" maxLength="28">Editor ng puting pisara</string>
@@ -263,7 +274,7 @@
     <string name="search_using_deck_name">Hanapin gamit ang pangalan ng deck</string>
     <string name="external_storage_unavailable">Naudlot ang pag-download, wala nang natirang lugar sa external storage</string>
     <string name="home" maxLength="28">Home</string>
-    <!-- Reviewer actions
+    <!-- Study Screen actions
     Each of these strings ends with a period, following the notation of Anki Desktop -->
     <string name="card_buried">Naibaon ang card.</string>
     <plurals name="note_suspended">
@@ -324,8 +335,8 @@
         <item quantity="other">%d na mga card ang tinanggal sa pagkabaon</item>
     </plurals>
     <string name="card_template_reposition_template" comment="move a card template to a new position" maxLength="28">Muling iposisyon</string>
-    <string name="previewer_next" comment="Name of the next button in the previewer" maxLength="28">Next</string>
-    <string name="previewer_back" comment="Name of the back button in the previewer" maxLength="28">Back</string>
+    <string name="previewer_next" comment="Name of the next button in the previewer" maxLength="28">Sunod</string>
+    <string name="previewer_back" comment="Name of the back button in the previewer" maxLength="28">Bumalik</string>
     <string name="start_recording">I-rekord</string>
     <string name="stop_recording">Ihinto</string>
     <string name="play_recording">I-play</string>
@@ -349,4 +360,6 @@
     <string name="edit_browser_appearance" comment="Description of the shortcut that edits the browser appearance of card template">Baguhin ang anyo ng browser</string>
     <string name="missing_user_action_dialog_message" comment="%s is the user action number">User action %s is not set in this notetype. Please configure it</string>
     <string name="directory_inaccessible_info">Learn more about how to restore access here %s or go to settings to update collection folder.</string>
+    <!-- Scheduler Upgrade Required Dialog title-->
+    <string name="scheduler_upgrade_required_dialog_title" comment="Shown in a dialog when user has imported a collection using a very old version of the Anki spaced repetition scheduler">Scheduler upgrade required</string>
 </resources>

@@ -20,13 +20,13 @@ import android.net.Uri
 import android.webkit.WebResourceRequest
 import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.ichi2.testutils.AnkiAssert.assertDoesNotThrow
 import com.ichi2.testutils.EmptyApplication
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.contains
 import org.hamcrest.Matchers.equalTo
 import org.junit.Before
 import org.junit.Test
+import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 import java.io.File
@@ -102,11 +102,11 @@ class MediaErrorHandlerTest {
         sut.processFailure(invalidRequest, consumer)
     }
 
-    private fun processMissingSound(
+    private fun processMissingMedia(
         file: File,
         onFailure: (String) -> Unit,
     ) {
-        sut.processMissingSound(file, onFailure)
+        sut.processMissingMedia(file, onFailure)
     }
 
     @Test
@@ -119,18 +119,18 @@ class MediaErrorHandlerTest {
     fun testThirdSoundIsIgnored() {
         // Tests that the third call to processMissingSound is ignored
         val handler = defaultHandler()
-        processMissingSound(File("example.wav"), handler)
+        processMissingMedia(File("example.wav"), handler)
         sut.onCardSideChange()
-        processMissingSound(File("example2.wav"), handler)
+        processMissingMedia(File("example2.wav"), handler)
         sut.onCardSideChange()
-        processMissingSound(File("example3.wav"), handler)
+        processMissingMedia(File("example3.wav"), handler)
         assertThat(timesCalled, equalTo(2))
         assertThat(fileNames, contains("example.wav", "example2.wav"))
     }
 
     @Test
     fun testMissingSound_ExceptionCaught() {
-        assertDoesNotThrow { processMissingSound(File("example.wav")) { throw RuntimeException("expected") } }
+        assertDoesNotThrow { processMissingMedia(File("example.wav")) { throw RuntimeException("expected") } }
     }
 
     private fun getValidRequest(fileName: String): WebResourceRequest {

@@ -16,7 +16,9 @@
 package com.ichi2.anki
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.ichi2.libanki.sched.DeckNode
+import com.ichi2.anki.deckpicker.addVisibleToList
+import com.ichi2.anki.libanki.filterAndFlatten
+import com.ichi2.anki.libanki.sched.DeckNode
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith

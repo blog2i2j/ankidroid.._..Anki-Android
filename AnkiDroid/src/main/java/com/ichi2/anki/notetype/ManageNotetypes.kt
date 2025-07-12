@@ -34,16 +34,17 @@ import com.ichi2.anki.CardTemplateEditor
 import com.ichi2.anki.CollectionManager.withCol
 import com.ichi2.anki.NoteTypeFieldEditor
 import com.ichi2.anki.R
+import com.ichi2.anki.common.annotations.NeedsTest
 import com.ichi2.anki.launchCatchingTask
+import com.ichi2.anki.libanki.getNotetype
+import com.ichi2.anki.libanki.getNotetypeNameIdUseCount
+import com.ichi2.anki.libanki.getNotetypeNames
+import com.ichi2.anki.libanki.removeNotetype
+import com.ichi2.anki.libanki.updateNotetype
 import com.ichi2.anki.snackbar.showSnackbar
 import com.ichi2.anki.userAcceptsSchemaChange
+import com.ichi2.anki.utils.Destination
 import com.ichi2.anki.withProgress
-import com.ichi2.annotations.NeedsTest
-import com.ichi2.libanki.getNotetype
-import com.ichi2.libanki.getNotetypeNameIdUseCount
-import com.ichi2.libanki.getNotetypeNames
-import com.ichi2.libanki.removeNotetype
-import com.ichi2.libanki.updateNotetype
 import com.ichi2.ui.AccessibleSearchView
 import com.ichi2.utils.getInputField
 import com.ichi2.utils.input
@@ -52,6 +53,7 @@ import com.ichi2.utils.negativeButton
 import com.ichi2.utils.positiveButton
 import com.ichi2.utils.show
 import com.ichi2.utils.title
+import net.ankiweb.rsdroid.BackendException
 
 class ManageNotetypes : AnkiActivity() {
     private lateinit var actionBar: ActionBar
@@ -95,7 +97,7 @@ class ManageNotetypes : AnkiActivity() {
         setContentView(R.layout.activity_manage_note_types)
         actionBar = enableToolbar()
         noteTypesList =
-            findViewById<RecyclerView?>(R.id.note_types_list).apply {
+            findViewById<RecyclerView>(R.id.note_types_list).apply {
                 adapter = notetypesAdapter
             }
         findViewById<FloatingActionButton>(R.id.note_type_add).setOnClickListener {
@@ -160,7 +162,12 @@ class ManageNotetypes : AnkiActivity() {
                     .show {
                         title(R.string.rename_model)
                         positiveButton(R.string.rename) {
-                            launchCatchingTask {
+                            launchCatchingTask(
+                                // TODO: Change to CardTypeException: https://github.com/ankidroid/Anki-Android-Backend/issues/537
+                                // Card template 1 in note type 'character' has a problem.
+                                // Expected to find a field replacement on the front of the card template.
+                                skipCrashReport = { it is BackendException },
+                            ) {
                                 runAndRefreshAfter {
                                     val initialNotetype = getNotetype(manageNoteTypeUiModel.id)
                                     val renamedNotetype =
@@ -228,7 +235,7 @@ class ManageNotetypes : AnkiActivity() {
      *
      * @param action the action to run before the notetypes refresh, if not provided simply refresh
      */
-    suspend fun runAndRefreshAfter(action: com.ichi2.libanki.Collection.() -> Unit = {}) {
+    suspend fun runAndRefreshAfter(action: com.ichi2.anki.libanki.Collection.() -> Unit = {}) {
         val updatedNotetypes =
             withProgress {
                 withCol {
@@ -263,4 +270,8 @@ class ManageNotetypes : AnkiActivity() {
             else -> throw IllegalArgumentException("Unexpected value type: ${newExtra.value}")
         }
     }
+}
+
+class ManageNoteTypesDestination : Destination {
+    override fun toIntent(context: Context) = Intent(context, ManageNotetypes::class.java)
 }

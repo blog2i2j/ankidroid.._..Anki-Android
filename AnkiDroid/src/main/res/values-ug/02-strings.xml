@@ -47,6 +47,7 @@
     <!-- Navigation drawer strings -->
     <string name="drawer_open">يان تارتمىنى ئاچ</string>
     <string name="drawer_close">يان تارتمىنى تاقا</string>
+    <string name="note_message">Note saved</string>
     <string name="CardEditorCardDeck">كارتا دەستىسى:</string>
     <string name="CardEditorNoteDeck">دەستە:</string>
     <string name="CardEditorModel">تۈرى:</string>
@@ -60,16 +61,18 @@
     <string name="filter_tags" maxLength="28">بەلگە سۈزگۈچ</string>
     <string name="no_tags">سىز تېخى ھېچقانداق خەتكۈچ قوشمىدىڭىز</string>
     <string name="updated_version">%s نەشرىگە يېڭىلاندى</string>
-    <!-- Reviewer.kt -->
+    <!-- Reviewer.kt (Study Screen) -->
     <string name="save_whiteboard" maxLength="28">ئاق دوسكىنى ساقلا</string>
     <string name="enable_stylus" maxLength="28">قەلەمدە يېزىشنى قوزغىتىدۇ</string>
     <string name="disable_stylus">قەلەمدە يېزىشنى چەكلەيدۇ</string>
     <string name="enable_whiteboard" maxLength="28">ئاق دوسكىنى قوزغىتىدۇ</string>
     <string name="disable_whiteboard">ئاق دوسكىنى چەكلەيدۇ</string>
     <string name="show_whiteboard">ئاق دوسكىنى كۆرسەت</string>
+    <string name="enable_eraser" maxLength="28">ئۆچۈرگۈچنى قوزغات</string>
+    <string name="disable_eraser" maxLength="28">ئۆچۈرگۈچنى چەكلە</string>
     <string name="hide_whiteboard" maxLength="28">ئاق دوسكىنى يوشۇر</string>
     <string name="clear_whiteboard" maxLength="28">ئاق دوسكىنى تازىلا</string>
-    <string name="replay_audio" maxLength="28">ئاۋازنى قايتىلا</string>
+    <string name="replay_media" maxLength="28">ۋاسىتىنى قايتا قوي</string>
     <string name="leech_suspend_notification">كارتىغا ئۇنتۇلغاق ۋە كېچىكتۈرۈلگەن بەلگىسى قويۇلغان</string>
     <string name="leech_notification">كارتىغا ئۇنتۇلغاق دەپ بەلگىسى قويۇلغان</string>
     <string name="webview_crash_unknown">يوچۇن خاتالىق</string>
@@ -105,6 +108,11 @@
     <string name="confirm_map_cards_to_nothing">ھېچنېمىگە خەرىتىلەنمىگەن كارتا ئۆچۈرۈلىدۇ. ئەگەر خاتىرىدە قېپقالغان كارتا بولمىسا، ئۇ يوقاپ كېتىدۇ. راستلا داۋاملاشتۇرامسىز؟</string>
     <string name="missing_note_type">ھېچقانداق خاتىرە تۈرى تېپىلمىدى</string>
     <string name="card_previewer_empty_front_indicator" comment="Extra text appended onto a tab title in the card previewer so that the user can see at a glance whether a card has no front.">%1$s (بوش)</string>
+    <!-- Image cropper -->
+    <string name="image_cropper_action_rotate" maxLength="28" comment="Action in image cropper screen">Rotate</string>
+    <string name="image_cropper_action_flip" maxLength="28" comment="Action in image cropper screen">Flip</string>
+    <string name="image_cropper_action_flip_horizontally" maxLength="28" comment="Submenu action in image cropper screen">Flip horizontally</string>
+    <string name="image_cropper_action_flip_vertically" maxLength="28" comment="Submenu action in image cropper screen">Flip vertically</string>
     <!-- Timebox -->
     <string name="timebox_reached_title">مۆھلەتكە يەتتى</string>
     <plurals name="timebox_reached">
@@ -193,7 +201,10 @@
     <!-- Card Template Browser Appearance -->
     <string name="restore_default" maxLength="28">كۆڭۈلدىكىگە قايتۇر</string>
     <string name="reviewer_tts_cloze_spoken_replacement">بوش</string>
-    <!-- Whiteboard save image message in Reviewer -->
+    <!-- Whiteboard eraser mode toggle message in Reviewer -->
+    <string name="white_board_eraser_enabled">ئۆچۈرگۈچ ھالىتى قوزغىتىلدى</string>
+    <string name="white_board_eraser_disabled">ئۆچۈرگۈچ ھالىتى توختىتىلدى</string>
+    <!-- Whiteboard save image message in the Study Screen -->
     <string name="white_board_image_save_failed">ئاق دوسكا سۈرىتىنى ساقلىيالمىدى %s</string>
     <string name="white_board_image_saved">ئاق دوسكا سۈرىتى %s غا ساقلاندى</string>
     <string name="title_whiteboard_editor" maxLength="28">ئاق دوسكا تەھرىرلىگۈچ</string>
@@ -263,7 +274,7 @@
     <string name="search_using_deck_name">دەستە ئىسمى بويىچە ئىزدەيدۇ</string>
     <string name="external_storage_unavailable">چۈشۈرۈش بىكار قىلىندى، سىرتقا ساقلىغۇچنى ئىشلەتكىلى بولمايدۇ</string>
     <string name="home" maxLength="28">باش بەت</string>
-    <!-- Reviewer actions
+    <!-- Study Screen actions
     Each of these strings ends with a period, following the notation of Anki Desktop -->
     <string name="card_buried">كارتا يوشۇرۇلدى.</string>
     <plurals name="note_suspended">
@@ -303,7 +314,7 @@
     <string name="show_cards" comment="Label for toggle cards button in BrowserOptionsDialog">كارتا</string>
     <string name="show_notes" comment="Label for toggle notes button in BrowserOptionsDialog">خاتىرە</string>
     <string name="toggle_cards_notes">كارتا/خاتىرە ئالماشتۇر</string>
-    <string name="truncate_content_help">Truncate the height of each row of the Browser to show only first 3 lines of content</string>
+    <string name="truncate_content_help">توركۆرگۈ قۇر ئېگىزلىكىنى قىسقارتىپ پەقەت ئالدىنقى 3 قۇردىكى مەزمۇننىلا كۆرسىتىدۇ</string>
     <string name="browser_options_dialog_heading">توركۆرگۈ تاللانما</string>
     <string name="audio_saved">خاتىرە ساقلاندى</string>
     <string name="deleting_selected_notes">تاللانغان خاتىرىنى ئۆچۈرۈۋاتىدۇ</string>
@@ -349,4 +360,6 @@
     <string name="edit_browser_appearance" comment="Description of the shortcut that edits the browser appearance of card template">كارتا كۆرگۈچ كۆرۈنۈشىنى تەھرىرلەيدۇ</string>
     <string name="missing_user_action_dialog_message" comment="%s is the user action number">%s  ئىشلەتكۈچى مەشغۇلاتى خاتىرە تۈرىدە تەڭشەلمىگەن. سەپلەڭ</string>
     <string name="directory_inaccessible_info">بۇ جاي %s دىكى زىيارەتنى قانداق ئەسلىگە كەلتۈرۈش ياكى تەڭشەككە يۆتكىلىپ توپلام قىسقۇچىنى يېڭىلاش ھەققىدىكى تەپسىلاتنى كۆرۈڭ.</string>
+    <!-- Scheduler Upgrade Required Dialog title-->
+    <string name="scheduler_upgrade_required_dialog_title" comment="Shown in a dialog when user has imported a collection using a very old version of the Anki spaced repetition scheduler">كۈنتەرتىپلىگۈچنى يېڭىلاش زۆرۈر</string>
 </resources>

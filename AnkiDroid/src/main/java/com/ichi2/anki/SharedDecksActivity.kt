@@ -35,8 +35,8 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.os.bundleOf
 import androidx.fragment.app.commit
 import com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_INDEFINITE
+import com.ichi2.anki.common.annotations.NeedsTest
 import com.ichi2.anki.snackbar.showSnackbar
-import com.ichi2.annotations.NeedsTest
 import com.ichi2.ui.AccessibleSearchView
 import com.ichi2.utils.FileNameAndExtension
 import timber.log.Timber
@@ -226,7 +226,7 @@ class SharedDecksActivity : AnkiActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
 
-        webView = findViewById(R.id.web_view)
+        webView = findViewById(R.id.media_check_webview)
 
         downloadManager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
 

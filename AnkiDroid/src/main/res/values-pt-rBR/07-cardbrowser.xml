@@ -88,10 +88,10 @@
         <item>Por retenção</item>
         <item>Por revisões</item>
         <item>Por falhas</item>
-        <item>By deck name</item>
+        <item>Pelo nome do baralho</item>
     </string-array>
-    <string name="chane_browser_column">Change column</string>
-    <string name="no_columns_available">No columns available</string>
+    <string name="chane_browser_column">Mudar coluna</string>
+    <string name="no_columns_available">Sem colunas disponíveis</string>
     <string name="card_browser_select_all" maxLength="28">Selecionar todos</string>
     <string name="card_browser_select_none" maxLength="28">Desselecionar todos</string>
     <string name="card_browser_no_cards_in_deck">Nenhum card encontrado no deck ‘%s\'</string>
@@ -121,6 +121,6 @@
     <string name="user_potential_columns">Disponível</string>
     <string name="include_column">Incluir coluna</string>
     <string name="exclude_column">Excluir coluna</string>
-    <string name="save_changes_message">Please save your changes first</string>
+    <string name="save_changes_message">Por favor, salve as alterações primeiro</string>
     <string name="browser_find_replace_loading_fields">Recuperando nomes de campos&#8230;</string>
 </resources>

@@ -47,6 +47,7 @@
     <!-- Navigation drawer strings -->
     <string name="drawer_open">Maak laai oop</string>
     <string name="drawer_close">Maak laai toe</string>
+    <string name="note_message">Note saved</string>
     <string name="CardEditorCardDeck">Kaartpak:</string>
     <string name="CardEditorNoteDeck">Pak:</string>
     <string name="CardEditorModel">Tipe:</string>
@@ -60,16 +61,18 @@
     <string name="filter_tags" maxLength="28">Filter etikette</string>
     <string name="no_tags">Jy het nog geen etikette bygevoeg nie</string>
     <string name="updated_version">Opgedateer na weergawe %s</string>
-    <!-- Reviewer.kt -->
+    <!-- Reviewer.kt (Study Screen) -->
     <string name="save_whiteboard" maxLength="28">Stoor witbord</string>
     <string name="enable_stylus" maxLength="28">Aktiveer stylus skryf</string>
     <string name="disable_stylus">Deaktiveer stylus skryf</string>
     <string name="enable_whiteboard" maxLength="28">Aktiveer witbord</string>
     <string name="disable_whiteboard">Deaktiveer witbord</string>
     <string name="show_whiteboard">Wys witbord</string>
+    <string name="enable_eraser" maxLength="28">Enable eraser</string>
+    <string name="disable_eraser" maxLength="28">Disable eraser</string>
     <string name="hide_whiteboard" maxLength="28">Versteek witbord</string>
     <string name="clear_whiteboard" maxLength="28">Duidelike witbord</string>
-    <string name="replay_audio" maxLength="28">Herhaal klank</string>
+    <string name="replay_media" maxLength="28">Replay media</string>
     <string name="leech_suspend_notification">Kaart gemerk as bloedsuier en opgeskort</string>
     <string name="leech_notification">Kaart gemerk as bloedsuier</string>
     <string name="webview_crash_unknown">Onbekende fout</string>
@@ -105,6 +108,11 @@
     <string name="confirm_map_cards_to_nothing">Enige kaarte wat aan niks gekoppel is nie, sal verwyder word. As \'n nota geen oorblywende kaarte het nie, sal dit verlore gaan. Is jy seker jy wil voortgaan?</string>
     <string name="missing_note_type">Geen nota tipe gevind nie</string>
     <string name="card_previewer_empty_front_indicator" comment="Extra text appended onto a tab title in the card previewer so that the user can see at a glance whether a card has no front.">%1$s (empty)</string>
+    <!-- Image cropper -->
+    <string name="image_cropper_action_rotate" maxLength="28" comment="Action in image cropper screen">Rotate</string>
+    <string name="image_cropper_action_flip" maxLength="28" comment="Action in image cropper screen">Flip</string>
+    <string name="image_cropper_action_flip_horizontally" maxLength="28" comment="Submenu action in image cropper screen">Flip horizontally</string>
+    <string name="image_cropper_action_flip_vertically" maxLength="28" comment="Submenu action in image cropper screen">Flip vertically</string>
     <!-- Timebox -->
     <string name="timebox_reached_title">Tydkas bereik</string>
     <plurals name="timebox_reached">
@@ -193,7 +201,10 @@
     <!-- Card Template Browser Appearance -->
     <string name="restore_default" maxLength="28">Herstel Standaard</string>
     <string name="reviewer_tts_cloze_spoken_replacement">Leeg</string>
-    <!-- Whiteboard save image message in Reviewer -->
+    <!-- Whiteboard eraser mode toggle message in Reviewer -->
+    <string name="white_board_eraser_enabled">Eraser mode activated</string>
+    <string name="white_board_eraser_disabled">Eraser mode deactivated</string>
+    <!-- Whiteboard save image message in the Study Screen -->
     <string name="white_board_image_save_failed">Kon nie witbordbeeld stoor nie. %s</string>
     <string name="white_board_image_saved">Witbordbeeld gestoor na %s</string>
     <string name="title_whiteboard_editor" maxLength="28">Witbordredakteur</string>
@@ -263,7 +274,7 @@
     <string name="search_using_deck_name">Soek met paknaam</string>
     <string name="external_storage_unavailable">Aflaai gestaak, die eksterne berging is nie beskikbaar nie</string>
     <string name="home" maxLength="28">Tuis</string>
-    <!-- Reviewer actions
+    <!-- Study Screen actions
     Each of these strings ends with a period, following the notation of Anki Desktop -->
     <string name="card_buried">Kaart begrawe.</string>
     <plurals name="note_suspended">
@@ -349,4 +360,6 @@
     <string name="edit_browser_appearance" comment="Description of the shortcut that edits the browser appearance of card template">Wysig kaartblaaier voorkoms</string>
     <string name="missing_user_action_dialog_message" comment="%s is the user action number">Gebruikerhandeling %s is nie in hierdie notatipe gestel nie. Stel dit asseblief op</string>
     <string name="directory_inaccessible_info">Lees meer oor hoe om toegang hier te herstel %s of gaan na instellings om versameling vouer op te dateer.</string>
+    <!-- Scheduler Upgrade Required Dialog title-->
+    <string name="scheduler_upgrade_required_dialog_title" comment="Shown in a dialog when user has imported a collection using a very old version of the Anki spaced repetition scheduler">Scheduler upgrade required</string>
 </resources>

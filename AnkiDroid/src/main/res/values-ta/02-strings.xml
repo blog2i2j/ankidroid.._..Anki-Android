@@ -47,6 +47,7 @@
     <!-- Navigation drawer strings -->
     <string name="drawer_open">அலமாரியைத் திறக்கவும்</string>
     <string name="drawer_close">அலமாரியை மூடு</string>
+    <string name="note_message">Note saved</string>
     <string name="CardEditorCardDeck">அட்டை தளம்:</string>
     <string name="CardEditorNoteDeck">தளம்:</string>
     <string name="CardEditorModel">வகை:</string>
@@ -60,16 +61,18 @@
     <string name="filter_tags" maxLength="28">குறிச்சொற்களை வடிகட்டி</string>
     <string name="no_tags">நீங்கள் இதுவரை எந்தக் குறிச்சொற்களையும் சேர்க்கவில்லை</string>
     <string name="updated_version">%s பதிப்பிற்கு புதுப்பிக்கப்பட்டது</string>
-    <!-- Reviewer.kt -->
+    <!-- Reviewer.kt (Study Screen) -->
     <string name="save_whiteboard" maxLength="28">ஒயிட்போர்டை சேமிக்கவும்</string>
     <string name="enable_stylus" maxLength="28">எழுத்தாணி எழுத்தை இயக்கு</string>
     <string name="disable_stylus">எழுத்தாணி எழுத்தை முடக்கு</string>
     <string name="enable_whiteboard" maxLength="28">ஒயிட்போர்டை இயக்கு</string>
     <string name="disable_whiteboard">ஒயிட் போர்டை முடக்கு</string>
     <string name="show_whiteboard">ஒயிட் போர்டைக் காட்டு</string>
+    <string name="enable_eraser" maxLength="28">Enable eraser</string>
+    <string name="disable_eraser" maxLength="28">Disable eraser</string>
     <string name="hide_whiteboard" maxLength="28">வெள்ளை பலகையை மறை</string>
     <string name="clear_whiteboard" maxLength="28">வெள்ளை பலகையை அழிக்கவும்</string>
-    <string name="replay_audio" maxLength="28">ஆடியோவை மீண்டும் இயக்கவும்</string>
+    <string name="replay_media" maxLength="28">Replay media</string>
     <string name="leech_suspend_notification">அட்டை லீச் எனக் குறிக்கப்பட்டு இடைநிறுத்தப்பட்டது</string>
     <string name="leech_notification">அட்டை லீச் எனக் குறிக்கப்பட்டது</string>
     <string name="webview_crash_unknown">அறியப்படாத பிழை</string>
@@ -105,6 +108,11 @@
     <string name="confirm_map_cards_to_nothing">எதுவும் இல்லை என்று வரைபடமாக்கப்படும் எந்த அட்டைகளும் நீக்கப்படும். ஒரு குறிப்பில் மீதமுள்ள அட்டைகள் இல்லை என்றால், அது இழக்கப்படும். நீங்கள் நிச்சயமாகத் தொடர விரும்புகிறீர்களா?</string>
     <string name="missing_note_type">குறிப்பு வகை இல்லை</string>
     <string name="card_previewer_empty_front_indicator" comment="Extra text appended onto a tab title in the card previewer so that the user can see at a glance whether a card has no front.">%1$s (empty)</string>
+    <!-- Image cropper -->
+    <string name="image_cropper_action_rotate" maxLength="28" comment="Action in image cropper screen">Rotate</string>
+    <string name="image_cropper_action_flip" maxLength="28" comment="Action in image cropper screen">Flip</string>
+    <string name="image_cropper_action_flip_horizontally" maxLength="28" comment="Submenu action in image cropper screen">Flip horizontally</string>
+    <string name="image_cropper_action_flip_vertically" maxLength="28" comment="Submenu action in image cropper screen">Flip vertically</string>
     <!-- Timebox -->
     <string name="timebox_reached_title">டைம்பாக்ஸை அடைந்தது</string>
     <plurals name="timebox_reached">
@@ -193,7 +201,10 @@
     <!-- Card Template Browser Appearance -->
     <string name="restore_default" maxLength="28">இயல்புநிலையை மீட்டமை</string>
     <string name="reviewer_tts_cloze_spoken_replacement">வெற்று</string>
-    <!-- Whiteboard save image message in Reviewer -->
+    <!-- Whiteboard eraser mode toggle message in Reviewer -->
+    <string name="white_board_eraser_enabled">Eraser mode activated</string>
+    <string name="white_board_eraser_disabled">Eraser mode deactivated</string>
+    <!-- Whiteboard save image message in the Study Screen -->
     <string name="white_board_image_save_failed">ஒயிட்போர்டு படத்தைச் சேமிப்பதில் தோல்வி. %s</string>
     <string name="white_board_image_saved">ஒயிட்போர்டு படம் %s இல் சேமிக்கப்பட்டது</string>
     <string name="title_whiteboard_editor" maxLength="28">ஒயிட்போர்டு எடிட்டர்</string>
@@ -263,7 +274,7 @@
     <string name="search_using_deck_name">டெக் பெயரைப் பயன்படுத்தி தேடவும்</string>
     <string name="external_storage_unavailable">பதிவிறக்கம் நிறுத்தப்பட்டது, வெளிப்புற சேமிப்பிடம் கிடைக்கவில்லை</string>
     <string name="home" maxLength="28">வீடு</string>
-    <!-- Reviewer actions
+    <!-- Study Screen actions
     Each of these strings ends with a period, following the notation of Anki Desktop -->
     <string name="card_buried">அட்டை புதைக்கப்பட்டது.</string>
     <plurals name="note_suspended">
@@ -349,4 +360,6 @@
     <string name="edit_browser_appearance" comment="Description of the shortcut that edits the browser appearance of card template">உலாவியின் தோற்றத்தைத் திருத்தவும்</string>
     <string name="missing_user_action_dialog_message" comment="%s is the user action number">இந்த நோட்டிப்பில் பயனர் செயல் %s அமைக்கப்படவில்லை. தயவுசெய்து அதை உள்ளமைக்கவும்</string>
     <string name="directory_inaccessible_info">அணுகலை எவ்வாறு மீட்டெடுப்பது என்பது பற்றி இங்கே %s இல் மேலும் அறிக அல்லது சேகரிப்பு கோப்புறையைப் புதுப்பிக்க அமைப்புகளுக்குச் செல்லவும்.</string>
+    <!-- Scheduler Upgrade Required Dialog title-->
+    <string name="scheduler_upgrade_required_dialog_title" comment="Shown in a dialog when user has imported a collection using a very old version of the Anki spaced repetition scheduler">Scheduler upgrade required</string>
 </resources>

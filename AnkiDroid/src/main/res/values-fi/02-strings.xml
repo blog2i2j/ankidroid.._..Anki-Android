@@ -47,6 +47,7 @@
     <!-- Navigation drawer strings -->
     <string name="drawer_open">Avaa laatikosto</string>
     <string name="drawer_close">Sulje laatikosto</string>
+    <string name="note_message">Note saved</string>
     <string name="CardEditorCardDeck">Korttipakka:</string>
     <string name="CardEditorNoteDeck">Pakka:</string>
     <string name="CardEditorModel">Tyyppi:</string>
@@ -60,16 +61,18 @@
     <string name="filter_tags" maxLength="28">Suodata tunnisteita</string>
     <string name="no_tags">Et ole vielä lisännyt tunnisteita</string>
     <string name="updated_version">Päivitetty versioon %s</string>
-    <!-- Reviewer.kt -->
+    <!-- Reviewer.kt (Study Screen) -->
     <string name="save_whiteboard" maxLength="28">Tallenna tussitaulu</string>
     <string name="enable_stylus" maxLength="28">Ota käyttöön kynäkirjoitus</string>
     <string name="disable_stylus">Poista kynäkirjoitus käytöstä</string>
     <string name="enable_whiteboard" maxLength="28">Ota kirjoitustaulu käyttöön</string>
     <string name="disable_whiteboard">Poista kirjoitustaulu käytöstä</string>
     <string name="show_whiteboard">Näytä kirjoitustaulu</string>
+    <string name="enable_eraser" maxLength="28">Enable eraser</string>
+    <string name="disable_eraser" maxLength="28">Disable eraser</string>
     <string name="hide_whiteboard" maxLength="28">Piilota kirjoitustaulu</string>
     <string name="clear_whiteboard" maxLength="28">Tyhjennä kirjoitustaulu</string>
-    <string name="replay_audio" maxLength="28">Toista ääni</string>
+    <string name="replay_media" maxLength="28">Replay media</string>
     <string name="leech_suspend_notification">Kortti on merkitty resurssisyöpöksi ja hyllytetty</string>
     <string name="leech_notification">Kortti on merkitty resurssisyöpöksi</string>
     <string name="webview_crash_unknown">Tuntematon virhe</string>
@@ -105,6 +108,11 @@
     <string name="confirm_map_cards_to_nothing">Kortit, joita ei ole liitetty mihinkään, poistetaan. Jos muistiinpanoon ei liity jäljelle jääviä kortteja, se katoaa. Oletko varma, että haluat jatkaa?</string>
     <string name="missing_note_type">Muistiinpanotyyppejä ei löytynyt</string>
     <string name="card_previewer_empty_front_indicator" comment="Extra text appended onto a tab title in the card previewer so that the user can see at a glance whether a card has no front.">%1$s (empty)</string>
+    <!-- Image cropper -->
+    <string name="image_cropper_action_rotate" maxLength="28" comment="Action in image cropper screen">Rotate</string>
+    <string name="image_cropper_action_flip" maxLength="28" comment="Action in image cropper screen">Flip</string>
+    <string name="image_cropper_action_flip_horizontally" maxLength="28" comment="Submenu action in image cropper screen">Flip horizontally</string>
+    <string name="image_cropper_action_flip_vertically" maxLength="28" comment="Submenu action in image cropper screen">Flip vertically</string>
     <!-- Timebox -->
     <string name="timebox_reached_title">Aikaikkuna saavutettu</string>
     <plurals name="timebox_reached">
@@ -193,7 +201,10 @@
     <!-- Card Template Browser Appearance -->
     <string name="restore_default" maxLength="28">Palauta oletusarvot</string>
     <string name="reviewer_tts_cloze_spoken_replacement">Tyhjä</string>
-    <!-- Whiteboard save image message in Reviewer -->
+    <!-- Whiteboard eraser mode toggle message in Reviewer -->
+    <string name="white_board_eraser_enabled">Eraser mode activated</string>
+    <string name="white_board_eraser_disabled">Eraser mode deactivated</string>
+    <!-- Whiteboard save image message in the Study Screen -->
     <string name="white_board_image_save_failed">Kirjoitustaulun kuvan tallentaminen epäonnistui. %s</string>
     <string name="white_board_image_saved">Kirjoitustaulun kuva tallennettu sijaintiin %s</string>
     <string name="title_whiteboard_editor" maxLength="28">Valkotaulu editori</string>
@@ -263,7 +274,7 @@
     <string name="search_using_deck_name">Etsi käyttäen pakan nimeä</string>
     <string name="external_storage_unavailable">Lataus keskeytetty, ulkoinen tallennustila ei ole käytettävissä</string>
     <string name="home" maxLength="28">Koti</string>
-    <!-- Reviewer actions
+    <!-- Study Screen actions
     Each of these strings ends with a period, following the notation of Anki Desktop -->
     <string name="card_buried">Kortti haudattu.</string>
     <plurals name="note_suspended">
@@ -349,4 +360,6 @@
     <string name="edit_browser_appearance" comment="Description of the shortcut that edits the browser appearance of card template">Muokkaa selaimen ulkoasua</string>
     <string name="missing_user_action_dialog_message" comment="%s is the user action number">Käyttäjän toimea %s ei ole määritetty tässä muistiinpanotyypissä. Määritä se</string>
     <string name="directory_inaccessible_info">Lue lisää siitä, miten palauttaa pääsy tänne (%s) tai siirry asetuksiin vaihtaaksesi kokoelmakansiota</string>
+    <!-- Scheduler Upgrade Required Dialog title-->
+    <string name="scheduler_upgrade_required_dialog_title" comment="Shown in a dialog when user has imported a collection using a very old version of the Anki spaced repetition scheduler">Scheduler upgrade required</string>
 </resources>

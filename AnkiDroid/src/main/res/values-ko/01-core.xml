@@ -80,11 +80,12 @@
     <string name="ease_button_hard" maxLength="41" comment="In the reviewer, in the answer side. Label of the button that used by the user to state finding the correct answer was hard.">어려움</string>
     <string name="ease_button_good" maxLength="41" comment="In the reviewer, in the answer side. Label of the button that used by the user to state their answer was good.">괜찮음</string>
     <string name="ease_button_easy" maxLength="41" comment="In the reviewer, in the answer side. Label of the button that used by the user to state that finding the answer to the question was easy.">쉬움</string>
+    <string name="show_answer_hint_long_press" comment="In the reviewer, hint is shown when touching the show answer button and the user has the long-press accessibility setting enabled">\'%s\' is enabled</string>
     <!-- General -->
     <string name="undo" maxLength="28" comment="When tapping on this text, the last action is undone.">실행 취소</string>
     <string name="redo" maxLength="28" comment="Menu entry that allows to redo action that was just undone.">다시 실행</string>
     <!-- flashcard_portrait.xml -->
-    <string name="undo_action_whiteboard_last_stroke" comment="One of the display patterns of \'Undo\' item on the action menu in Reviewer. It is shown as the title of the item when the whiteboard (handwriting) feature is enabled and visible and has any strokes (handwritten lines)" maxLength="28">실행 취소</string>
+    <string name="undo_action_whiteboard_last_stroke" comment="One of the display patterns of \'Undo\' item on the action menu in the Study Screen. It is shown as the title of the item when the whiteboard (handwriting) feature is enabled and visible and has any strokes (handwritten lines)" maxLength="28">실행 취소</string>
     <string name="move_all_to_deck">카드묶음으로 모두 이동</string>
     <string name="unbury" maxLength="28">지금 보기</string>
     <string name="rename_deck" maxLength="28">카드 묶음 이름 바꾸기</string>
@@ -102,7 +103,7 @@
     <string name="menu_bury" maxLength="28">나중에 보기</string>
     <string name="menu_suspend" maxLength="28">미뤄두기</string>
     <string name="menu_delete_note" maxLength="28">노트 삭제하기</string>
-    <string name="menu_flag" maxLength="41">표시</string>
+    <string name="menu_flag" maxLength="41">깃발</string>
     <string name="rename_flag">플래그 이름 변경하기</string>
     <string name="menu_flag_card" maxLength="28">카드에 플래그 달기</string>
     <string name="menu_edit_tags" maxLength="28">태그 수정</string>

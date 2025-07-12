@@ -47,6 +47,7 @@
     <!-- Navigation drawer strings -->
     <string name="drawer_open">Atvērt izvēlni</string>
     <string name="drawer_close">Aizvērt izvēlni</string>
+    <string name="note_message">Note saved</string>
     <string name="CardEditorCardDeck">Kartītes kava:</string>
     <string name="CardEditorNoteDeck">Kava:</string>
     <string name="CardEditorModel">Veids:</string>
@@ -60,16 +61,18 @@
     <string name="filter_tags" maxLength="28">Atlasīt birkas</string>
     <string name="no_tags">Vēl nav pievienota neviena birka</string>
     <string name="updated_version">Atjaunināta uz versiju %s</string>
-    <!-- Reviewer.kt -->
+    <!-- Reviewer.kt (Study Screen) -->
     <string name="save_whiteboard" maxLength="28">Saglabāt tāfeli</string>
     <string name="enable_stylus" maxLength="28">Iespējot rakstīšanu ar irbuli</string>
     <string name="disable_stylus">Atspējot rakstīšanu ar irbuli</string>
     <string name="enable_whiteboard" maxLength="28">Iespējot tāfeli</string>
     <string name="disable_whiteboard">Atspējot tāfeli</string>
     <string name="show_whiteboard">Rādīt tāfeli</string>
+    <string name="enable_eraser" maxLength="28">Enable eraser</string>
+    <string name="disable_eraser" maxLength="28">Disable eraser</string>
     <string name="hide_whiteboard" maxLength="28">Paslēpt tāfeli</string>
     <string name="clear_whiteboard" maxLength="28">Notīrīt tāfeli</string>
-    <string name="replay_audio" maxLength="28">Atkārtoti atskaņot skaņu</string>
+    <string name="replay_media" maxLength="28">Replay media</string>
     <string name="leech_suspend_notification">Kartīte atzīmēta kā izsūcoša un atlikta</string>
     <string name="leech_notification">Kartīte atzīmēta kā izsūcoša</string>
     <string name="webview_crash_unknown">Nezināma kļūda</string>
@@ -106,6 +109,11 @@
     <string name="confirm_map_cards_to_nothing">Jebkuras kartītes, kas nav ne pret ko kartētas, tiks izdzēstas. Ja piezīmei nav atlikusi neviena kartīte, tā tiks pazaudēta. Vai tiešām turpināt?</string>
     <string name="missing_note_type">Nav atrasts neviens piezīmju veids</string>
     <string name="card_previewer_empty_front_indicator" comment="Extra text appended onto a tab title in the card previewer so that the user can see at a glance whether a card has no front.">%1$s (tukša)</string>
+    <!-- Image cropper -->
+    <string name="image_cropper_action_rotate" maxLength="28" comment="Action in image cropper screen">Rotate</string>
+    <string name="image_cropper_action_flip" maxLength="28" comment="Action in image cropper screen">Flip</string>
+    <string name="image_cropper_action_flip_horizontally" maxLength="28" comment="Submenu action in image cropper screen">Flip horizontally</string>
+    <string name="image_cropper_action_flip_vertically" maxLength="28" comment="Submenu action in image cropper screen">Flip vertically</string>
     <!-- Timebox -->
     <string name="timebox_reached_title">Sasniegts laika logs</string>
     <plurals name="timebox_reached">
@@ -197,7 +205,10 @@
     <!-- Card Template Browser Appearance -->
     <string name="restore_default" maxLength="28">Atjaunot noklusējumu</string>
     <string name="reviewer_tts_cloze_spoken_replacement">Tukšs</string>
-    <!-- Whiteboard save image message in Reviewer -->
+    <!-- Whiteboard eraser mode toggle message in Reviewer -->
+    <string name="white_board_eraser_enabled">Eraser mode activated</string>
+    <string name="white_board_eraser_disabled">Eraser mode deactivated</string>
+    <!-- Whiteboard save image message in the Study Screen -->
     <string name="white_board_image_save_failed">Neizdevās saglabāt tāfeles attēlu. %s</string>
     <string name="white_board_image_saved">Tāfeles attēls saglabāts %s</string>
     <string name="title_whiteboard_editor" maxLength="28">Tāfeles redaktors</string>
@@ -267,7 +278,7 @@
     <string name="search_using_deck_name">Meklēt izmantojot kavas nosaukumu</string>
     <string name="external_storage_unavailable">Lejupielāde priekšlaicīgi pārtraukta, ārējā krātuve nav pieejama</string>
     <string name="home" maxLength="28">Sākums</string>
-    <!-- Reviewer actions
+    <!-- Study Screen actions
     Each of these strings ends with a period, following the notation of Anki Desktop -->
     <string name="card_buried">Kartīte paslēpta.</string>
     <plurals name="note_suspended">
@@ -295,7 +306,7 @@
     <string name="intro_ankidroid_tagline_two">Apgūsti vairāk</string>
     <string name="intro_short_ankidroid_explanation">Anki kartīšu plānotājs ietaupa laiku ar vājāko atmiņu stiprināšanu un stripāko atmiņu saglabāšanu</string>
     <string name="intro_get_started" comment="Action to start AnkiDroid for the first time without syncing from AnkiWeb">Uzsākt</string>
-    <string name="intro_sync_from_ankiweb">Sinhronizēt no AnkiWeb</string>
+    <string name="intro_sync_from_ankiweb">Vienādot no AnkiWeb</string>
     <!-- IntentHandler -->
     <string name="app_not_initialized_new">AnkiDroid vēl nav sāknēta. Lūgums atvērt AnkiDroid un mēģināt vēlreiz</string>
     <string name="already_logged_in">Jau pieteicies</string>
@@ -355,4 +366,6 @@
     <string name="edit_browser_appearance" comment="Description of the shortcut that edits the browser appearance of card template">Mainīt pārlūka izskatu</string>
     <string name="missing_user_action_dialog_message" comment="%s is the user action number">Lietotāja darbība %s nav iestatīta šajā piezīmju veidā. Lūgums konfigurēt to</string>
     <string name="directory_inaccessible_info">%s var uzzināt vairāk par to, kā atjaunot piekļuvi, vai jādodas uz iestatījumiem, lai atjauninātu krājumu mapi.</string>
+    <!-- Scheduler Upgrade Required Dialog title-->
+    <string name="scheduler_upgrade_required_dialog_title" comment="Shown in a dialog when user has imported a collection using a very old version of the Anki spaced repetition scheduler">Scheduler upgrade required</string>
 </resources>

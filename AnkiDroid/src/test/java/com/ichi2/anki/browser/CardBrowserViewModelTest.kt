@@ -25,7 +25,7 @@ import com.ichi2.anki.CardBrowser
 import com.ichi2.anki.CollectionManager
 import com.ichi2.anki.DeckSpinnerSelection
 import com.ichi2.anki.Flag
-import com.ichi2.anki.NoteEditor
+import com.ichi2.anki.NoteEditorFragment
 import com.ichi2.anki.SingleFragmentActivity
 import com.ichi2.anki.browser.CardBrowserColumn.ANSWER
 import com.ichi2.anki.browser.CardBrowserColumn.CARD
@@ -52,6 +52,12 @@ import com.ichi2.anki.browser.RepositionCardsRequest.ContainsNonNewCardsError
 import com.ichi2.anki.browser.RepositionCardsRequest.RepositionData
 import com.ichi2.anki.export.ExportDialogFragment
 import com.ichi2.anki.flagCardForNote
+import com.ichi2.anki.libanki.CardId
+import com.ichi2.anki.libanki.DeckId
+import com.ichi2.anki.libanki.Note
+import com.ichi2.anki.libanki.QueueType
+import com.ichi2.anki.libanki.QueueType.ManuallyBuried
+import com.ichi2.anki.libanki.QueueType.New
 import com.ichi2.anki.model.CardsOrNotes
 import com.ichi2.anki.model.SortType
 import com.ichi2.anki.model.SortType.NO_SORTING
@@ -59,18 +65,13 @@ import com.ichi2.anki.model.SortType.SORT_FIELD
 import com.ichi2.anki.servicelayer.NoteService
 import com.ichi2.anki.setFlagFilterSync
 import com.ichi2.anki.utils.ext.ifNotZero
-import com.ichi2.libanki.CardId
-import com.ichi2.libanki.DeckId
-import com.ichi2.libanki.Note
-import com.ichi2.libanki.QueueType
-import com.ichi2.libanki.QueueType.ManuallyBuried
-import com.ichi2.libanki.QueueType.New
 import com.ichi2.testutils.IntentAssert
 import com.ichi2.testutils.JvmTest
 import com.ichi2.testutils.TestClass
 import com.ichi2.testutils.createTransientDirectory
 import com.ichi2.testutils.ensureNoOpsExecuted
 import com.ichi2.testutils.ensureOpsExecuted
+import com.ichi2.testutils.ext.reopenWithLanguage
 import com.ichi2.testutils.mockIt
 import kotlinx.coroutines.flow.first
 import org.hamcrest.MatcherAssert.assertThat
@@ -160,7 +161,7 @@ class CardBrowserViewModelTest : JvmTest() {
 
             val addIntent = CardBrowser.createAddNoteLauncher(this).toIntent(mockIt())
             val bundle = addIntent.getBundleExtra(SingleFragmentActivity.FRAGMENT_ARGS_EXTRA)
-            IntentAssert.doesNotHaveExtra(bundle, NoteEditor.EXTRA_DID)
+            IntentAssert.doesNotHaveExtra(bundle, NoteEditorFragment.EXTRA_DID)
         }
 
     @Test
@@ -532,7 +533,7 @@ class CardBrowserViewModelTest : JvmTest() {
     @Test
     fun `suspend - cards - some suspended`() =
         runViewModelTest(notes = 2) {
-            suspend(cards.first().toCardId(cardsOrNotes))
+            suspendCards(cards.first().toCardId(cardsOrNotes))
             ensureOpsExecuted(1) {
                 selectAll()
                 toggleSuspendCards()
@@ -576,7 +577,7 @@ class CardBrowserViewModelTest : JvmTest() {
     fun `suspend - notes - some notes suspended`() =
         runViewModelNotesTest(notes = 2) {
             val nid = cards.first().cardOrNoteId
-            suspend(col.getNote(nid))
+            suspendNote(col.getNote(nid))
             ensureOpsExecuted(1) {
                 selectAll()
                 toggleSuspendCards()
@@ -588,7 +589,7 @@ class CardBrowserViewModelTest : JvmTest() {
     fun `suspend - notes - some cards suspended`() =
         runViewModelNotesTest(notes = 2) {
             // this suspends o single cid from a nid
-            suspend(cards.first().toCardId(cardsOrNotes))
+            suspendCards(cards.first().toCardId(cardsOrNotes) as CardId)
             ensureOpsExecuted(1) {
                 selectAll()
                 toggleSuspendCards()
@@ -1054,6 +1055,7 @@ class CardBrowserViewModelTest : JvmTest() {
                 cacheDir = createTransientDirectory(),
                 options = null,
                 preferences = AnkiDroidApp.sharedPreferencesProvider,
+                isFragmented = false,
                 manualInit = manualInit,
             )
         // makes ignoreValuesFromViewModelLaunch work under test
@@ -1078,6 +1080,7 @@ class CardBrowserViewModelTest : JvmTest() {
                 cacheDir = createTransientDirectory(),
                 options = null,
                 preferences = AnkiDroidApp.sharedPreferencesProvider,
+                isFragmented = false,
                 manualInit = manualInit,
             )
         // makes ignoreValuesFromViewModelLaunch work under test
@@ -1107,7 +1110,13 @@ class CardBrowserViewModelTest : JvmTest() {
             }
 
             val cache = File(createTempDirectory().pathString)
-            return CardBrowserViewModel(lastDeckIdRepository, cache, intent, AnkiDroidApp.sharedPreferencesProvider).apply {
+            return CardBrowserViewModel(
+                lastDeckIdRepository = lastDeckIdRepository,
+                cacheDir = cache,
+                options = intent,
+                isFragmented = false,
+                preferences = AnkiDroidApp.sharedPreferencesProvider,
+            ).apply {
                 invokeInitialSearch()
             }
         }
@@ -1187,11 +1196,11 @@ private fun TestClass.suspendAll() {
     }
 }
 
-private fun TestClass.suspend(vararg cardIds: CardId) {
+private fun TestClass.suspendCards(vararg cardIds: CardId) {
     col.sched.suspendCards(ids = cardIds.toList())
 }
 
-private fun TestClass.suspend(note: Note) {
+private fun TestClass.suspendNote(note: Note) {
     col.sched.suspendCards(note.cardIds(col))
 }
 

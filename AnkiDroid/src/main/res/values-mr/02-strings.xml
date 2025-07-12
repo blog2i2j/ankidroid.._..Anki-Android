@@ -47,6 +47,7 @@
     <!-- Navigation drawer strings -->
     <string name="drawer_open">Ḍrŏvara ughaḍā</string>
     <string name="drawer_close">Ḍrŏvara banda karā</string>
+    <string name="note_message">Note saved</string>
     <string name="CardEditorCardDeck">Kārḍa ḍēka:</string>
     <string name="CardEditorNoteDeck">Ḍēka:</string>
     <string name="CardEditorModel">Prakāra:</string>
@@ -60,16 +61,18 @@
     <string name="filter_tags" maxLength="28">Ṭĕga philṭara karā</string>
     <string name="no_tags">You haven’t added any tags yet</string>
     <string name="updated_version">Āvr̥ttīmadhyē adyatanita kēlē%s</string>
-    <!-- Reviewer.kt -->
+    <!-- Reviewer.kt (Study Screen) -->
     <string name="save_whiteboard" maxLength="28">व्हाईटबोर्ड जतन करा</string>
     <string name="enable_stylus" maxLength="28">स्टाईलस लेखन सक्षम करा</string>
     <string name="disable_stylus">स्टाइलस लेखन अक्षम करा</string>
     <string name="enable_whiteboard" maxLength="28">Vhā\'iṭabōrḍa sakṣama karā</string>
     <string name="disable_whiteboard">Vhā\'iṭabōrḍa akṣama karā</string>
     <string name="show_whiteboard">Vhā\'īṭabōrḍa darśavā</string>
+    <string name="enable_eraser" maxLength="28">Enable eraser</string>
+    <string name="disable_eraser" maxLength="28">Disable eraser</string>
     <string name="hide_whiteboard" maxLength="28">Vhā\'iṭabōrḍa lapavā</string>
     <string name="clear_whiteboard" maxLength="28">Vhā\'īṭabōrḍa sāpha karā</string>
-    <string name="replay_audio" maxLength="28">Ŏḍi\'ō punhā plē karā</string>
+    <string name="replay_media" maxLength="28">Replay media</string>
     <string name="leech_suspend_notification">Kārḍa līka asē cinhāṅkita kēlē āhē āṇi nilambita kēlē āhē</string>
     <string name="leech_notification">Kārḍa jaḷū mhaṇūna cinhāṅkita</string>
     <string name="webview_crash_unknown">Unknown error</string>
@@ -105,6 +108,11 @@
     <string name="confirm_map_cards_to_nothing">Kāhīhī na kēlēlyā kōṇatyāhī kārḍānnā haṭavilē jā\'īla. Ṭīpakaḍē urvarita kārḍa nasalyāsa tō gamāvalā jā\'īla. Āpalyālā khātrī āhē kī āpaṇa surū ṭhēvū icchitā?</string>
     <string name="missing_note_type">नोट प्रकार आढळला नाही</string>
     <string name="card_previewer_empty_front_indicator" comment="Extra text appended onto a tab title in the card previewer so that the user can see at a glance whether a card has no front.">%1$s (empty)</string>
+    <!-- Image cropper -->
+    <string name="image_cropper_action_rotate" maxLength="28" comment="Action in image cropper screen">Rotate</string>
+    <string name="image_cropper_action_flip" maxLength="28" comment="Action in image cropper screen">Flip</string>
+    <string name="image_cropper_action_flip_horizontally" maxLength="28" comment="Submenu action in image cropper screen">Flip horizontally</string>
+    <string name="image_cropper_action_flip_vertically" maxLength="28" comment="Submenu action in image cropper screen">Flip vertically</string>
     <!-- Timebox -->
     <string name="timebox_reached_title">टाइमबॉक्स गाठला</string>
     <plurals name="timebox_reached">
@@ -193,7 +201,10 @@
     <!-- Card Template Browser Appearance -->
     <string name="restore_default" maxLength="28">डीफॉल्ट पुनर्संचयित करा</string>
     <string name="reviewer_tts_cloze_spoken_replacement">कोरा</string>
-    <!-- Whiteboard save image message in Reviewer -->
+    <!-- Whiteboard eraser mode toggle message in Reviewer -->
+    <string name="white_board_eraser_enabled">Eraser mode activated</string>
+    <string name="white_board_eraser_disabled">Eraser mode deactivated</string>
+    <!-- Whiteboard save image message in the Study Screen -->
     <string name="white_board_image_save_failed">व्हाईटबोर्ड इमेज सेव्ह करण्यात अयशस्वी. %s</string>
     <string name="white_board_image_saved">व्हाईटबोर्ड इमेज %s मध्ये सेव्ह केली</string>
     <string name="title_whiteboard_editor" maxLength="28">व्हाईटबोर्ड संपादक</string>
@@ -263,7 +274,7 @@
     <string name="search_using_deck_name">डेकचे नाव वापरून शोधा</string>
     <string name="external_storage_unavailable">डाउनलोड रद्द केले, बाह्य संचयन उपलब्ध नाही</string>
     <string name="home" maxLength="28">मुख्यपृष्ठ</string>
-    <!-- Reviewer actions
+    <!-- Study Screen actions
     Each of these strings ends with a period, following the notation of Anki Desktop -->
     <string name="card_buried">कार्ड पुरले.</string>
     <plurals name="note_suspended">
@@ -349,4 +360,6 @@
     <string name="edit_browser_appearance" comment="Description of the shortcut that edits the browser appearance of card template">Edit browser appearance</string>
     <string name="missing_user_action_dialog_message" comment="%s is the user action number">User action %s is not set in this notetype. Please configure it</string>
     <string name="directory_inaccessible_info">Learn more about how to restore access here %s or go to settings to update collection folder.</string>
+    <!-- Scheduler Upgrade Required Dialog title-->
+    <string name="scheduler_upgrade_required_dialog_title" comment="Shown in a dialog when user has imported a collection using a very old version of the Anki spaced repetition scheduler">Scheduler upgrade required</string>
 </resources>

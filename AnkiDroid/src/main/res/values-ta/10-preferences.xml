@@ -116,6 +116,9 @@
     <string name="gestures_corner_tap_middle_center" maxLength="41">நடுத்தர மையத்தைத் தொடவும்</string>
     <string name="gestures_corner_tap_bottom_left" maxLength="41">கீழே இடதுபுறத்தைத் தொடவும்</string>
     <string name="gestures_corner_tap_bottom_right" maxLength="41">கீழ் வலதுபுறத்தைத் தொடவும்</string>
+    <string name="gestures_two_finger_tap" maxLength="41">Two-finger tap</string>
+    <string name="gestures_three_finger_tap" maxLength="41">Three-finger tap</string>
+    <string name="gestures_four_finger_tap" maxLength="41">Four-finger tap</string>
     <string name="gestures_shake" maxLength="41">சாதனத்தை அசைக்கவும்</string>
     <string name="card_browser_enable_external_context_menu" maxLength="41">‘%s’ மெனு</string>
     <string name="card_browser_enable_external_context_menu_summary">உலகளவில் சூழல் மெனு \'%s\' ஐ இயக்குகிறது</string>
@@ -161,7 +164,7 @@
     <string name="disable_extended_text_ui_summ">லேண்ட்ஸ்கேப் பயன்முறையில் இருக்கும்போது \'அழித்தலை மூடவும்\' சூழல் மெனுவை அனுமதிக்கிறது.</string>
     <string name="vertical_centering" maxLength="41">மத்திய சீரமைப்பு</string>
     <string name="vertical_centering_summ">அட்டைகளின் உள்ளடக்கத்தை செங்குத்தாக மையப்படுத்தவும்</string>
-    <string name="pref_double_tap_time_interval" maxLength="41">இருமுறை தட்டுதல் நேர இடைவெளி (மில்லி விநாடிகள்)</string>
+    <string name="pref_double_tap_time_interval" maxLength="41">இருமுறை தட்டுதல் நேர இடைவெளி</string>
     <string name="pref_double_tap_time_interval_summary">இந்த நேரம் முடிவடையவில்லை என்றால், பதில் பொத்தான்களில் இரண்டாவது தட்டினால் புறக்கணிக்கப்படும். இது தற்செயலான இரட்டை குழாய்களைத் தடுக்கிறது</string>
     <string name="pref_show_answer_long_press_time" maxLength="41">பதிலைக் காட்டு நீண்ட நேரம் அழுத்தவும்</string>
     <string name="pref_show_answer_long_press_time_summary">பதிலளிப்பு பொத்தானைக் காண்பி, தொடுவதற்கு முன் குறைந்தபட்ச அழுத்த நேரம்.</string>
@@ -201,13 +204,13 @@
     <string name="pref_controls_previews_tab" maxLength="41" comment="Name of the tab to configure controls for the previews screen">Previews</string>
     <string name="toggle_backside_only" maxLength="41" comment="Control setting that toggles \'Backside only\' in the previews screen">Toggle backside only</string>
     <!-- Appearance settings -->
-    <string name="pref_cat_reviewer" maxLength="41">விமர்சகர்</string>
+    <string name="pref_cat_reviewer" maxLength="41">Study Screen</string>
     <string name="show_deck_title" maxLength="41">டெக் தலைப்பைக் காட்டு</string>
     <string name="accessibility" maxLength="41">அணுகல்தன்மை</string>
     <!-- Paste clipboard image as png option -->
     <string name="paste_as_png" maxLength="41">கிளிப்போர்டு படங்களை PNG ஆக ஒட்டவும்</string>
     <string name="exit_via_double_tap_back" maxLength="41">திரும்பிச் செல்ல/வெளியேற மீண்டும் இருமுறை அழுத்தவும்</string>
-    <string name="exit_via_double_tap_back_summ">தற்செயலாக மதிப்பாய்வாளர் அல்லது விண்ணப்பத்தை விட்டு வெளியேறுவதைத் தவிர்க்க</string>
+    <string name="exit_via_double_tap_back_summ">To avoid accidentally leaving the study screen or the app</string>
     <!-- Allow all files in media imports -->
     <string name="media_import_allow_all_files" maxLength="41">மீடியா இறக்குமதியில் எல்லா கோப்புகளையும் அனுமதிக்கவும்</string>
     <string name="media_import_allow_all_files_summ">ஆண்ட்ராய்டு மீடியா கோப்பை அங்கீகரிக்கவில்லை என்றால்</string>
@@ -252,7 +255,7 @@
     <string name="note_editor_replace_newlines" maxLength="41">புதிய வரிகளை HTML உடன் மாற்றவும்</string>
     <string name="note_editor_replace_newlines_summ">குறிப்பு எடிட்டரில், &lt;br&gt; கார்டைத் திருத்தும்போது புதிய வரிகளுக்கு.</string>
     <string name="type_in_answer_focus" maxLength="41">\'பதிலைத் தட்டச்சு செய்வதில்\' கவனம் செலுத்துங்கள்</string>
-    <string name="type_in_answer_focus_summ">மதிப்பாய்வாளரில் \'பதிலில் உள்ள வகை\' புலத்தைத் தானாகவே மையப்படுத்தவும்</string>
+    <string name="type_in_answer_focus_summ">Automatically focus the ‘type in answer’ field in the study screen</string>
     <!-- About -->
     <string name="open_changelog">சேஞ்ச்லாக்கைத் திறக்கவும்</string>
     <string name="pref_cat_about_title" maxLength="41">பற்றி</string>
@@ -269,7 +272,7 @@
     <string name="binding_add_axis">கடைசி ஒத்திசைவு 10 க்கும் அதிகமாக இருந்தால், தொடக்க/வெளியேறும்போது பயன்பாடு தானாகவே ஒத்திசைக்கப்படும்</string>
     <string name="axis_picker_move_joystick">கடைசி ஒத்திசைவு 10 க்கும் அதிகமாக இருந்தால், தொடக்க/வெளியேறும்போது பயன்பாடு தானாகவே ஒத்திசைக்கப்படும்</string>
     <string name="user_actions" maxLength="41">பயனர் நடவடிக்கைகள்</string>
-    <string name="user_actions_summary" maxLength="41">மதிப்பாய்வுத் திரையில் இருந்து JavaScript ஐத் தூண்டவும்</string>
+    <string name="user_actions_summary" maxLength="41">Trigger JavaScript from the study screen</string>
     <string name="user_action_1" maxLength="28">பயனர் செயல் 1</string>
     <string name="user_action_2" maxLength="28">பயனர் செயல் 2</string>
     <string name="user_action_3" maxLength="28">பயனர் செயல் 3</string>
@@ -279,7 +282,7 @@
     <string name="user_action_7" maxLength="28">பயனர் செயல் 7</string>
     <string name="user_action_8" maxLength="28">பயனர் செயல் 8</string>
     <string name="user_action_9" maxLength="28">பயனர் செயல் 9</string>
-    <string name="toggle_auto_advance" maxLength="41">தானியங்கு-முன்னேற்றத்தை நிலைமாற்று</string>
+    <string name="toggle_auto_advance" maxLength="28">தானியங்கு-முன்னேற்றத்தை நிலைமாற்று</string>
     <!-- Select card side -->
     <string name="card_side_selection_title">அட்டைப் பக்கத்தைத் தேர்ந்தெடுக்கவும்</string>
     <string name="card_side_question">கேள்வி</string>
@@ -294,6 +297,8 @@
     <string name="pref_cat_experimental" maxLength="41" tools:ignore="UnusedResources">பரிசோதனை</string>
     <string name="readtext_deprecation_warn">AnkiDroid ஒரு சிறந்த TTS பொறிமுறையை அறிமுகப்படுத்தியுள்ளது, இது மற்ற Anki கிளையண்டுகளுடன் இணக்கமானது மேலும் மேலும் குரல்கள் மற்றும் மொழி பின்னணி மேம்பாடுகளை உள்ளடக்கியது!\n\nஇந்த அமைப்பு விரைவில் அகற்றப்படும் என்பதால், கூடிய விரைவில் மேம்படுத்தவும்.</string>
     <string name="readtext_reviewer_warn" tools:ignore="UnusedResources">புதிய உரையை பேச்சு வடிவத்திற்கு மாற்றவும்</string>
+    <string name="pref_fixed_port_title" maxLength="41">localStorage in Study Screen</string>
+    <string name="pref_fixed_port_summary">Enables JavaScript localStorage by using a fixed server port in the Study Screen</string>
     <!-- Developer options -->
     <string name="pref_cat_dev_options" maxLength="41">டெவலப்பர் விருப்பங்கள்</string>
     <string name="dev_options_enabled_pref" maxLength="41">டெவலப்பர் விருப்பங்களை இயக்கு</string>
@@ -368,8 +373,17 @@
     <string name="hide_answer_buttons" maxLength="41">பதில் பொத்தான்களை மறை</string>
     <string name="hide_hard_and_easy" maxLength="41">\'ஹார்ட்\' மற்றும் \'ஈஸி\' பொத்தான்களை மறைக்கவும்</string>
     <string name="reviewer_frame_style" maxLength="41">Frame style</string>
-    <string name="reviewer_frame_style_card" maxLength="41" comment="Style name of the \'Card\' card frame of the Reviewer">Card</string>
-    <string name="reviewer_frame_style_box" maxLength="41" comment="Style name of the \'Box\' card frame of the Reviewer">Box</string>
+    <string name="reviewer_frame_style_card" maxLength="41" comment="Style name of the \'Card\' card frame of the Study Screen">Card</string>
+    <string name="reviewer_frame_style_box" maxLength="41" comment="Style name of the \'Box\' card frame of the Study Screen">Box</string>
+    <string name="reviewer_toolbar_top" maxLength="41" comment="Setting to put the toolbar on the top of the study screen">Top</string>
+    <string name="reviewer_toolbar_bottom" maxLength="41" comment="Setting to put the toolbar on the bottom of the study screen">Bottom</string>
+    <string name="reviewer_toolbar_none" maxLength="41" comment="Setting to remove the toolbar from the study screen">None</string>
+    <string name="toolbar" maxLength="41">Toolbar</string>
+    <string name="toolbar_actions" maxLength="41">Toolbar actions</string>
+    <string name="toolbar_position" maxLength="41">Toolbar position</string>
+    <string name="new_study_screen" maxLength="41">New study screen</string>
+    <string name="new_study_screen_summ"><![CDATA[Improved study screen that will succeed the current one. Some features of the old screen have been changed or removed. Please report any <a href="%1$s">feedback</a> or <a href="%2$s">bugs</a>.]]></string>
+    <string name="show_answer_feedback" maxLength="41">Show answer feedback</string>
     <!--Keyboard shortcuts dialog-->
     <string name="open_settings" comment="Description of the shortcut that opens the app settings">அமைப்புகளைத் திறக்கவும்</string>
 </resources>

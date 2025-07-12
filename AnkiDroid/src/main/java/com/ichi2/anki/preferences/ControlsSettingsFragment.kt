@@ -16,8 +16,6 @@
 package com.ichi2.anki.preferences
 
 import android.content.res.Configuration
-import android.os.Bundle
-import android.view.View
 import androidx.annotation.StringRes
 import androidx.annotation.XmlRes
 import androidx.preference.Preference
@@ -26,12 +24,12 @@ import com.google.android.material.tabs.TabLayout
 import com.ichi2.anki.CollectionManager.TR
 import com.ichi2.anki.R
 import com.ichi2.anki.cardviewer.ViewerCommand
+import com.ichi2.anki.common.annotations.NeedsTest
 import com.ichi2.anki.previewer.PreviewerAction
 import com.ichi2.anki.reviewer.MappableAction
 import com.ichi2.anki.reviewer.MappableBinding.Companion.toPreferenceString
 import com.ichi2.anki.ui.internationalization.toSentenceCase
 import com.ichi2.anki.utils.ext.sharedPrefs
-import com.ichi2.annotations.NeedsTest
 import com.ichi2.preferences.ControlPreference
 import timber.log.Timber
 
@@ -44,7 +42,7 @@ class ControlsSettingsFragment :
         get() = "prefs.controls"
 
     override fun initSubscreen() {
-        requirePreference<Preference>(R.string.pref_controls_tab_layout_key).setViewId(R.id.tab_layout)
+        requirePreference<ControlsTabPreference>(R.string.pref_controls_tab_layout_key).setOnTabSelectedListener(this)
         val initialScreen = ControlPreferenceScreen.entries.first()
         addPreferencesFromResource(initialScreen.xmlRes)
         // TODO replace the preference with something dismissible. This is meant only to improve
@@ -70,22 +68,6 @@ class ControlsSettingsFragment :
             .forEach { pref -> commands[pref.key]?.getBindings(prefs)?.toPreferenceString()?.let { pref.value = it } }
     }
 
-    override fun onViewCreated(
-        view: View,
-        savedInstanceState: Bundle?,
-    ) {
-        super.onViewCreated(view, savedInstanceState)
-
-        listView.post {
-            val tabLayout = listView.findViewById<TabLayout>(R.id.tab_layout)
-            for (screen in ControlPreferenceScreen.entries) {
-                val tab = tabLayout.newTab().setText(screen.titleRes)
-                tabLayout.addTab(tab)
-            }
-            tabLayout.addOnTabSelectedListener(this)
-        }
-    }
-
     override fun onTabSelected(tab: TabLayout.Tab) {
         val screen = ControlPreferenceScreen.entries[tab.position]
         Timber.v("Selected tab %d - %s", tab.position, screen.name)
@@ -94,11 +76,11 @@ class ControlsSettingsFragment :
         setDynamicTitle()
     }
 
-    @NeedsTest("General category is kept and the other elements are removed")
+    @NeedsTest("Only the tab elements are removed")
     override fun onTabUnselected(tab: TabLayout.Tab?) {
         val preferences = preferenceScreen.children.toList()
-        // 0 is the `General` category, which should be kept
-        for (pref in preferences.subList(1, preferences.size)) {
+        val tabsPrefIndex = preferences.indexOfFirst { it is ControlsTabPreference }
+        for (pref in preferences.subList(tabsPrefIndex + 1, preferences.size)) {
             preferenceScreen.removePreference(pref)
         }
     }
@@ -113,9 +95,6 @@ class ControlsSettingsFragment :
         }
         findPreference<ControlPreference>(getString(R.string.toggle_whiteboard_command_key))?.let {
             it.title = getString(R.string.gesture_toggle_whiteboard).toSentenceCase(R.string.sentence_gesture_toggle_whiteboard)
-        }
-        findPreference<ControlPreference>(getString(R.string.abort_and_sync_command_key))?.let {
-            it.title = getString(R.string.gesture_abort_sync).toSentenceCase(R.string.sentence_gesture_abort_sync)
         }
         findPreference<ControlPreference>(getString(R.string.flag_red_command_key))?.let {
             it.title = getString(R.string.gesture_flag_red).toSentenceCase(R.string.sentence_gesture_flag_red)
@@ -150,10 +129,9 @@ class ControlsSettingsFragment :
 
 enum class ControlPreferenceScreen(
     @XmlRes val xmlRes: Int,
-    @StringRes val titleRes: Int,
 ) {
-    REVIEWER(R.xml.preferences_reviewer_controls, R.string.pref_controls_reviews_tab),
-    PREVIEWER(R.xml.preferences_previewer_controls, R.string.pref_controls_previews_tab),
+    REVIEWER(R.xml.preferences_reviewer_controls),
+    PREVIEWER(R.xml.preferences_previewer_controls),
     ;
 
     fun getActions(): List<MappableAction<*>> =

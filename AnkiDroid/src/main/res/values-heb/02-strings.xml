@@ -47,6 +47,7 @@
     <!-- Navigation drawer strings -->
     <string name="drawer_open">פתיחת תפריט</string>
     <string name="drawer_close">סגירת תפריט</string>
+    <string name="note_message">Note saved</string>
     <string name="CardEditorCardDeck">חפיסת כרטיסים:‏</string>
     <string name="CardEditorNoteDeck">חפיסה:‏</string>
     <string name="CardEditorModel">סוג:</string>
@@ -60,16 +61,18 @@
     <string name="filter_tags" maxLength="28">סנן תגיות</string>
     <string name="no_tags">עוד לא הוספת שום תגיות</string>
     <string name="updated_version">עודקן לגירסה %s</string>
-    <!-- Reviewer.kt -->
+    <!-- Reviewer.kt (Study Screen) -->
     <string name="save_whiteboard" maxLength="28">שמור לוח</string>
     <string name="enable_stylus" maxLength="28">הפעל מצב סטיילוס</string>
     <string name="disable_stylus">כבה מצב סטיילוס</string>
     <string name="enable_whiteboard" maxLength="28">לאפשר ציור</string>
     <string name="disable_whiteboard">בטל הציור</string>
     <string name="show_whiteboard">הצג לוח ציור</string>
+    <string name="enable_eraser" maxLength="28">Enable eraser</string>
+    <string name="disable_eraser" maxLength="28">Disable eraser</string>
     <string name="hide_whiteboard" maxLength="28">הסתר לוח ציור</string>
     <string name="clear_whiteboard" maxLength="28">נקה לוח ציור</string>
-    <string name="replay_audio" maxLength="28">החזר שמע</string>
+    <string name="replay_media" maxLength="28">Replay media</string>
     <string name="leech_suspend_notification">כרטיס מסומן כעלוקה ומושעה</string>
     <string name="leech_notification">כרטיס מסומן כעלוקה</string>
     <string name="webview_crash_unknown">שגיאה לא מוכרת</string>
@@ -107,6 +110,11 @@
     <string name="confirm_map_cards_to_nothing">קלף שממופה לכלום ימחק. אם לרשימה אין קלפים נותרים, היא תימחק. להמשיך?</string>
     <string name="missing_note_type">לא נמצא סוג פתק</string>
     <string name="card_previewer_empty_front_indicator" comment="Extra text appended onto a tab title in the card previewer so that the user can see at a glance whether a card has no front.">%1$s (ריק)</string>
+    <!-- Image cropper -->
+    <string name="image_cropper_action_rotate" maxLength="28" comment="Action in image cropper screen">Rotate</string>
+    <string name="image_cropper_action_flip" maxLength="28" comment="Action in image cropper screen">Flip</string>
+    <string name="image_cropper_action_flip_horizontally" maxLength="28" comment="Submenu action in image cropper screen">Flip horizontally</string>
+    <string name="image_cropper_action_flip_vertically" maxLength="28" comment="Submenu action in image cropper screen">Flip vertically</string>
     <!-- Timebox -->
     <string name="timebox_reached_title">קופסת הזמן הגיעה</string>
     <plurals name="timebox_reached">
@@ -201,7 +209,10 @@
     <!-- Card Template Browser Appearance -->
     <string name="restore_default" maxLength="28">שחזור בררת המחדל</string>
     <string name="reviewer_tts_cloze_spoken_replacement">ריק</string>
-    <!-- Whiteboard save image message in Reviewer -->
+    <!-- Whiteboard eraser mode toggle message in Reviewer -->
+    <string name="white_board_eraser_enabled">Eraser mode activated</string>
+    <string name="white_board_eraser_disabled">Eraser mode deactivated</string>
+    <!-- Whiteboard save image message in the Study Screen -->
     <string name="white_board_image_save_failed">נכשל לשמור תמונת לוח. %s</string>
     <string name="white_board_image_saved">תמונת לוח נשמרה ל %s</string>
     <string name="title_whiteboard_editor" maxLength="28">עורך לוח</string>
@@ -271,7 +282,7 @@
     <string name="search_using_deck_name">חיפוש באמצעות שם החפיסה</string>
     <string name="external_storage_unavailable">ההורדה בוטלה, האחסון החיצוני אינו זמין</string>
     <string name="home" maxLength="28">בית</string>
-    <!-- Reviewer actions
+    <!-- Study Screen actions
     Each of these strings ends with a period, following the notation of Anki Desktop -->
     <string name="card_buried">הקלף נקבר</string>
     <plurals name="note_suspended">
@@ -361,4 +372,6 @@
     <string name="edit_browser_appearance" comment="Description of the shortcut that edits the browser appearance of card template">ערוך את מראה הדפדפן</string>
     <string name="missing_user_action_dialog_message" comment="%s is the user action number">פעולת המשתמש %s לא מוגדרת בסוג הערה זה. אנא הגדר אותו</string>
     <string name="directory_inaccessible_info">למד עוד על איך לשחזר גישה כאן %s או עבור להגדרות כדי לעדכן את תיקיית האוסף.</string>
+    <!-- Scheduler Upgrade Required Dialog title-->
+    <string name="scheduler_upgrade_required_dialog_title" comment="Shown in a dialog when user has imported a collection using a very old version of the Anki spaced repetition scheduler">Scheduler upgrade required</string>
 </resources>

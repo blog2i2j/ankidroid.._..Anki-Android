@@ -485,7 +485,7 @@ object UsageAnalytics {
             R.string.learn_cutoff_preference, // Learn ahead limit
             R.string.time_limit_preference, // Timebox time limit
             R.string.keep_screen_on_preference, // Disable screen timeout
-            R.string.double_tap_time_interval_preference, // Double tap time interval (milliseconds)
+            R.string.double_tap_timeout_pref_key, // Double tap time interval (milliseconds)
             // ******************************** Sync ***************************************************
             R.string.sync_fetch_media_key, // Fetch media on sync
             R.string.automatic_sync_choice_key, // Automatic synchronization
@@ -546,11 +546,11 @@ object UsageAnalytics {
             R.string.page_down_command_key,
             R.string.tag_command_key,
             R.string.card_info_command_key,
-            R.string.abort_and_sync_command_key,
             R.string.record_voice_command_key,
             R.string.replay_voice_command_key,
             R.string.save_voice_command_key,
             R.string.toggle_whiteboard_command_key,
+            R.string.toggle_eraser_command_key,
             R.string.clear_whiteboard_command_key,
             R.string.change_whiteboard_pen_color_command_key,
             R.string.toggle_auto_advance_command_key,
@@ -585,6 +585,7 @@ object UsageAnalytics {
             R.string.type_in_answer_focus_key, // Focus ‘type in answer’
             R.string.media_import_allow_all_files_key, // Allow all files in media imports
             R.string.enable_api_key, // Enable AnkiDroid API
+            R.string.use_fixed_port_pref_key, // localStorage in Study Screen
             // ******************************** App bar buttons ****************************************
             R.string.reset_custom_buttons_key,
             R.string.custom_button_undo_key,
@@ -604,11 +605,13 @@ object UsageAnalytics {
             R.string.custom_button_suspend_key,
             R.string.custom_button_delete_key,
             R.string.custom_button_enable_whiteboard_key,
+            R.string.custom_button_toggle_eraser_key,
             R.string.custom_button_toggle_stylus_key,
             R.string.custom_button_save_whiteboard_key,
             R.string.custom_button_whiteboard_pen_color_key,
             R.string.custom_button_show_hide_whiteboard_key,
             R.string.custom_button_clear_whiteboard_key,
+            R.string.custom_button_toggle_auto_advance,
             R.string.custom_button_user_action_1_key,
             R.string.custom_button_user_action_2_key,
             R.string.custom_button_user_action_3_key,
@@ -618,6 +621,9 @@ object UsageAnalytics {
             R.string.custom_button_user_action_7_key,
             R.string.custom_button_user_action_8_key,
             R.string.custom_button_user_action_9_key,
+            // *********************************** Study Screen ************************************
+            R.string.new_reviewer_options_key,
+            R.string.show_answer_feedback_key,
         )
 
     lateinit var preferencesWhoseChangesShouldBeReported: Set<String>

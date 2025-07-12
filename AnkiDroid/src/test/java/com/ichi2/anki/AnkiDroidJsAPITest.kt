@@ -22,8 +22,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.ichi2.anki.AnkiDroidJsAPI.Companion.SUCCESS_KEY
 import com.ichi2.anki.AnkiDroidJsAPI.Companion.VALUE_KEY
 import com.ichi2.anki.common.time.TimeManager
+import com.ichi2.anki.libanki.CardType
 import com.ichi2.anki.utils.ext.CardExt.setFlag
-import com.ichi2.libanki.CardType
 import com.ichi2.utils.BASIC_NOTE_TYPE_NAME
 import net.ankiweb.rsdroid.withoutUnicodeIsolation
 import org.hamcrest.CoreMatchers.equalTo
@@ -428,7 +428,7 @@ class AnkiDroidJsAPITest : RobolectricTest() {
 
             // test get tags for note
             val expectedTags = n.tags
-            val response = getDataFromRequest("getNoteTags", jsapi, jsonObjectOf("noteId" to n.id))
+            val response = getDataFromRequest("getNoteTags", jsapi)
             val jsonResponse = JSONObject(response)
             val actualTags = JSONArray(jsonResponse.getString("value"))
 
@@ -471,21 +471,5 @@ class AnkiDroidJsAPITest : RobolectricTest() {
             jsAPI
                 .handleJsApiRequest(methodName, jsApiContract(apiData), false)
                 .decodeToString()
-
-        suspend fun getDataFromRequest(
-            methodName: String,
-            jsAPI: AnkiDroidJsAPI,
-            apiData: JSONObject,
-        ): String =
-            jsAPI
-                .handleJsApiRequest(methodName, jsApiContract(apiData.toString()), false)
-                .decodeToString()
     }
 }
-
-private fun jsonObjectOf(vararg pairs: Pair<String, Any>): JSONObject =
-    JSONObject().apply {
-        for ((key, value) in pairs) {
-            put(key, value)
-        }
-    }

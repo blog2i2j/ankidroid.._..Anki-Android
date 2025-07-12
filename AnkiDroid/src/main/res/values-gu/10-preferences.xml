@@ -116,6 +116,9 @@
     <string name="gestures_corner_tap_middle_center" maxLength="41">મધ્ય કેન્દ્રને સ્પર્શ કરો</string>
     <string name="gestures_corner_tap_bottom_left" maxLength="41">નીચે ડાબી બાજુએ ટચ કરો</string>
     <string name="gestures_corner_tap_bottom_right" maxLength="41">નીચે જમણે ટચ કરો</string>
+    <string name="gestures_two_finger_tap" maxLength="41">Two-finger tap</string>
+    <string name="gestures_three_finger_tap" maxLength="41">Three-finger tap</string>
+    <string name="gestures_four_finger_tap" maxLength="41">Four-finger tap</string>
     <string name="gestures_shake" maxLength="41">શેક ઉપકરણ</string>
     <string name="card_browser_enable_external_context_menu" maxLength="41">\'%s\' મેનૂ</string>
     <string name="card_browser_enable_external_context_menu_summary">વૈશ્વિક સ્તરે \'%s\' સંદર્ભ મેનૂને સક્ષમ કરે છે</string>
@@ -161,7 +164,7 @@
     <string name="disable_extended_text_ui_summ">જ્યારે લેન્ડસ્કેપ મોડમાં હોય ત્યારે સંદર્ભ મેનૂને \'કાઢી નાખવાનું બંધ\' કરવાની મંજૂરી આપે છે.</string>
     <string name="vertical_centering" maxLength="41">કેન્દ્રમાં સંરેખિત કરો</string>
     <string name="vertical_centering_summ">કાર્ડ્સની સામગ્રીને ઊભી રીતે કેન્દ્રમાં રાખો</string>
-    <string name="pref_double_tap_time_interval" maxLength="41">ડબલ ટેપ સમય અંતરાલ (મિલિસેકન્ડ)</string>
+    <string name="pref_double_tap_time_interval" maxLength="41">ડબલ ટેપ સમય અંતરાલ</string>
     <string name="pref_double_tap_time_interval_summary">A second tap of the answer buttons will be ignored if this time has not elapsed. This prevents accidental double taps</string>
     <string name="pref_show_answer_long_press_time" maxLength="41">જવાબ લાંબો સમય દબાવવાનો સમય બતાવો</string>
     <string name="pref_show_answer_long_press_time_summary">શો જવાબ બટન રજીસ્ટર થાય તે પહેલા ન્યૂનતમ દબાવવાનો સમય વધારે છે.</string>
@@ -201,13 +204,13 @@
     <string name="pref_controls_previews_tab" maxLength="41" comment="Name of the tab to configure controls for the previews screen">Previews</string>
     <string name="toggle_backside_only" maxLength="41" comment="Control setting that toggles \'Backside only\' in the previews screen">Toggle backside only</string>
     <!-- Appearance settings -->
-    <string name="pref_cat_reviewer" maxLength="41">સમીક્ષક</string>
+    <string name="pref_cat_reviewer" maxLength="41">Study Screen</string>
     <string name="show_deck_title" maxLength="41">ડેક શીર્ષક બતાવો</string>
     <string name="accessibility" maxLength="41">સુલભતા</string>
     <!-- Paste clipboard image as png option -->
     <string name="paste_as_png" maxLength="41">ક્લિપબોર્ડ છબીઓને PNG તરીકે પેસ્ટ કરો</string>
     <string name="exit_via_double_tap_back" maxLength="41">પાછા જવા/બહાર જવા માટે બે વાર પાછા દબાવો</string>
-    <string name="exit_via_double_tap_back_summ">આકસ્મિક રીતે સમીક્ષક અથવા એપ્લિકેશન છોડવાનું ટાળવા માટે</string>
+    <string name="exit_via_double_tap_back_summ">To avoid accidentally leaving the study screen or the app</string>
     <!-- Allow all files in media imports -->
     <string name="media_import_allow_all_files" maxLength="41">મીડિયા આયાતમાં બધી ફાઇલોને મંજૂરી આપો</string>
     <string name="media_import_allow_all_files_summ">જો એન્ડ્રોઇડ મીડિયા ફાઇલને ઓળખતું નથી</string>
@@ -252,7 +255,7 @@
     <string name="note_editor_replace_newlines" maxLength="41">નવી લાઇનને HTML સાથે બદલો</string>
     <string name="note_editor_replace_newlines_summ">નોંધ સંપાદકમાં, &lt;br&gt; કાર્ડ સંપાદિત કરતી વખતે નવી લાઇનમાં.</string>
     <string name="type_in_answer_focus" maxLength="41">\'જવાબ લખો\' પર ફોકસ કરો</string>
-    <string name="type_in_answer_focus_summ">સમીક્ષકમાં આપમેળે \'ટાઈપ ઇન જવાબ\' ફીલ્ડ પર ફોકસ કરો</string>
+    <string name="type_in_answer_focus_summ">Automatically focus the ‘type in answer’ field in the study screen</string>
     <!-- About -->
     <string name="open_changelog">ચેન્જલોગ ખોલો</string>
     <string name="pref_cat_about_title" maxLength="41">વિશે</string>
@@ -269,7 +272,7 @@
     <string name="binding_add_axis">જોયસ્ટિક/મોશન કંટ્રોલર ઉમેરો</string>
     <string name="axis_picker_move_joystick">જોયસ્ટીક/મોશન કંટ્રોલર ખસેડો</string>
     <string name="user_actions" maxLength="41">વપરાશકર્તા ક્રિયાઓ</string>
-    <string name="user_actions_summary" maxLength="41">સમીક્ષા સ્ક્રીનમાંથી JavaScript ટ્રિગર કરો</string>
+    <string name="user_actions_summary" maxLength="41">Trigger JavaScript from the study screen</string>
     <string name="user_action_1" maxLength="28">વપરાશકર્તા ક્રિયા 1</string>
     <string name="user_action_2" maxLength="28">વપરાશકર્તા ક્રિયા 2</string>
     <string name="user_action_3" maxLength="28">વપરાશકર્તા ક્રિયા 3</string>
@@ -279,7 +282,7 @@
     <string name="user_action_7" maxLength="28">વપરાશકર્તા ક્રિયા 7</string>
     <string name="user_action_8" maxLength="28">વપરાશકર્તા ક્રિયા 8</string>
     <string name="user_action_9" maxLength="28">વપરાશકર્તા ક્રિયા 9</string>
-    <string name="toggle_auto_advance" maxLength="41">ઑટો એડવાન્સ ટૉગલ કરો</string>
+    <string name="toggle_auto_advance" maxLength="28">ઑટો એડવાન્સ ટૉગલ કરો</string>
     <!-- Select card side -->
     <string name="card_side_selection_title">કાર્ડ બાજુ પસંદ કરો</string>
     <string name="card_side_question">પ્રશ્ન</string>
@@ -294,6 +297,8 @@
     <string name="pref_cat_experimental" maxLength="41" tools:ignore="UnusedResources">Experimental</string>
     <string name="readtext_deprecation_warn">AnkiDroid has introduced a better TTS mechanism which is compatible with other Anki clients and includes more voices and improvements to language playback!\n\nPlease upgrade as soon as possible, as this setting will be removed soon</string>
     <string name="readtext_reviewer_warn" tools:ignore="UnusedResources">કૃપા કરીને નવા ટેક્સ્ટ ટુ સ્પીચ ફોર્મેટમાં અપગ્રેડ કરો</string>
+    <string name="pref_fixed_port_title" maxLength="41">localStorage in Study Screen</string>
+    <string name="pref_fixed_port_summary">Enables JavaScript localStorage by using a fixed server port in the Study Screen</string>
     <!-- Developer options -->
     <string name="pref_cat_dev_options" maxLength="41">વિકાસકર્તા વિકલ્પો</string>
     <string name="dev_options_enabled_pref" maxLength="41">વિકાસકર્તા વિકલ્પો સક્ષમ કરો</string>
@@ -368,8 +373,17 @@
     <string name="hide_answer_buttons" maxLength="41">જવાબ બટનો છુપાવો</string>
     <string name="hide_hard_and_easy" maxLength="41">\'હાર્ડ\' અને \'ઇઝી\' બટનો છુપાવો</string>
     <string name="reviewer_frame_style" maxLength="41">Frame style</string>
-    <string name="reviewer_frame_style_card" maxLength="41" comment="Style name of the \'Card\' card frame of the Reviewer">Card</string>
-    <string name="reviewer_frame_style_box" maxLength="41" comment="Style name of the \'Box\' card frame of the Reviewer">Box</string>
+    <string name="reviewer_frame_style_card" maxLength="41" comment="Style name of the \'Card\' card frame of the Study Screen">Card</string>
+    <string name="reviewer_frame_style_box" maxLength="41" comment="Style name of the \'Box\' card frame of the Study Screen">Box</string>
+    <string name="reviewer_toolbar_top" maxLength="41" comment="Setting to put the toolbar on the top of the study screen">Top</string>
+    <string name="reviewer_toolbar_bottom" maxLength="41" comment="Setting to put the toolbar on the bottom of the study screen">Bottom</string>
+    <string name="reviewer_toolbar_none" maxLength="41" comment="Setting to remove the toolbar from the study screen">None</string>
+    <string name="toolbar" maxLength="41">Toolbar</string>
+    <string name="toolbar_actions" maxLength="41">Toolbar actions</string>
+    <string name="toolbar_position" maxLength="41">Toolbar position</string>
+    <string name="new_study_screen" maxLength="41">New study screen</string>
+    <string name="new_study_screen_summ"><![CDATA[Improved study screen that will succeed the current one. Some features of the old screen have been changed or removed. Please report any <a href="%1$s">feedback</a> or <a href="%2$s">bugs</a>.]]></string>
+    <string name="show_answer_feedback" maxLength="41">Show answer feedback</string>
     <!--Keyboard shortcuts dialog-->
     <string name="open_settings" comment="Description of the shortcut that opens the app settings">Open settings</string>
 </resources>

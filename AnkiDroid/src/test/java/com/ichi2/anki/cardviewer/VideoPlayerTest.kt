@@ -18,7 +18,7 @@ package com.ichi2.anki.cardviewer
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.ichi2.anki.RobolectricTest
-import com.ichi2.libanki.SoundOrVideoTag
+import com.ichi2.anki.libanki.SoundOrVideoTag
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.CompletionHandler
 import kotlinx.coroutines.CoroutineDispatcher
@@ -47,8 +47,8 @@ class VideoPlayerTest : RobolectricTest() {
 
         val result = assertNotNull(m.result)
         assertThat("failure", result.isFailure)
-        val exception = result.exceptionOrNull() as? SoundException
-        assertThat("Audio is stopped", exception != null && exception.continuationBehavior == SoundErrorBehavior.STOP_AUDIO)
+        val exception = result.exceptionOrNull() as? MediaException
+        assertThat("Audio is stopped", exception != null && exception.continuationBehavior == MediaErrorBehavior.STOP_MEDIA)
     }
 
     // TODO: use a mock - couldn't get mockk working here

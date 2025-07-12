@@ -28,8 +28,8 @@ import androidx.preference.EditTextPreference
 import androidx.preference.EditTextPreferenceDialogFragmentCompat
 import com.ichi2.anki.AnkiDroidApp
 import com.ichi2.anki.R
+import com.ichi2.anki.common.annotations.NeedsTest
 import com.ichi2.anki.utils.getFormattedStringOrPlurals
-import com.ichi2.annotations.NeedsTest
 import timber.log.Timber
 
 open class NumberRangePreferenceCompat
@@ -149,6 +149,20 @@ open class NumberRangePreferenceCompat
             val fromString = getValidatedRangeFromString(value)
             text = fromString.toString()
             persistInt(fromString)
+        }
+
+        /**
+         * Sets the callback to be invoked when this preference is changed by the user
+         * (but before the internal state has been updated) on the internal onPreferenceChangeListener,
+         * returning true on it by default
+         * @param onPreferenceChangeListener The callback to be invoked
+         */
+        fun setOnPreferenceChangeListener(onPreferenceChangeListener: (newValue: Int) -> Unit) {
+            this.setOnPreferenceChangeListener { _, newValue ->
+                if (newValue !is Int) return@setOnPreferenceChangeListener false
+                onPreferenceChangeListener(newValue)
+                true
+            }
         }
 
         open class NumberRangeDialogFragmentCompat : EditTextPreferenceDialogFragmentCompat() {

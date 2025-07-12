@@ -21,40 +21,45 @@ package com.ichi2.anki.tests
 import android.content.ContentResolver
 import android.content.ContentUris
 import android.content.ContentValues
+import android.database.Cursor
 import android.database.CursorWindow
 import android.net.Uri
 import anki.notetypes.StockNotetype
 import com.ichi2.anki.CollectionManager
-import com.ichi2.anki.Ease
 import com.ichi2.anki.FlashCardsContract
 import com.ichi2.anki.common.utils.annotation.KotlinCleanup
+import com.ichi2.anki.common.utils.emptyStringArray
+import com.ichi2.anki.libanki.Card
+import com.ichi2.anki.libanki.Collection
+import com.ichi2.anki.libanki.DeckId
+import com.ichi2.anki.libanki.Decks
+import com.ichi2.anki.libanki.Note
+import com.ichi2.anki.libanki.NoteTypeId
+import com.ichi2.anki.libanki.NotetypeJson
+import com.ichi2.anki.libanki.Notetypes
+import com.ichi2.anki.libanki.QueueType
+import com.ichi2.anki.libanki.Utils
+import com.ichi2.anki.libanki.addNotetypeLegacy
+import com.ichi2.anki.libanki.backend.BackendUtils
+import com.ichi2.anki.libanki.exception.ConfirmModSchemaException
+import com.ichi2.anki.libanki.getStockNotetype
+import com.ichi2.anki.libanki.sched.Ease
+import com.ichi2.anki.libanki.sched.Scheduler
 import com.ichi2.anki.provider.pureAnswer
 import com.ichi2.anki.testutil.DatabaseUtils.cursorFillWindow
 import com.ichi2.anki.testutil.GrantStoragePermission.storagePermission
 import com.ichi2.anki.testutil.addNote
 import com.ichi2.anki.testutil.grantPermissions
-import com.ichi2.libanki.Card
-import com.ichi2.libanki.DeckId
-import com.ichi2.libanki.Decks
-import com.ichi2.libanki.Note
-import com.ichi2.libanki.NoteTypeId
-import com.ichi2.libanki.NotetypeJson
-import com.ichi2.libanki.Notetypes
-import com.ichi2.libanki.QueueType
-import com.ichi2.libanki.Utils
-import com.ichi2.libanki.addNotetypeLegacy
-import com.ichi2.libanki.backend.BackendUtils
-import com.ichi2.libanki.exception.ConfirmModSchemaException
-import com.ichi2.libanki.getStockNotetype
-import com.ichi2.libanki.sched.Scheduler
 import com.ichi2.testutils.common.assertThrows
-import com.ichi2.utils.emptyStringArray
+import kotlinx.serialization.json.Json
 import net.ankiweb.rsdroid.exceptions.BackendNotFoundException
 import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.allOf
 import org.hamcrest.Matchers.containsString
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.greaterThan
 import org.hamcrest.Matchers.greaterThanOrEqualTo
+import org.hamcrest.Matchers.hasItem
 import org.json.JSONObject.NULL
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -67,6 +72,7 @@ import org.junit.Rule
 import org.junit.Test
 import timber.log.Timber
 import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 import kotlin.test.junit.JUnitAsserter.assertNotNull
 
 /**
@@ -175,7 +181,7 @@ class ContentProviderTest : InstrumentedTest() {
 
     @Throws(Exception::class)
     private fun removeAllNoteTypesByName(
-        col: com.ichi2.libanki.Collection,
+        col: com.ichi2.anki.libanki.Collection,
         name: String,
     ) {
         var testNoteType = col.notetypes.byName(name)
@@ -1086,7 +1092,7 @@ class ContentProviderTest : InstrumentedTest() {
         )
     }
 
-    private fun getFirstCardFromScheduler(col: com.ichi2.libanki.Collection): Card? {
+    private fun getFirstCardFromScheduler(col: com.ichi2.anki.libanki.Collection): Card? {
         val deckId = testDeckIds[0]
         col.decks.select(deckId)
         return col.sched.card
@@ -1345,7 +1351,140 @@ class ContentProviderTest : InstrumentedTest() {
             } ?: fail("query returned null")
     }
 
-    private fun reopenCol(): com.ichi2.libanki.Collection {
+    @Test
+    fun testMediaFilesAddedCorrectlyInReviewInfo() {
+        val imageFileName = "img.jpg"
+        val audioFileName = "test.mp3"
+        addNoteUsingBasicNoteType("""Hello <img src="$imageFileName"> [sound:$audioFileName]""")
+            .firstCard(col)
+            .update {
+                queue = QueueType.New
+                due = col.sched.today
+            }
+
+        queryReviewInfo { cursor ->
+            val media =
+                cursor
+                    .getString(cursor.getColumnIndex(FlashCardsContract.ReviewInfo.MEDIA_FILES))
+                    .let { Json.decodeFromString<List<String>>(it) }
+
+            assertThat(
+                "media files returned",
+                media,
+                allOf(
+                    hasItem(imageFileName),
+                    hasItem(audioFileName),
+                ),
+            )
+        }
+    }
+
+    private fun queryReviewInfo(block: (Cursor) -> Unit) {
+        contentResolver
+            .query(
+                FlashCardsContract.ReviewInfo.CONTENT_URI,
+                null,
+                null,
+                null,
+                null,
+            )?.use { cursor ->
+                assertTrue("has rows") { cursor.moveToFirst() }
+                block(cursor)
+            }
+    }
+
+    @Test
+    fun emptyCards_noCardsInCollection() {
+        assertThat("deleted when collection empty", emptyCards(notetypes.cloze), equalTo(0))
+    }
+
+    @Test
+    fun emptyCards_emptyCard() {
+        val note =
+            addTempClozeNote("{{c1::A}} {{c2::B}}").update {
+                fields[0] = "{{c1::A}}"
+            }
+        assertThat("initial cards", note.numberOfCards(col), equalTo(2))
+        assertThat("cards removed by empty_cards", emptyCards(notetypes.cloze), equalTo(1))
+        assertThat("remaining cards after empty_cards", note.numberOfCards(col), equalTo(1))
+    }
+
+    @Test
+    fun emptyCards_emptyNote() {
+        // deleting the note was requested by the original implementer of this functionality in 2016
+        // https://github.com/ankidroid/Anki-Android/issues/18435#issuecomment-2954066920
+        val note =
+            addTempClozeNote("{{c1::A}} {{c2::B}}").update {
+                fields[0] = "Invalid Cloze"
+            }
+        assertThat("initial cards", note.numberOfCards(col), equalTo(2))
+        assertThat("cards removed by empty_cards", emptyCards(notetypes.cloze), equalTo(2))
+        assertThat("remaining cards after empty_cards", note.numberOfCards(col), equalTo(0))
+        assertThrows<BackendNotFoundException>("note should be deleted") { col.backend.getNote(note.id) }
+    }
+
+    @Test
+    fun emptyCards_nothingToDo() {
+        val note = addTempClozeNote("{{c1::A}}")
+        assertThat("initial cards", note.numberOfCards(col), equalTo(1))
+        assertThat("cards removed by empty_cards", emptyCards(notetypes.cloze), equalTo(0))
+        assertThat("remaining cards after empty_cards", note.numberOfCards(col), equalTo(1))
+    }
+
+    @Test
+    fun emptyCards_nonMatchingNoteType() {
+        val noteTypeToEmpty = notetypes.basic
+        val note =
+            addTempClozeNote("{{c1::A}} {{c2::B}}").update {
+                fields[0] = "{{c1::A}}"
+            }
+        assertThat("initial cards", note.numberOfCards(col), equalTo(2))
+        assertThat("cards removed by empty_cards", emptyCards(noteTypeToEmpty), equalTo(0))
+        assertThat("remaining cards after empty_cards", note.numberOfCards(col), equalTo(2))
+    }
+
+    @Test
+    fun emptyCards_invalidNoteType() {
+        assertThat("empty_cards: invalid input", emptyCardsForId(0), equalTo(-1))
+    }
+
+    @Test
+    fun emptyCards_invalidUri() {
+        val emptyCardsUri =
+            FlashCardsContract.Model.CONTENT_URI
+                .buildUpon()
+                .appendPath("should_be_numeric")
+                .appendPath("empty_cards")
+                .build()
+        val exception = assertThrows<IllegalArgumentException> { contentResolver.delete(emptyCardsUri, null, null) }
+        assertThat(exception.message, containsString("must be either numeric or"))
+    }
+
+    /**
+     * Helper for "empty_cards"
+     *
+     * see `NOTE_TYPES_ID_EMPTY_CARDS`
+     */
+    private fun emptyCards(noteType: NotetypeJson): Int = emptyCardsForId(noteType.id)
+
+    /** @see emptyCardsForId */
+    private fun emptyCardsForId(noteTypeId: NoteTypeId): Int {
+        val emptyCardsUri =
+            FlashCardsContract.Model.CONTENT_URI
+                .buildUpon()
+                .appendPath(noteTypeId.toString())
+                .appendPath("empty_cards")
+                .build()
+        return contentResolver.delete(emptyCardsUri, null, null)
+    }
+
+    /** Adds a note which will be removed by [tearDown] */
+    private fun addTempClozeNote(text: String): Note =
+        addClozeNote(text).update {
+            tags.add(TEST_TAG)
+        }
+
+    private fun reopenCol(): com.ichi2.anki.libanki.Collection {
         Timber.i("closeCollection: %s", "ContentProviderTest: reopenCol")
         CollectionManager.closeCollectionBlocking()
         return col
@@ -1380,7 +1519,7 @@ class ContentProviderTest : InstrumentedTest() {
 
         @Suppress("SameParameterValue")
         private fun setupNewNote(
-            col: com.ichi2.libanki.Collection,
+            col: com.ichi2.anki.libanki.Collection,
             noteTypeId: NoteTypeId,
             did: DeckId,
             fields: Array<String>,
@@ -1416,14 +1555,14 @@ class ContentProviderTest : InstrumentedTest() {
     ): String {
         val noteType = col.notetypes.new(name)
         for (field in fields) {
-            col.notetypes.addFieldInNewNoteType(noteType, col.notetypes.newField(field))
+            col.notetypes.addFieldLegacy(noteType, col.notetypes.newField(field))
         }
         val t =
             Notetypes.newTemplate("Card 1").also { t ->
                 t.qfmt = qfmt
                 t.afmt = afmt
             }
-        col.notetypes.addTemplateInNewNoteType(noteType, t)
+        col.notetypes.addTemplate(noteType, t)
         col.notetypes.add(noteType)
         return name
     }

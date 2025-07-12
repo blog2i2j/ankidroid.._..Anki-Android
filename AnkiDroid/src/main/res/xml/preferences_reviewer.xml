@@ -1,6 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:title="@string/new_study_screen"
+    >
+
+    <com.ichi2.preferences.HtmlHelpPreference
+        android:summary="The new study screen is still a WIP developer option with features under development, so please don't create reports about it. The message below requesting feedback only exists at the moment for it to get translated."
+        />
+
+    <com.ichi2.preferences.HtmlHelpPreference
+        android:summary="@string/new_study_screen_summ"
+        app:substitution1="@string/link_anki_forum_ankidroid"
+        app:substitution2="@string/link_help"
+        />
+
+    <SwitchPreferenceCompat
+        android:key="@string/new_reviewer_options_key"
+        android:title="@string/new_study_screen"
+        android:defaultValue="true"
+        />
+
+    <ListPreference
+        android:defaultValue="@string/reviewer_frame_style_card_value"
+        android:entries="@array/reviewer_frame_style_entries"
+        android:entryValues="@array/reviewer_frame_style_values"
+        android:key="@string/reviewer_frame_style_key"
+        android:title="@string/reviewer_frame_style"
+        app:useSimpleSummaryProvider="true"/>
 
     <ListPreference
         android:defaultValue="@string/hide_system_bars_none_value"
@@ -17,26 +44,74 @@
         />
 
     <SwitchPreferenceCompat
-        android:defaultValue="false"
-        android:key="@string/hide_answer_buttons_key"
-        android:title="@string/hide_answer_buttons"
+        android:key="@string/show_answer_feedback_key"
+        android:title="@string/show_answer_feedback"
+        android:defaultValue="true"
         />
 
     <SwitchPreferenceCompat
-        android:defaultValue="false"
-        android:key="@string/hide_hard_and_easy_key"
-        android:title="@string/hide_hard_and_easy"
+        android:key="@string/show_progress_preference"
+        tools:title="Show remaining card count"
+        android:defaultValue="true"
         />
 
-    <Preference
-        android:title="Menu actions"
-        android:key="@string/reviewer_menu_settings_key" />
+    <SwitchPreferenceCompat
+        android:key="@string/show_audio_play_buttons_key"
+        android:defaultValue="true"
+        tools:title="Show play buttons on cards with audio"
+        />
 
-    <ListPreference
-        android:defaultValue="@string/reviewer_frame_style_card_value"
-        android:entries="@array/reviewer_frame_style_entries"
-        android:entryValues="@array/reviewer_frame_style_values"
-        android:key="@string/reviewer_frame_style_key"
-        android:title="@string/reviewer_frame_style"
-        app:useSimpleSummaryProvider="true"/>
+    <PreferenceCategory
+        android:title="@string/toolbar">
+        <Preference
+            android:title="@string/toolbar_actions"
+            android:key="@string/reviewer_menu_settings_key"
+            android:icon="@drawable/ic_widgets"
+            android:fragment="com.ichi2.anki.preferences.reviewer.ReviewerMenuSettingsFragment"
+            />
+        <ListPreference
+            android:defaultValue="@string/reviewer_toolbar_value_top"
+            android:entries="@array/reviewer_toolbar_position_entries"
+            android:entryValues="@array/reviewer_toolbar_position_values"
+            android:key="@string/reviewer_toolbar_position_key"
+            android:icon="@drawable/ic_toolbar"
+            android:title="@string/toolbar_position"
+            app:useSimpleSummaryProvider="true"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/answer_buttons">
+
+        <SwitchPreferenceCompat
+            android:defaultValue="false"
+            android:key="@string/hide_answer_buttons_key"
+            android:title="@string/hide_answer_buttons"
+            />
+
+        <SwitchPreferenceCompat
+            android:key="@string/show_estimates_preference"
+            android:summary="@string/show_estimates_summ"
+            android:title="@string/show_estimates" />
+
+        <com.ichi2.preferences.SliderPreference
+            android:title="@string/button_size"
+            android:key="@string/answer_button_size_pref_key"
+            android:defaultValue="100"
+            android:valueFrom="100"
+            android:valueTo="200"
+            android:stepSize="10"
+            app:displayFormat="@string/percentage"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="@string/addons_category_key"
+        tools:title="Add-ons">
+
+        <SwitchPreferenceCompat
+            android:defaultValue="false"
+            android:key="@string/hide_hard_and_easy_key"
+            android:title="@string/hide_hard_and_easy"
+            />
+
+    </PreferenceCategory>
 </androidx.preference.PreferenceScreen>
